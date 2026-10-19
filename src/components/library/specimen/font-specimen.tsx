@@ -1,4 +1,5 @@
 import { groundOf } from "@/components/library/shared/grounds";
+import { parseWeights, weightName } from "@/lib/library/fonts";
 import type { Asset } from "@/lib/library/types";
 import type { PaneSettings } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
@@ -106,6 +107,73 @@ export function FontProof({
           ))}
         </div>
       </SpecimenSection>
+    </div>
+  );
+}
+
+/** Every declared weight, one line each, at 1.5em of the pane's "Corpo". */
+export function FontWeights({ asset, settings }: { asset: Asset; settings: PaneSettings }) {
+  const weights = parseWeights(asset.weights);
+  return (
+    <div className="space-y-6" style={{ fontSize: settings.fontSize }}>
+      {weights.map((weight) => (
+        <div key={weight}>
+          <p className="text-xs opacity-60 tabular-nums">
+            {weight} {weightName(weight)}
+          </p>
+          <p
+            className="mt-1 truncate text-[1.5em] leading-snug"
+            style={{ fontFamily: asset.family, fontWeight: weight }}
+          >
+            Clareza na conversa com o agente
+          </p>
+          <p
+            className="max-w-[62ch] leading-relaxed opacity-80"
+            style={{ fontFamily: asset.family, fontWeight: weight }}
+          >
+            {settings.sampleText}
+          </p>
+        </div>
+      ))}
+      <p className="text-xs opacity-60">
+        Pesos declarados: {asset.weights || "não informados"}. Pesos que a fonte não tem aparecem
+        sintetizados pelo navegador.
+      </p>
+    </div>
+  );
+}
+
+const GLYPH_ROWS: { label: string; chars: string }[] = [
+  { label: "Maiúsculas", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+  { label: "Minúsculas", chars: "abcdefghijklmnopqrstuvwxyz" },
+  { label: "Números", chars: "0123456789" },
+  { label: "Acentos", chars: "áàâãäéêíóôõúüçÁÀÂÃÉÊÍÓÔÕÚÇ" },
+  { label: "Pontuação", chars: ".,:;!?¡¿'\"“”‘’()[]{}-–—/\\@#$%&*+=<>«»…" },
+];
+
+/** The character set, grouped, in cells big enough to judge each glyph. */
+export function FontGlyphs({ asset, settings }: { asset: Asset; settings: PaneSettings }) {
+  return (
+    <div className="space-y-8">
+      {GLYPH_ROWS.map((row) => (
+        <section key={row.label} aria-label={row.label}>
+          <h3 className="text-xs font-medium opacity-60">{row.label}</h3>
+          <div
+            className="mt-2 grid grid-cols-[repeat(auto-fill,minmax(3em,1fr))] border-t border-l border-current/10"
+            style={{ fontSize: settings.fontSize }}
+          >
+            {[...row.chars].map((char, index) => (
+              <span
+                key={`${char}-${index}`}
+                className="grid aspect-square place-items-center border-r border-b border-current/10 text-[1.6em]"
+                style={{ fontFamily: asset.family }}
+              >
+                {char}
+              </span>
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
