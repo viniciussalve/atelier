@@ -50,6 +50,7 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
   return (
     <section
       aria-label="Painel"
+      data-pane-id={paneId}
       className="@container flex h-full min-h-0 min-w-0 flex-col bg-bg"
       onPointerDownCapture={() => focus(paneId)}
       onFocusCapture={() => focus(paneId)}
