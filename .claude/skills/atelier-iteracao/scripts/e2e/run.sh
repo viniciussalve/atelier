@@ -11,7 +11,9 @@ export BASE_URL="http://127.0.0.1:$port/"
 export SHOTS="${SHOTS:-$root/screenshots}"
 export ATELIER_E2E="$here"
 # Playwright global: bate com os navegadores pré-instalados em /opt/pw-browsers.
+# O lib.cjs o carrega por este caminho, porque o do projeto espera outro build.
 export NODE_PATH="${NODE_PATH:-$(npm root -g)}"
+export ATELIER_PLAYWRIGHT="${ATELIER_PLAYWRIGHT:-$(npm root -g)/playwright}"
 # Sem isto o Chromium manda o próprio localhost pelo proxy do ambiente.
 export PLAYWRIGHT_DISABLE_FORCED_CHROMIUM_PROXIED_LOOPBACK=1
 

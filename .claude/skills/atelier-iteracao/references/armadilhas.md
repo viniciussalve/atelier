@@ -14,6 +14,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
   - Causa: o Chromium manda o loopback pelo proxy.
   - O que fazer: rode com `PLAYWRIGHT_DISABLE_FORCED_CHROMIUM_PROXIED_LOOPBACK=1`, que o `e2e/run.sh` já define.
   - Use o Playwright global (`npm root -g`), que bate com os navegadores em `/opt/pw-browsers`. O do projeto espera outro build.
+- **"Executable doesn't exist at /opt/pw-browsers/…" ao rodar um roteiro.**
+  - Causa: um `require("playwright")` feito de dentro do repositório acha o Playwright do projeto antes do global.
+  - O que fazer: no roteiro, use só o `lib.cjs`, que carrega o global pelo caminho em `ATELIER_PLAYWRIGHT` (o `run.sh` define essa variável). Não faça `require("playwright")` direto.
 - **Ícones não aparecem no teste.**
   - Causa: o proxy bloqueia `api.iconify.design`. O Google Fonts passa.
   - O que fazer: o `e2e/lib.cjs` simula o Iconify. Um nome que começa com `nao-existe` responde 404.

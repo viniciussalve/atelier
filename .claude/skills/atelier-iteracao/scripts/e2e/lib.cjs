@@ -1,6 +1,8 @@
 // Utilitários de Playwright para verificar o Atelier no navegador.
-// Use via run.sh, que define BASE_URL, SHOTS, NODE_PATH e o ambiente do proxy.
-const { chromium } = require("playwright");
+// Use via run.sh, que define BASE_URL, SHOTS, ATELIER_PLAYWRIGHT e o ambiente do proxy.
+// Carrega o Playwright global pelo caminho: dentro do repositório, require("playwright")
+// acharia o do projeto, que espera outro build do Chromium.
+const { chromium } = require(process.env.ATELIER_PLAYWRIGHT || "playwright");
 
 const BASE = process.env.BASE_URL || "http://127.0.0.1:8080/";
 const SHOTS = process.env.SHOTS || "screenshots";
