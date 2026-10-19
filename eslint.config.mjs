@@ -42,6 +42,22 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+  {
+    // These modules run under `node --experimental-strip-types` in tests, which
+    // keeps a value import of a type-only export and fails at runtime.
+    files: ["src/lib/library/**/*.ts"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+    },
+  },
+  {
+    // CommonJS on purpose: the e2e scripts load the global Playwright through
+    // NODE_PATH, which only `require` honors.
+    files: ["**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
   // Disable rules that conflict with Prettier formatting.
   prettier,
 );

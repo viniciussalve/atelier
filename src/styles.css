@@ -16,6 +16,15 @@
   --color-ink: #12141a;
   --color-navy: #243056;
   --color-sand: #f3e6c4;
+  /* Non-photo blue: the pencil designers mark proofs with. Focus, the active
+     pane, selections and scores. `proof-ink` is the same mark on paper. */
+  --color-proof: #93cfe4;
+  --color-proof-fg: #0b2430;
+  --color-proof-ink: #2b7894;
+  /* Verdicts: usar, revisar, evitar. */
+  --color-good: #8fcf9f;
+  --color-warn: #e8c46e;
+  --color-bad: #ef8f86;
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --radius-sm: 6px;
@@ -42,7 +51,12 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-fg) 18%, transparent);
+    background: color-mix(in oklab, var(--color-proof) 30%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-proof);
+    outline-offset: 2px;
   }
 }
 
