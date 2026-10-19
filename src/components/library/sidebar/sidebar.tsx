@@ -2,6 +2,7 @@ import { useMemo, useState, type ComponentType } from "react";
 import {
   ChevronsDownUp,
   CircleDashed,
+  Command,
   FolderPlus,
   FolderX,
   History,
@@ -15,7 +16,9 @@ import { Segmented } from "@/components/ui/segmented";
 import { openItem, showLibrary, showView } from "@/lib/library/commands";
 import { viewCounts } from "@/lib/library/filters";
 import { explorerTree, filterExplorer, type ExplorerNode } from "@/lib/library/folders";
+import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
+import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import type { Kind, View } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
 import { Explorer, type Draft } from "./explorer";
@@ -43,7 +46,15 @@ function firstAsset(nodes: ExplorerNode[]): string | null {
   return null;
 }
 
-export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () => void }) {
+export function Sidebar({
+  open,
+  onNavigate,
+  onQuickOpen,
+}: {
+  open: boolean;
+  onNavigate: () => void;
+  onQuickOpen: () => void;
+}) {
   const kind = useLibrary((state) => state.kind);
   const view = useLibrary((state) => state.nav[state.kind].view);
   const assets = useLibrary((state) => state.assets);
@@ -73,9 +84,20 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
       )}
     >
       <div className="flex flex-col gap-3 px-3 pt-4 pb-3">
-        <div className="px-1">
-          <p className="text-[15px] font-semibold tracking-tight">Atelier</p>
-          <p className="text-xs text-muted">Avaliação de fontes e ícones</p>
+        <div className="flex items-start gap-2 px-1">
+          <div className="min-w-0 flex-1">
+            <p className="text-[15px] font-semibold tracking-tight">Atelier</p>
+            <p className="text-xs text-muted">Avaliação de artefatos</p>
+          </div>
+          <button
+            type="button"
+            onClick={onQuickOpen}
+            aria-label="Abrir item, pasta ou comando"
+            className="mt-0.5 inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-xs text-muted hover:border-muted hover:text-fg"
+          >
+            <Command className="size-3.5" />
+            <kbd className="font-sans">{shortcutLabel("quickOpen", isMacPlatform())}</kbd>
+          </button>
         </div>
         <Segmented<Kind>
           label="Biblioteca"

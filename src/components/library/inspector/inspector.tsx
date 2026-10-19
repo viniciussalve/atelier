@@ -25,12 +25,8 @@ export function Inspector() {
   return (
     <>
       {!wide ? (
-        <button
-          type="button"
-          aria-label="Fechar o inspetor"
-          className="fixed inset-0 z-30 bg-ink/70"
-          onClick={() => setOpen(false)}
-        />
+        // Clicking outside closes; the close button inside is the accessible way.
+        <div aria-hidden className="fixed inset-0 z-30 bg-ink/70" onClick={() => setOpen(false)} />
       ) : null}
       <aside
         aria-label={`Inspetor de ${asset.name}`}

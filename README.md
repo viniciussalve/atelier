@@ -1,10 +1,57 @@
 # Atelier
 
-Quadro compartilhado para avaliar fontes tipográficas e conjuntos de ícones (Iconify) junto com um agente.
+Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de ícones do Iconify), comparando lado a lado e registrando uma avaliação com critérios.
 
-A barra organiza pastas e itens. O centro mostra a prova — leitura, interface, caracteres críticos e tamanhos para fontes; amostras, tamanhos e componentes para conjuntos. O painel da direita guarda o veredito, as notas por critério, estrelas, notas e link.
+## Como funciona
+
+**Barra lateral.** Escolha a biblioteca (Fontes ou Ícones). Vistas rápidas: Tudo, Recentes, Para avaliar, Sem pasta e Sem tag. Abaixo fica o explorador de pastas: um item aparece só na pasta mais funda de cada ramo, as pastas começam recolhidas e o filtro do topo procura em pastas e itens. Arraste um item para uma pasta para incluí-lo nela.
+
+**Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação.
+
+- Filtros: veredito, status, nota mínima, tags, licença, estilo e formato. Cada opção mostra quantos itens tem com os outros filtros aplicados.
+- Ordenação: nome, nota, veredito, modificado e uso recente.
+- Marque de dois a seis itens e use "Comparar lado a lado".
+
+**Painéis.** Como os editores do VS Code.
+
+- Cada painel tem abas. Um clique abre o item como prévia (em itálico), que o próximo clique substitui. Clique duas vezes na aba ou dê uma nota para fixá-la.
+- Divida à direita ou abaixo, arraste as divisórias e clique duas vezes numa divisória para igualar.
+- Arraste itens e abas para as bordas de um painel para dividir, ou para o centro para abrir ali.
+- O menu de cada painel sincroniza texto, corpo, fundo, aba e rolagem entre todos os painéis.
+
+**Provas.**
+
+- Fontes: Prova, Pesos, Glifos e Info.
+- Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos, Componentes e Info.
+
+**Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe nota de 1 a 5 e, se quiser, uma nota escrita. A nota geral é a média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a nota do critério que ela mede, para avaliar olhando o espécime.
+
+| Atalho (Mac / outros) | Ação                              |
+| --------------------- | --------------------------------- |
+| ⌘K / Ctrl+K           | Abrir item, pasta ou comando      |
+| ⌘\ / Ctrl+\           | Dividir à direita                 |
+| ⇧⌘\ / Ctrl+Shift+\    | Dividir abaixo                    |
+| ⌥W / Alt+W            | Fechar aba                        |
+| ⌥1–6 / Alt+1–6        | Ir para o painel                  |
+| ← →                   | Item anterior ou próximo da lista |
+
+Tudo fica salvo no navegador (localStorage).
+
+## Desenvolvimento
 
 ```bash
-npm install
-npm run dev
+npm install --legacy-peer-deps
+npm run dev        # http://localhost:8080
+npm test           # testes de src/lib/library e scripts
+npm run typecheck
+npm run lint
 ```
+
+A lógica fica em módulos puros com testes em `src/lib/library/`:
+
+- `criteria`: critérios e nota.
+- `filters` e `folders`: vistas, filtros e explorador.
+- `layout` e `workspace-model`: painéis e abas.
+- `migrate`: estado salvo antigo.
+
+A interface fica em `src/components/library/`.

@@ -94,6 +94,8 @@ export function AssetTab({ paneId, assetId }: { paneId: string; assetId: string 
         <button
           type="button"
           aria-pressed={inspectorShown}
+          aria-label="Avaliar"
+          title="Mostrar ou ocultar a avaliação"
           onClick={() => setInspector(!inspectorShown)}
           className={cn(
             "inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-sm transition-colors",
