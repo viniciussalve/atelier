@@ -179,29 +179,34 @@ export function CommandPalette({
               onSelect={() => run(equalizeAll)}
             />
           ) : null}
-          <Action
-            icon={<PanelRight />}
-            label="Mostrar ou ocultar o inspetor"
-            onSelect={() =>
-              run(() => {
-                const state = useWorkspace.getState();
-                state.setInspector(!(state.canSplit ? state.inspectorOpen : state.inspectorDrawer));
-              })
-            }
-          />
+          {/* With the collection in front there is no inspector to show or hide. */}
           {activeAssetId() ? (
-            <Action
-              icon={<X />}
-              label="Fechar aba"
-              shortcut={shortcutLabel("closeTab", mac)}
-              onSelect={() =>
-                run(() => {
-                  const state = useWorkspace.getState();
-                  const pane = state.panes[state.activePaneId];
-                  if (pane) close(pane.id, pane.active);
-                })
-              }
-            />
+            <>
+              <Action
+                icon={<PanelRight />}
+                label="Mostrar ou ocultar o inspetor"
+                onSelect={() =>
+                  run(() => {
+                    const state = useWorkspace.getState();
+                    state.setInspector(
+                      !(state.canSplit ? state.inspectorOpen : state.inspectorDrawer),
+                    );
+                  })
+                }
+              />
+              <Action
+                icon={<X />}
+                label="Fechar aba"
+                shortcut={shortcutLabel("closeTab", mac)}
+                onSelect={() =>
+                  run(() => {
+                    const state = useWorkspace.getState();
+                    const pane = state.panes[state.activePaneId];
+                    if (pane) close(pane.id, pane.active);
+                  })
+                }
+              />
+            </>
           ) : null}
         </Command.Group>
       </Command.List>
