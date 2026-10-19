@@ -65,8 +65,8 @@ describe("navigate", () => {
   });
 });
 
-describe("scoreInActivePane", () => {
-  it("pins the preview tab of the item scored from the inspector", () => {
+describe("score", () => {
+  it("pins the preview tab of the item scored in the specimen", () => {
     m.commands.openItem("roboto", "preview");
     const pane = () => {
       const state = m.workspace.useWorkspace.getState();
@@ -74,7 +74,7 @@ describe("scoreInActivePane", () => {
     };
     assert.equal(pane().preview, m.model.assetKey("roboto"));
 
-    m.commands.scoreInActivePane("roboto", "leitura", 4);
+    m.commands.score(m.workspace.useWorkspace.getState().activePaneId, "roboto", "leitura", 4);
 
     assert.equal(pane().preview, null);
     const roboto = m.store.useLibrary.getState().assets.find((item) => item.id === "roboto");

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
-import { Info, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FaceIcon } from "@/components/ui/face-icon";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -23,32 +23,22 @@ type Props = {
  * the current face clears it; arrow keys move between faces. Only the chosen
  * face lights up, with a ring, so the state never rests on color alone.
  *
- * `inline` sits in a specimen section header, drawn like a proof mark in the
- * margin, so the criterion is judged while looking at what it is about.
+ * It sits in a specimen section header, drawn like a proof mark in the margin,
+ * so the criterion is judged while looking at what it is about.
  */
-export function ScoreControl({
-  variant,
-  onPaper = false,
-  ...props
-}: Props & { variant: "inline" | "full"; onPaper?: boolean }) {
-  return variant === "inline" ? (
-    <InlineScore onPaper={onPaper} {...props} />
-  ) : (
-    <FullScore {...props} />
-  );
+export function ScoreControl({ onPaper = false, ...props }: Props & { onPaper?: boolean }) {
+  return <InlineScore onPaper={onPaper} {...props} />;
 }
 
 function Segments({
   criterion,
   value,
   onScore,
-  size,
   onPaper,
 }: {
   criterion: CriterionDef;
   value: Score | null;
   onScore: (value: Score | null) => void;
-  size: "sm" | "md";
   onPaper: boolean;
 }) {
   return (
@@ -68,7 +58,7 @@ function Segments({
               aria-label={`${criterion.label}: ${SCALE[option]}`}
               className={cn(
                 "grid place-items-center rounded-[5px] transition-colors",
-                size === "md" ? "h-8 flex-1" : "size-6",
+                "size-6",
                 onPaper
                   ? chosen
                     ? "bg-proof-ink/10 text-proof-ink ring-1 ring-proof-ink/70"
@@ -78,7 +68,7 @@ function Segments({
                     : "text-subtle hover:bg-elevated hover:text-muted",
               )}
             >
-              <FaceIcon level={option} size={size === "md" ? 20 : 18} />
+              <FaceIcon level={option} size={18} />
             </ToggleGroup.Item>
           </Tooltip>
         );
@@ -156,7 +146,7 @@ function InlineScore({ criterion, entry, onScore, onNote, onPaper }: Props & { o
       )}
     >
       <span className="text-xs font-medium">{criterion.label}</span>
-      <Segments criterion={criterion} value={value} onScore={onScore} size="sm" onPaper={onPaper} />
+      <Segments criterion={criterion} value={value} onScore={onScore} onPaper={onPaper} />
       <Popover>
         <PopoverTrigger
           aria-label={note ? `Nota sobre ${criterion.label}: ${note}` : `Anotar ${criterion.label}`}
@@ -171,55 +161,12 @@ function InlineScore({ criterion, entry, onScore, onNote, onPaper }: Props & { o
           ) : null}
         </PopoverTrigger>
         <PopoverContent className="w-72 space-y-2">
-          <p className="text-xs text-muted">{criterion.hint}</p>
+          <p className="text-xs text-muted">
+            <span className="text-fg">Peso {criterion.weight}.</span> {criterion.hint}
+          </p>
           <NoteEditor criterion={criterion} note={note} onNote={onNote} autoFocus />
         </PopoverContent>
       </Popover>
-    </div>
-  );
-}
-
-function FullScore({ criterion, entry, onScore, onNote }: Props) {
-  const value = entry?.value ?? null;
-  const note = entry?.note ?? "";
-  const [writing, setWriting] = useState(false);
-  return (
-    <div className="space-y-2">
-      <div className="flex items-baseline gap-2">
-        <span className="text-sm font-medium">{criterion.label}</span>
-        <span className="text-xs text-subtle">peso {criterion.weight}</span>
-        <Popover>
-          <PopoverTrigger
-            aria-label={`O que observar em ${criterion.label}`}
-            className="self-center text-subtle hover:text-fg"
-          >
-            <Info className="size-3.5" />
-          </PopoverTrigger>
-          <PopoverContent side="left" className="w-64 text-sm text-muted">
-            {criterion.hint}
-          </PopoverContent>
-        </Popover>
-        <span className={cn("ml-auto text-xs", value ? "text-proof" : "text-subtle")}>
-          {value ? SCALE[value] : "Sem nota"}
-        </span>
-      </div>
-      <Segments criterion={criterion} value={value} onScore={onScore} size="md" onPaper={false} />
-      {note || writing ? (
-        <NoteEditor
-          criterion={criterion}
-          note={note}
-          onNote={onNote}
-          autoFocus={writing && !note}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setWriting(true)}
-          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-fg"
-        >
-          <PenLine className="size-3" /> Anotar
-        </button>
-      )}
     </div>
   );
 }

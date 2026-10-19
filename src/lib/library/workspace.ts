@@ -21,15 +21,12 @@ import {
 export type DragPayload =
   { type: "asset"; assetId: string } | { type: "tab"; fromPaneId: string; key: TabKey };
 
-export type InspectorTab = "avaliacao" | "detalhes";
-
 type WorkspaceState = Workspace & {
   sync: SyncFlags;
   /** Inspector column on wide screens. */
   inspectorOpen: boolean;
   /** Inspector drawer on narrow screens; starts closed, not persisted. */
   inspectorDrawer: boolean;
-  inspectorTab: InspectorTab;
   /** What is being dragged right now; not persisted. */
   drag: DragPayload | null;
   /** Bumped when sizes change outside a drag, so the panel groups re-apply them. */
@@ -47,7 +44,6 @@ type WorkspaceState = Workspace & {
   setSync: (key: SyncKey, on: boolean) => void;
   /** Opens or closes the inspector in whichever form the screen uses. */
   setInspector: (open: boolean) => void;
-  setInspectorTab: (tab: InspectorTab) => void;
   setDrag: (drag: DragPayload | null) => void;
   setCanSplit: (canSplit: boolean) => void;
   setSelection: (paneId: string, selection: Selection) => void;
@@ -77,7 +73,6 @@ export const useWorkspace = create<WorkspaceState>()(
       sync: DEFAULT_SYNC,
       inspectorOpen: true,
       inspectorDrawer: false,
-      inspectorTab: "avaliacao",
       drag: null,
       layoutEpoch: 0,
       canSplit: true,
@@ -115,7 +110,6 @@ export const useWorkspace = create<WorkspaceState>()(
         }),
       setInspector: (open) =>
         set((state) => (state.canSplit ? { inspectorOpen: open } : { inspectorDrawer: open })),
-      setInspectorTab: (inspectorTab) => set({ inspectorTab }),
       setDrag: (drag) => set({ drag }),
       setCanSplit: (canSplit) => set({ canSplit }),
       setArea: (area) => set({ area }),
@@ -131,7 +125,6 @@ export const useWorkspace = create<WorkspaceState>()(
         ...pickWorkspace(state),
         sync: state.sync,
         inspectorOpen: state.inspectorOpen,
-        inspectorTab: state.inspectorTab,
       }),
       merge: (persisted, current) => {
         const raw = (persisted ?? {}) as Record<string, unknown>;
@@ -142,10 +135,6 @@ export const useWorkspace = create<WorkspaceState>()(
           sync: sanitizeSync(raw.sync),
           inspectorOpen:
             typeof raw.inspectorOpen === "boolean" ? raw.inspectorOpen : current.inspectorOpen,
-          inspectorTab:
-            raw.inspectorTab === "detalhes" || raw.inspectorTab === "avaliacao"
-              ? raw.inspectorTab
-              : current.inspectorTab,
         };
       },
     },

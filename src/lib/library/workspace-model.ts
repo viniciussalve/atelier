@@ -47,8 +47,8 @@ function fits(ws: Workspace, paneId: string, edge: Edge, area?: Box): boolean {
 }
 
 export type TabKey = "collection" | `asset:${string}`;
-export type FontSpecimenTab = "prova" | "pesos" | "glifos" | "info";
-export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes" | "info";
+export type FontSpecimenTab = "prova" | "pesos" | "glifos";
+export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes";
 
 export type PaneSettings = {
   sampleText: string;
@@ -74,8 +74,8 @@ export type Workspace = { root: LayoutNode; panes: Record<string, Pane>; activeP
 export type SyncKey = "text" | "size" | "ground" | "tab" | "scroll";
 export type SyncFlags = Record<SyncKey, boolean>;
 
-export const FONT_TABS: FontSpecimenTab[] = ["prova", "pesos", "glifos", "info"];
-export const ICON_TABS: IconSpecimenTab[] = ["amostras", "tamanhos", "componentes", "info"];
+export const FONT_TABS: FontSpecimenTab[] = ["prova", "pesos", "glifos"];
+export const ICON_TABS: IconSpecimenTab[] = ["amostras", "tamanhos", "componentes"];
 const GROUND_IDS: PreviewGround[] = ["paper", "mist", "ink", "navy", "sand"];
 
 export const FONT_SIZE_RANGE = { min: 12, max: 28 } as const;

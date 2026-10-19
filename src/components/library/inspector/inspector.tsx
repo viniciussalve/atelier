@@ -3,10 +3,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { PanelRightClose } from "lucide-react";
 import { Scorecard } from "@/components/library/evaluation/scorecard";
 import { IconButton } from "@/components/ui/icon-button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSteadyWhilePressed } from "@/components/library/shared/use-steady-while-pressed";
 import { useActiveAsset, useAsset } from "@/lib/library/hooks";
-import { useWorkspace, type InspectorTab } from "@/lib/library/workspace";
+import { useWorkspace } from "@/lib/library/workspace";
 import type { Asset } from "@/lib/library/types";
 import { INSPECTOR_WIDTH } from "@/lib/library/workspace-model";
 import { Details } from "./details";
@@ -74,32 +73,18 @@ export function Inspector() {
 }
 
 function InspectorBody({ asset, onClose }: { asset: Asset; onClose: () => void }) {
-  const tab = useWorkspace((state) => state.inspectorTab);
-  const setTab = useWorkspace((state) => state.setInspectorTab);
   return (
-    <Tabs
-      value={tab}
-      onValueChange={(next) => setTab(next as InspectorTab)}
-      className="flex min-h-0 flex-1 flex-col"
-    >
-      <div className="flex items-center gap-2 border-b border-border pr-1 pl-3">
-        <TabsList aria-label="Seções do inspetor">
-          <TabsTrigger value="avaliacao">Avaliação</TabsTrigger>
-          <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
-        </TabsList>
-        <IconButton label="Fechar o inspetor" size="sm" className="ml-auto" onClick={onClose}>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex h-10 items-center gap-2 border-b border-border pr-1 pl-4">
+        <p className="min-w-0 flex-1 truncate text-sm font-medium">{asset.name}</p>
+        <IconButton label="Fechar o inspetor" size="sm" onClick={onClose}>
           <PanelRightClose className="size-4" />
         </IconButton>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        <p className="mb-4 truncate text-sm text-muted">{asset.name}</p>
-        <TabsContent value="avaliacao">
-          <Scorecard key={asset.id} asset={asset} />
-        </TabsContent>
-        <TabsContent value="detalhes">
-          <Details key={asset.id} asset={asset} />
-        </TabsContent>
+      <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-4">
+        <Scorecard key={`placar-${asset.id}`} asset={asset} />
+        <Details key={`detalhes-${asset.id}`} asset={asset} />
       </div>
-    </Tabs>
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { leaves, type LayoutNode } from "./layout.ts";
 import {
+  DEFAULT_PANE_SETTINGS,
   DEFAULT_SYNC,
   MAX_PANES,
   INSPECTOR_WIDTH,
@@ -384,6 +385,25 @@ describe("sanitizeWorkspace", () => {
     assert.ok(ws);
     valid(ws);
     assert.equal(shape(ws.root), "H[P,P]");
+  });
+
+  it("sends a pane saved on the removed Info tab back to the first specimen tab", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["collection"],
+          active: "collection",
+          preview: null,
+          settings: { ...DEFAULT_PANE_SETTINGS, fontTab: "info", iconTab: "info" },
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.equal(ws.panes["pane-1"].settings.fontTab, "prova");
+    assert.equal(ws.panes["pane-1"].settings.iconTab, "amostras");
   });
 
   it("fills missing settings and repairs a stray active tab", () => {

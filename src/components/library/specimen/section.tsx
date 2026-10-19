@@ -39,7 +39,6 @@ export function SpecimenSection({
             {criteria.map((criterion) => (
               <ScoreControl
                 key={criterion.id}
-                variant="inline"
                 onPaper={onPaper}
                 criterion={criterion}
                 entry={asset.criteria[criterion.id]}

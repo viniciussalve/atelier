@@ -21,7 +21,7 @@ export function IconSpecimen({
   asset: Asset;
   paneId: string;
   settings: PaneSettings;
-  tab: Exclude<IconSpecimenTab, "info">;
+  tab: IconSpecimenTab;
 }) {
   const ground = groundOf(settings.ground);
   const section = { asset, paneId, onPaper: !ground.dark };

@@ -186,11 +186,6 @@ export function score(
   pin(paneId, assetKey(assetId));
 }
 
-/** Scoring from the inspector, which shows the active pane's item, pins it the same way. */
-export function scoreInActivePane(assetId: string, criterion: CriterionId, value: Score | null) {
-  score(ws().activePaneId, assetId, criterion, value);
-}
-
 /** The item in the active pane, if its active tab is one. */
 export function activeAssetId(): string | null {
   const state = ws();
