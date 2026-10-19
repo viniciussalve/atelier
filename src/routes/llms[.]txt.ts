@@ -6,7 +6,7 @@ import { VARY_BASE, baseOf, markdown } from "@/lib/ai/respond";
 export const Route = createFileRoute("/llms.txt")({
   server: {
     handlers: {
-      GET: ({ request }) => markdown(guide(baseOf(request)), 200, VARY_BASE),
+      GET: ({ request }) => markdown(guide(baseOf(request)), 200, "public", VARY_BASE),
     },
   },
 });

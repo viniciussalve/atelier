@@ -16,10 +16,12 @@ import {
   X,
 } from "lucide-react";
 import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
+import { activeTab } from "@/components/library/shared/active-tab";
 import { buildAiContext, buildAiLink } from "@/components/library/shared/ai-link";
 import { copyText } from "@/components/library/shared/copy";
 import { KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
+import { returnFocus } from "@/components/ui/return-focus";
 import {
   activeAssetId,
   close,
@@ -50,14 +52,6 @@ const filter = ignoringAccents((value, search, keywords) => {
   return score < 0.01 ? 0 : score;
 });
 
-/** The tab in front in the active pane: the one in the Tab order there. */
-function activeTab() {
-  const id = CSS.escape(useWorkspace.getState().activePaneId);
-  return document.querySelector<HTMLElement>(
-    `[data-pane-id="${id}"] [role=tab][aria-selected=true]`,
-  );
-}
-
 /** ⌘K: jump to any item, folder or command. ⌘Enter opens an item beside the current pane. */
 export function CommandPalette({
   open,
@@ -87,12 +81,8 @@ export function CommandPalette({
   useEffect(() => {
     toSide.current = false;
     if (!open) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    return () => {
-      const back =
-        opener && opener !== document.body && opener.isConnected && !opener.closest("[inert]");
-      (back ? opener : activeTab())?.focus();
-    };
+    const opener = document.activeElement;
+    return () => returnFocus(opener, activeTab);
   }, [open]);
 
   const run = (action: () => void) => {

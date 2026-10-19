@@ -47,6 +47,12 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **JSON de pacote no servidor quebra com `ERR_IMPORT_ATTRIBUTE_MISSING`.**
   - Causa: o SSR do Vite deixa o pacote para o Node, que exige `with { type: "json" }`. O índice do `@iconify/collections` importa o JSON sem isso.
   - O que fazer: importe o `.json` direto, com o atributo: `import collections from "@iconify/collections/collections.json" with { type: "json" }`.
+- **Um erro ou uma consulta que falhou fica no cache por cinco minutos.**
+  - Causa: `json`/`markdown` mandavam `public, max-age=300` em toda resposta, inclusive 4xx/5xx e resultados de uma consulta ao vivo (Google Fonts, Iconify).
+  - O que fazer: `cacheControl` já manda `no-store` para status ≥ 400. Para sucesso que depende de rede, passe `"none"` (o "não encontrado" do `/api/adicionar` pode ser um timeout) ou `"private"` (`/api/icones`).
+- **O Iconify devolve mais ícones do que o pedido.**
+  - Causa: a busca dele tem limite mínimo de 32.
+  - O que fazer: peça ao menos 32 e corte no limite pedido (`searchIcons` já faz).
 - **Rota de servidor nova não existe para o `tsc`.**
   - Causa: o `src/routeTree.gen.ts` só se refaz quando o dev ou o build rodam.
   - O que fazer: suba o dev antes do typecheck e commite o arquivo gerado (ele está no `.prettierignore`).
@@ -109,6 +115,8 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Fundo escuro de gaveta**: use um `div aria-hidden` com `onClick`, não um botão com o mesmo nome do "Fechar". A gaveta oferece outro jeito de sair: o botão de fechar ou Escape.
 - **Gaveta sobre a página é modal.** Ao abrir, o foco entra nela e o resto fica fora do Tab e da árvore de acessibilidade. Ao fechar, o foco volta a quem abriu.
   - O inspetor usa `Dialog` do Radix. Sem `Dialog.Trigger`, o Radix devolve o foco ao `body`, então guarde quem abriu em `onOpenAutoFocus`.
+  - Mas o Radix **não chama `onOpenAutoFocus`** quando um campo dentro tem `autoFocus` (o foco já está lá). O `Modal` de `ui/dialog.tsx` guarda quem abriu num `useLayoutEffect`, que roda antes de o portal montar o conteúdo. Para diálogos novos, use o `Modal` em vez de repetir isso.
+  - Quem abriu pode não servir mais: saiu da página (um item tomou o lugar da coleção), ficou sob `inert` (a gaveta fechou) ou era o `body` (diálogo aberto por link). `returnFocus` (`ui/return-focus.ts`) cai então no `fallbackFocus`; na biblioteca, passe `activeTab` (`shared/active-tab.ts`). Quando fechar abre outra coisa na frente (confirmar o diálogo de adicionar), ponha o foco nela com `onCloseAutoFocus` e `event.preventDefault()`.
   - A barra fica montada (desliza com transição), então usa `inert` no `<main>` e move o foco num efeito.
   - Para conferir a árvore, leia a do Chromium (`Accessibility.getFullAXTree` via CDP): o `getByRole` do Playwright não considera `inert`.
 - **Papéis ARIA prometem comportamento.** `tree`, `tablist` e `radiogroup` sem navegação por setas confundem leitor de tela. Na dúvida, use botões com `aria-expanded`, `aria-pressed` ou `aria-current`.

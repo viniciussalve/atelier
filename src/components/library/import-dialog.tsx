@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { Glyph } from "@/components/library/icons";
+import { activeTab } from "@/components/library/shared/active-tab";
 import { CHROME_INK } from "@/components/library/shared/grounds";
 import { useFontLinks } from "@/components/library/shared/use-font-links";
 import { DialogClose, Modal } from "@/components/ui/dialog";
@@ -131,7 +132,9 @@ function ImportBody({ request, onClose }: { request: ImportRequest; onClose: () 
       return next;
     });
 
+  const confirmed = useRef(false);
   const confirm = () => {
+    confirmed.current = true;
     addItems([...chosen.values()], {
       fromAi: request.mode === "link",
       reason: request.mode === "link" ? request.reason : undefined,
@@ -159,6 +162,14 @@ function ImportBody({ request, onClose }: { request: ImportRequest; onClose: () 
       onOpenChange={(open) => !open && onClose()}
       title={title}
       description={description}
+      // Opened from a link, nothing had focus: the active tab takes it.
+      fallbackFocus={activeTab}
+      // Confirming opens the first new item in front: its tab takes focus, not the opener.
+      onCloseAutoFocus={(event) => {
+        if (!confirmed.current) return;
+        event.preventDefault();
+        activeTab()?.focus();
+      }}
       footer={
         <>
           <DialogClose className="h-9 rounded-md px-3 text-sm text-muted hover:bg-elevated hover:text-fg">
