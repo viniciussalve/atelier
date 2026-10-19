@@ -203,6 +203,17 @@ describe("moveTab", () => {
     ws = moveTab(ws, id, b, id, 0);
     assert.deepEqual(pane(valid(ws)).tabs, [b, "collection", a]);
   });
+
+  it("pins a preview tab dragged within its pane, so the next preview opens beside it", () => {
+    let ws = createWorkspace();
+    const id = ws.activePaneId;
+    ws = openTab(ws, id, a, { preview: true });
+    ws = moveTab(ws, id, a, id, 0);
+    assert.equal(pane(valid(ws)).preview, null);
+    ws = openTab(ws, id, b, { preview: true });
+    assert.ok(pane(valid(ws)).tabs.includes(a), "the dragged tab is not replaced");
+    assert.equal(pane(ws).preview, b);
+  });
 });
 
 describe("dropTab", () => {

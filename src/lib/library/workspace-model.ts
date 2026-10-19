@@ -299,6 +299,7 @@ export function moveTab(
       ...source,
       tabs: [...rest.slice(0, at), key, ...rest.slice(at)],
       active: key,
+      preview: source.preview === key ? null : source.preview,
     });
   }
   let tabs = target.tabs;

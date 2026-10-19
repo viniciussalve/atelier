@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Command } from "cmdk";
 import {
   Columns2,
@@ -50,15 +50,19 @@ export function CommandPalette({
   const toSide = useRef(false);
   const mac = isMacPlatform();
 
+  // ⌘/Ctrl+Enter applies to the selection it triggers, not to later ones:
+  // opening or closing the palette clears it, whatever was selected.
+  useEffect(() => {
+    toSide.current = false;
+  }, [open]);
+
   const run = (action: () => void) => {
     onOpenChange(false);
     action();
   };
 
-  // ⌘/Ctrl+Enter applies to the selection it triggers, not to later ones.
   const openAsset = (asset: Asset) => {
     const side = toSide.current && canSplit;
-    toSide.current = false;
     run(() => openItem(asset.id, side ? "side" : "pin"));
   };
 
