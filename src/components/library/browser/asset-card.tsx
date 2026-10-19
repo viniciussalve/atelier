@@ -48,7 +48,7 @@ export function AssetCard({ asset, preview, selected, selecting, onSelect, handl
         selected={selected}
         selecting={selecting}
         onSelect={onSelect}
-        className="absolute right-3 bottom-3"
+        className="absolute top-3 right-3"
       />
     </div>
   );
@@ -128,7 +128,7 @@ function Heading({ asset, stacked = false }: { asset: Asset; stacked?: boolean }
 
   if (stacked) {
     return (
-      <span className="flex min-h-10 flex-col gap-1">
+      <span className="flex min-h-10 flex-col gap-1 pr-8">
         <span className="flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-sm font-medium">{asset.name}</span>
           {evaluation}
