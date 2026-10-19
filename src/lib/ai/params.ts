@@ -39,10 +39,15 @@ function text(value: string | null): string | undefined {
   return value?.trim() || undefined;
 }
 
+/** "Monoespaçada", "mono" or "monospace" → "monospace"; unknown → undefined. */
+export function fontCategoryFrom(value: string | null | undefined): FontCategory | undefined {
+  return CATEGORIES[normalizeText(value?.trim() ?? "")];
+}
+
 export function fontQueryFrom(params: URLSearchParams): FontQuery {
   return {
     q: text(params.get("q")),
-    category: CATEGORIES[normalizeText(params.get("categoria")?.trim() ?? "")],
+    category: fontCategoryFrom(params.get("categoria")),
     variable: flag(params.get("variavel")),
     subset: text(params.get("alfabeto"))?.toLowerCase(),
     limit: int(params.get("limite")),

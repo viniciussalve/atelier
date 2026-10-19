@@ -174,6 +174,17 @@ export async function decodeSnapshot(text: string): Promise<Snapshot | null> {
   }
 }
 
+/** The encoded snapshot from a pasted "Link para IA", or the bare value of its `b`. */
+export function snapshotFromLink(link: string): string {
+  const text = link.trim();
+  if (/^[A-Za-z0-9_-]+$/.test(text)) return text;
+  try {
+    return new URL(text).searchParams.get("b") ?? "";
+  } catch {
+    return /[?&]b=([A-Za-z0-9_-]+)/.exec(text)?.[1] ?? "";
+  }
+}
+
 const evaluated = (item: SnapItem) => Boolean(item.v || item.c);
 
 /**

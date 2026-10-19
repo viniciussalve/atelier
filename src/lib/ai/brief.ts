@@ -53,6 +53,19 @@ function answerSection(base: string): string {
   ].join("\n");
 }
 
+/** The scale and every criterion, as in the guide. */
+export function scaleAndCriteria(): string {
+  return `${scaleSection()}\n\n${criteriaSection()}\n`;
+}
+
+function mcpSection(base: string): string {
+  return [
+    "## MCP",
+    "",
+    `As mesmas buscas existem como ferramentas MCP em ${base}/mcp (Streamable HTTP, sem login). No Claude, em Configurações › Conectores › Adicionar conector personalizado; no ChatGPT, nos conectores do modo de desenvolvedor; em clientes como Cursor ou Claude Code, como servidor HTTP. Ferramentas: buscar_fontes, buscar_conjuntos, buscar_icones, parecidas, recomendar, ler_biblioteca, link_para_adicionar e escala_e_criterios.`,
+  ].join("\n");
+}
+
 function endpointsSection(base: string): string {
   return [
     "## Endpoints (GET, sem chave)",
@@ -79,6 +92,8 @@ export function guide(base: string): string {
     answerSection(base),
     "",
     endpointsSection(base),
+    "",
+    mcpSection(base),
     "",
     scaleSection(),
     "",
@@ -148,6 +163,8 @@ export function libraryBrief(snapshot: Snapshot, base: string): string {
     criteriaSection(),
     "",
     endpointsSection(base),
+    "",
+    mcpSection(base),
     "",
     `Guia geral do Atelier: ${base}/llms.txt`,
     "",

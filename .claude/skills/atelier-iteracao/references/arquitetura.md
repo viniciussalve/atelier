@@ -43,11 +43,14 @@ Módulos puros, testados com `node --experimental-strip-types` como os de `src/l
 | `snapshot.ts`            | O retrato da biblioteca que vai no "Link para IA": `snapshotOf` (chaves curtas), `encodeSnapshot`/`decodeSnapshot` (deflate e base64url, com limites), `fitSnapshot` (cabe em ~6 mil caracteres: corta notas, depois itens sem avaliação) | sim   |
 | `brief.ts`               | O que a IA lê: `guide` (`/llms.txt`), `libraryBrief` (`/ia?b=` e "Copiar contexto") e `robotsTxt`                                                                                                                                         | sim   |
 | `similarity.ts`          | Semelhança pelos metadados (`fontSimilarity`, `iconSetSimilarity`), `tasteOf` (gosto pelo veredito e pela carinha), `recommend`, cobertura de amostras (`coverageFrom`, `withCoverage`)                                                   | sim   |
+| `suggest.ts`             | `similarTo` e `recommendFor`, com Markdown e JSON: a lógica comum de `/api/parecidas` e das ferramentas MCP                                                                                                                               | sim   |
+| `mcp.ts`                 | Servidor MCP sem estado (`handleMcp`): fala a revisão 2026-07-28 (`server/discover`, versão no `_meta`) e as de 2025 (`initialize`), responde em JSON, sem SSE                                                                            | sim   |
+| `mcp-tools.ts`           | As ferramentas MCP (`buscar_fontes`, `buscar_conjuntos`, `buscar_icones`, `parecidas`, `recomendar`, `ler_biblioteca`, `link_para_adicionar`, `escala_e_criterios`) e as instruções do servidor                                           | sim   |
 | `respond.ts`             | Respostas JSON ou Markdown (`?formato=md`), com CORS aberto, porque são dados públicos; `baseOf` acha a origem pública atrás de proxy                                                                                                     | —     |
 | `catalog.server.ts`      | Só no servidor: os catálogos embutidos, `resolveAdditions` (confere no Google Fonts a família que o catálogo não tem) e `searchIcons` (busca do Iconify)                                                                                  | —     |
 | `data/google-fonts.json` | Catálogo do Google Fonts, gerado por `scripts/catalog-google-fonts.mjs`. O do Iconify vem do pacote `@iconify/collections`                                                                                                                | —     |
 
-Rotas de servidor: `src/routes/api/` (`fontes`, `conjuntos`, `icones`, `adicionar`, `parecidas`), `src/routes/ia.ts` (resumo da biblioteca, privado: `no-store` e `noindex`), `src/routes/llms[.]txt.ts` e `src/routes/robots[.]txt.ts`.
+Rotas de servidor: `src/routes/api/` (`fontes`, `conjuntos`, `icones`, `adicionar`, `parecidas`), `src/routes/ia.ts` (resumo da biblioteca, privado: `no-store` e `noindex`), `src/routes/llms[.]txt.ts`, `src/routes/robots[.]txt.ts` e `src/routes/mcp.ts` (POST e OPTIONS; GET e DELETE respondem 405).
 
 ### `src/components/library/`: interface
 
@@ -143,3 +146,4 @@ Em `command-palette.tsx`, acrescente um `<Action icon label shortcut onSelect>` 
 2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`.
 3. Suba o dev (`server.sh start`) antes do `tsc`: ele regenera `src/routeTree.gen.ts`, que vai no commit.
 4. Confira com `curl` em JSON e em `?formato=md`.
+5. Se a IA também deve usar pelo MCP, acrescente a ferramenta em `mcp-tools.ts` (com teste) e confira com `npx -y @modelcontextprotocol/inspector --cli http://127.0.0.1:8080/mcp --transport http --method tools/list`, rodado fora do repositório.

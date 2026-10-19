@@ -4,6 +4,7 @@ import {
   decodeSnapshot,
   encodeSnapshot,
   fitSnapshot,
+  snapshotFromLink,
   snapshotOf,
   type Snapshot,
 } from "./snapshot.ts";
@@ -97,5 +98,14 @@ describe("fitSnapshot", () => {
       false,
       "notes go first",
     );
+  });
+});
+
+describe("snapshotFromLink", () => {
+  it("takes the b value from a link, a pasted line or the bare value", () => {
+    assert.equal(snapshotFromLink("https://atelier.app/ia?b=abc_-1"), "abc_-1");
+    assert.equal(snapshotFromLink("  abc_-1 "), "abc_-1");
+    assert.equal(snapshotFromLink("veja atelier.app/ia?b=xyz9 e me diga"), "xyz9");
+    assert.equal(snapshotFromLink("https://atelier.app/ia"), "");
   });
 });
