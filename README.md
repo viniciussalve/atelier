@@ -24,7 +24,7 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 - Fontes: Prova, Pesos, Glifos e Info.
 - Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos, Componentes e Info.
 
-**Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe nota de 1 a 5 e, se quiser, uma nota escrita. A nota geral é a média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a nota do critério que ela mede, para avaliar olhando o espécime.
+**Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe uma carinha, de Muito ruim a Ótimo, e, se quiser, uma nota escrita. A nota geral é a carinha da média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a carinha do critério que ela mede, para avaliar olhando o espécime.
 
 | Atalho (Mac / outros) | Ação                              |
 | --------------------- | --------------------------------- |

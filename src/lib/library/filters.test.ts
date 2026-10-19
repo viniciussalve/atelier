@@ -131,6 +131,17 @@ describe("applyFilters", () => {
     assert.deepEqual(names(applyFilters(fonts, filters({ minScore: 4 }))), ["Inter"]);
   });
 
+  it("compares the minimum score with the face the item shows", () => {
+    // (4 × 3 + 3 × 2) / 5 = 3,6, shown as Bom (4).
+    const nearlyGood = asset({
+      id: "dm",
+      name: "DM Sans",
+      criteria: { leitura: { value: 4, note: "" }, distincao: { value: 3, note: "" } },
+    });
+    assert.deepEqual(names(applyFilters([nearlyGood], filters({ minScore: 4 }))), ["DM Sans"]);
+    assert.deepEqual(names(applyFilters([nearlyGood], filters({ minScore: 5 }))), []);
+  });
+
   it("matches any of an item's tags", () => {
     assert.deepEqual(names(applyFilters(fonts, filters({ tags: ["ui", "código"] }))), [
       "Inter",

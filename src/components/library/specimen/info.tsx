@@ -1,4 +1,4 @@
-import { ScoreMeter } from "@/components/library/evaluation/badges";
+import { ScoreFace } from "@/components/library/evaluation/badges";
 import { Property } from "@/components/library/shared/field";
 import {
   SCALE,
@@ -6,8 +6,8 @@ import {
   VERDICT_LABEL,
   criteriaFor,
   evaluationStatus,
-  formatScore,
   overallScore,
+  scaleLabel,
 } from "@/lib/library/criteria";
 import { folderPath } from "@/lib/library/folders";
 import { formatDate } from "@/lib/library/format";
@@ -23,10 +23,9 @@ export function SpecimenInfo({ asset }: { asset: Asset }) {
     <div className="max-w-lg space-y-8 font-sans">
       <section aria-label="Avaliação">
         <h3 className="mb-2 text-xs font-medium opacity-60">Avaliação</h3>
-        <div className="mb-3 flex items-end gap-3">
-          <span className="text-3xl leading-none font-semibold tabular-nums">
-            {formatScore(score)}
-          </span>
+        <div className="mb-3 flex items-center gap-3">
+          <ScoreFace value={score} size={32} className="text-current" />
+          <span className="text-2xl leading-none font-semibold">{scaleLabel(score)}</span>
           <span className="text-sm opacity-70">
             {VERDICT_LABEL[asset.verdict]}, {STATUS_LABEL[evaluationStatus(asset)].toLowerCase()}
           </span>
@@ -38,8 +37,8 @@ export function SpecimenInfo({ asset }: { asset: Asset }) {
               <li key={criterion.id} className="text-sm">
                 <div className="flex items-center gap-3">
                   <span className="flex-1">{criterion.label}</span>
-                  <ScoreMeter value={entry?.value ?? null} />
-                  <span className="w-20 text-right text-xs opacity-70">
+                  <ScoreFace value={entry?.value ?? null} className="text-current" />
+                  <span className="w-20 text-xs opacity-70">
                     {entry?.value ? SCALE[entry.value] : "Sem nota"}
                   </span>
                 </div>

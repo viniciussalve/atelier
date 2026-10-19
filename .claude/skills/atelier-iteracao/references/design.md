@@ -39,7 +39,7 @@ Cores em hex só em `shared/grounds.ts`, que espelha o tema para o Iconify color
 - Use verbos e diga o que acontece: "Comparar lado a lado", "Limpar filtros", "Excluir pasta". A confirmação repete o verbo: "Excluir “Sans serif”?" com o botão "Excluir pasta".
 - Estado vazio diz o que fazer, não lamenta: "Pasta vazia. Arraste itens da coleção ou da barra para a pasta."
 - Contagens: "9 fontes", "2 de 9 fontes", "3 de 4 critérios". Use `itemCount` de `shared/labels.ts` para o plural.
-- Notas no formato pt-BR, com vírgula: `formatScore` → "4,9".
+- Nota aparece como carinha (`FaceIcon`, de `components/ui/face-icon.tsx`) com a palavra da escala: Muito ruim, Ruim, Ok, Bom, Ótimo. A média geral mostra a carinha arredondada (`roundedScore`); o decimal não aparece na tela. Carinhas são sempre preenchidas e no azul de revisão: nada de vermelho→verde, que competiria com o veredito.
 - Não junte metadados com "·". Use elementos separados com espaçamento.
 - Rótulos de dados não vão em fonte monoespaçada; use `tabular-nums`.
 
@@ -48,5 +48,5 @@ Cores em hex só em `shared/grounds.ts`, que espelha o tema para o Iconify color
 - Todo botão só com ícone usa `IconButton`, que exige `label` e mostra tooltip. Passe `shortcut` quando houver atalho.
 - O foco visível usa o contorno `proof`, já global em `styles.css`. Não remova `outline` sem pôr outro indicador no lugar.
 - Use `aria-current` no item ou vista ativos, `aria-pressed` em alternâncias e `aria-expanded` em quem expande.
-- O controle de nota usa o ToggleGroup do Radix, com setas e um nome por segmento ("Leitura: 4, Muito bom").
+- O controle de nota usa o ToggleGroup do Radix, com setas e um nome por carinha ("Leitura: Bom"). Só a carinha escolhida acende, com anel, para o estado não depender só da cor.
 - Respeite `prefers-reduced-motion`; já há uma regra global. Animação só responde a ação da pessoa.

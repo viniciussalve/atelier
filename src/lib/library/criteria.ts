@@ -78,12 +78,13 @@ const ICON_CRITERIA: CriterionDef[] = [
   },
 ];
 
+/** One face per level, from the carinhas set. */
 export const SCALE: Record<Score, string> = {
-  1: "Fraco",
-  2: "Regular",
-  3: "Bom",
-  4: "Muito bom",
-  5: "Excelente",
+  1: "Muito ruim",
+  2: "Ruim",
+  3: "Ok",
+  4: "Bom",
+  5: "Ótimo",
 };
 
 export const VERDICTS: { id: Exclude<Verdict, "">; label: string }[] = [
@@ -148,8 +149,13 @@ export function formatScore(value: number | null): string {
   return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
+/** The face a mean shows: rounded half up and kept inside 1–5. */
+export function roundedScore(value: number | null): Score | null {
+  if (value === null) return null;
+  return Math.min(5, Math.max(1, Math.round(value))) as Score;
+}
+
 export function scaleLabel(value: number | null): string {
-  if (value === null) return "Sem nota";
-  const rounded = Math.min(5, Math.max(1, Math.round(value)));
-  return SCALE[rounded as Score];
+  const rounded = roundedScore(value);
+  return rounded === null ? "Sem nota" : SCALE[rounded];
 }

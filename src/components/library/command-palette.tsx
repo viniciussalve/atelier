@@ -92,7 +92,7 @@ export function CommandPalette({
             >
               {asset.name}
             </span>
-            <ScoreBadge asset={asset} />
+            <ScoreBadge asset={asset} compact />
           </Command.Item>
         ))}
     </Command.Group>

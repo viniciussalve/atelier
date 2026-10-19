@@ -1,7 +1,6 @@
 import {
   VERDICTS,
   criteriaFor,
-  formatScore,
   overallScore,
   scaleLabel,
   scoredCount,
@@ -10,7 +9,7 @@ import { scoreInActivePane } from "@/lib/library/commands";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
-import { ScoreMeter, StatusText } from "./badges";
+import { ScoreFace, StatusText } from "./badges";
 import { ScoreControl } from "./score-control";
 import { VERDICT_SOLID } from "./tones";
 
@@ -23,24 +22,26 @@ export function Scorecard({ asset }: { asset: Asset }) {
 
   return (
     <div className="space-y-6">
-      <section aria-label="Nota geral" className="flex items-end gap-4">
+      <section aria-label="Nota geral" className="flex items-center gap-4">
+        {score === null ? (
+          <span
+            aria-hidden
+            className="size-11 shrink-0 rounded-full border border-dashed border-border"
+          />
+        ) : (
+          <ScoreFace value={score} size={44} />
+        )}
         <div>
-          <p className="text-4xl leading-none font-semibold tracking-tight tabular-nums">
-            {formatScore(score)}
-          </p>
-          <p className="mt-2 text-xs text-muted">
-            {score === null ? "Dê nota a um critério para começar" : scaleLabel(score)}
-          </p>
-        </div>
-        <div className="ml-auto text-right">
-          <ScoreMeter value={score} className="[&>span]:w-1.5" />
+          <p className="text-2xl leading-none font-semibold tracking-tight">{scaleLabel(score)}</p>
           <p className="mt-2 text-xs text-muted tabular-nums">
-            {scored} de {total} critérios
+            {score === null
+              ? "Dê nota a um critério para começar"
+              : `${scored} de ${total} critérios`}
           </p>
         </div>
       </section>
       <p className="-mt-3 text-xs text-subtle">
-        Média dos critérios avaliados, ponderada pelo peso de cada um.
+        A carinha da média dos critérios avaliados, ponderada pelo peso de cada um.
       </p>
 
       <section aria-label="Veredito">
