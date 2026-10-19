@@ -23,7 +23,7 @@ O `smoke.cjs` cobre os fluxos que não podem quebrar, cada um num contexto limpo
 5. Ctrl+\, Ctrl+Shift+\, Alt+W, Alt+1 e → funcionam, e Ctrl+\ não divide um painel sem espaço para duas metades de 220 px.
 6. Ctrl+K com "playfair" e Enter abre o item.
 7. Um localStorage no formato v3, com nota 4 em estrelas, mostra "4,0".
-8. Em 390×844 não há botão de dividir, e o inspetor e a barra abrem como gaveta.
+8. Em 390×844 não há botão de dividir, e o inspetor e a barra abrem como gaveta. A barra aberta recebe o foco e deixa o `<main>` inerte.
 
 Ele termina com código 0 e "no page errors" em cada bloco. Os 404 do Iconify simulado são esperados e filtrados.
 

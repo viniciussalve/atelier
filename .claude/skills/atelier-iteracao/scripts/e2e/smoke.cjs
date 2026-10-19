@@ -207,6 +207,13 @@ async function mobile() {
     "celular: barra abre como gaveta",
     async () => (await page.locator("aside[aria-label=Biblioteca]").boundingBox()).x >= 0,
   );
+  await check(
+    "celular: a barra aberta é modal (foco nela, página inerte)",
+    async () =>
+      (await page.evaluate(
+        () => !!document.activeElement?.closest("aside[aria-label=Biblioteca]"),
+      )) && (await page.locator("main").evaluate((el) => el.inert)),
+  );
   await browser.close();
   return realErrors(errors);
 }

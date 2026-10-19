@@ -106,12 +106,15 @@ export function Atelier() {
 
   if (!ready) return <ShellFrame />;
 
+  const closeNav = () => setNavOpen(false);
+
   return (
     <TooltipProvider delayDuration={400}>
       <div className="flex h-dvh overflow-hidden bg-bg text-fg">
         <Sidebar
           open={navOpen}
-          onNavigate={() => setNavOpen(false)}
+          onClose={closeNav}
+          onNavigate={closeNav}
           onQuickOpen={() => {
             setNavOpen(false);
             setPaletteOpen(true);
@@ -122,10 +125,11 @@ export function Atelier() {
           <div
             aria-hidden
             className="fixed inset-0 z-20 bg-ink/70 min-[860px]:hidden"
-            onClick={() => setNavOpen(false)}
+            onClick={closeNav}
           />
         ) : null}
-        <main className="flex min-w-0 flex-1">
+        {/* Under the drawer the page is out of reach, as behind a modal dialog. */}
+        <main inert={navOpen && !wide} className="flex min-w-0 flex-1">
           <div className="min-w-0 flex-1">
             <Workspace onOpenNav={() => setNavOpen(true)} />
           </div>

@@ -90,6 +90,10 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
   - Por quê: o Chrome insere espaços entre elementos inline ao montar o nome ("Roboto , sem veredito").
 - **Botão com texto escondido por container query** (como "Avaliar" em painel estreito) precisa de `aria-label` fixo. Sem ele, fica sem nome.
 - **Fundo escuro de gaveta**: use um `div aria-hidden` com `onClick`, não um botão com o mesmo nome do "Fechar". A gaveta oferece outro jeito de sair: o botão de fechar ou Escape.
+- **Gaveta sobre a página é modal.** Ao abrir, o foco entra nela e o resto fica fora do Tab e da árvore de acessibilidade. Ao fechar, o foco volta a quem abriu.
+  - O inspetor usa `Dialog` do Radix. Sem `Dialog.Trigger`, o Radix devolve o foco ao `body`, então guarde quem abriu em `onOpenAutoFocus`.
+  - A barra fica montada (desliza com transição), então usa `inert` no `<main>` e move o foco num efeito.
+  - Para conferir a árvore, leia a do Chromium (`Accessibility.getFullAXTree` via CDP): o `getByRole` do Playwright não considera `inert`.
 - **Papéis ARIA prometem comportamento.** `tree`, `tablist` e `radiogroup` sem navegação por setas confundem leitor de tela. Na dúvida, use botões com `aria-expanded`, `aria-pressed` ou `aria-current`.
 
 ## Painéis (react-resizable-panels v4)

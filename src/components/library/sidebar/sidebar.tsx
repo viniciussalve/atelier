@@ -1,4 +1,4 @@
-import { useMemo, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import {
   ChevronsDownUp,
   CircleDashed,
@@ -7,6 +7,7 @@ import {
   FolderX,
   History,
   LayoutGrid,
+  PanelLeftClose,
   Search,
   Tag,
   X,
@@ -49,10 +50,12 @@ function firstAsset(nodes: ExplorerNode[]): string | null {
 
 export function Sidebar({
   open,
+  onClose,
   onNavigate,
   onQuickOpen,
 }: {
   open: boolean;
+  onClose: () => void;
   onNavigate: () => void;
   onQuickOpen: () => void;
 }) {
@@ -63,8 +66,23 @@ export function Sidebar({
   const collapseAll = useLibrary((state) => state.collapseAll);
   // Below 860 px the bar is a drawer: closed, it leaves the Tab order and the accessibility tree.
   const wide = useWorkspace((state) => state.canSplit);
+  const drawer = open && !wide;
+  const bar = useRef<HTMLElement>(null);
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState<Draft | null>(null);
+
+  // Open, the drawer is modal (the page behind it is inert): focus moves in, and
+  // goes back to the button that opened it unless closing put it somewhere else.
+  useEffect(() => {
+    const aside = bar.current;
+    if (!drawer || !aside) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    aside.querySelector<HTMLElement>("button, input")?.focus();
+    return () => {
+      const active = document.activeElement;
+      if (!active || active === document.body || aside.contains(active)) opener?.focus();
+    };
+  }, [drawer]);
 
   const counts = useMemo(() => viewCounts(assets, kind), [assets, kind]);
   const libraryCounts = useMemo(
@@ -80,6 +98,7 @@ export function Sidebar({
 
   return (
     <aside
+      ref={bar}
       aria-label="Biblioteca"
       inert={!open && !wide}
       className={cn(
@@ -100,8 +119,19 @@ export function Sidebar({
             className="mt-0.5 inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-xs text-muted hover:border-muted hover:text-fg"
           >
             <Command className="size-3.5" />
-            <kbd className="font-sans">{shortcutLabel("quickOpen", isMacPlatform())}</kbd>
+            {/* In the drawer the close button takes its room. */}
+            <kbd className="hidden font-sans min-[860px]:inline">
+              {shortcutLabel("quickOpen", isMacPlatform())}
+            </kbd>
           </button>
+          <IconButton
+            label="Fechar a barra"
+            size="sm"
+            className="min-[860px]:hidden"
+            onClick={onClose}
+          >
+            <PanelLeftClose className="size-4" />
+          </IconButton>
         </div>
         <Segmented<Kind>
           label="Biblioteca"
