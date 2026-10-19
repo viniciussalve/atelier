@@ -1,4 +1,5 @@
 /** Responses of the AI-facing endpoints: JSON by default, Markdown on `?formato=md`. */
+import { publicBase } from "./public-base.ts";
 
 /**
  * How long a successful answer may be reused:
@@ -29,17 +30,44 @@ export function wantsMarkdown(request: Request): boolean {
   return format === "md" || format === "markdown" || format === "texto";
 }
 
-export function json(body: unknown, status = 200, caching: Caching = "public"): Response {
+export function json(
+  body: unknown,
+  status = 200,
+  caching: Caching = "public",
+  extra: Record<string, string> = {},
+): Response {
   return new Response(JSON.stringify(body, null, 2), {
     status,
-    headers: headers("application/json; charset=utf-8", status, caching),
+    headers: { ...headers("application/json; charset=utf-8", status, caching), ...extra },
   });
 }
 
 /** Plain text, so a browser shows it instead of downloading a .md file. */
-export function markdown(body: string, status = 200, caching: Caching = "public"): Response {
+export function markdown(
+  body: string,
+  status = 200,
+  caching: Caching = "public",
+  extra: Record<string, string> = {},
+): Response {
   return new Response(body, {
     status,
-    headers: headers("text/plain; charset=utf-8", status, caching),
+    headers: { ...headers("text/plain; charset=utf-8", status, caching), ...extra },
   });
 }
+
+/**
+ * The public base of a request (see `publicBase`): `PUBLIC_BASE_URL` when set,
+ * else the origin behind the proxies that forward it, plus the port prefix on
+ * path-based previews. `linkPrefix` is `p` from the Link para IA.
+ */
+export function baseOf(request: Request, linkPrefix?: string | null): string {
+  return publicBase({
+    url: request.url,
+    headers: request.headers,
+    linkPrefix,
+    configured: typeof process === "undefined" ? undefined : process.env.PUBLIC_BASE_URL,
+  });
+}
+
+/** For cached responses whose body embeds `baseOf`: one copy per forwarded origin. */
+export const VARY_BASE = { vary: "X-Forwarded-Host, X-Forwarded-Proto, X-Forwarded-Prefix" };

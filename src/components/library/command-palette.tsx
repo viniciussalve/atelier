@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { Command, defaultFilter } from "cmdk";
 import {
   Columns2,
+  FileText,
   Equal,
   Folder,
   LayoutGrid,
@@ -11,10 +12,13 @@ import {
   Search,
   Type,
   Shapes,
+  Sparkles,
   X,
 } from "lucide-react";
 import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
 import { activeTab } from "@/components/library/shared/active-tab";
+import { buildAiContext, buildAiLink } from "@/components/library/shared/ai-link";
+import { copyText } from "@/components/library/shared/copy";
 import { KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import { returnFocus } from "@/components/ui/return-focus";
@@ -174,6 +178,33 @@ export function CommandPalette({
             label="Adicionar fonte ou conjunto…"
             // The palette gives focus back as it closes; the dialog opens after that.
             onSelect={() => run(() => requestAnimationFrame(onAddItems))}
+          />
+          <Action
+            icon={<Sparkles />}
+            label="Copiar link para IA"
+            // Built from the library as it is now; the copy starts inside the selection.
+            onSelect={() =>
+              run(
+                () =>
+                  void copyText(buildAiLink(), {
+                    notice: "Link para IA copiado",
+                    title: "Link para IA",
+                  }),
+              )
+            }
+          />
+          <Action
+            icon={<FileText />}
+            label="Copiar contexto para IA como texto"
+            onSelect={() =>
+              run(
+                () =>
+                  void copyText(buildAiContext(), {
+                    notice: "Contexto para IA copiado",
+                    title: "Contexto para IA",
+                  }),
+              )
+            }
           />
           <Action
             icon={<LayoutGrid />}

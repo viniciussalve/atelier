@@ -26,6 +26,8 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Adicionar.** No ⌘K, "Adicionar fonte ou conjunto…" busca no Google Fonts e no Iconify. Um link `/?adicionar=fonte:Inter Tight,icones:lucide&motivo=…`, o formato que uma IA escreve, abre o mesmo diálogo com as sugestões já marcadas. Nada entra sem confirmar. Sugestões de IA levam a tag `ia` e o motivo nas notas, e aparecem em Para avaliar.
 
+**Conversa com IA.** No topo da barra, "Link para IA" copia um link com a biblioteca e as instruções; cole numa IA com acesso à web. Ela lê o que você avaliou, busca e recomenda por semelhança, e responde com um link de adicionar. Para IA sem acesso à web, use "Copiar contexto para IA como texto" no ⌘K. As instruções gerais ficam em `/llms.txt`, apontado pelo `robots.txt` e pela cabeça da página, sem aparecer na tela. O link leva a biblioteca dentro da URL: quem tiver o link lê a biblioteca.
+
 **Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe uma carinha, de Muito ruim a Ótimo, e, se quiser, uma nota escrita. A nota geral é a carinha da média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a carinha do critério que ela mede, para avaliar olhando o espécime.
 
 | Atalho (Mac / outros) | Ação                              |
@@ -58,4 +60,6 @@ A lógica fica em módulos puros com testes em `src/lib/library/`:
 
 A interface fica em `src/components/library/`.
 
-Catálogos e endpoints para IA ficam em `src/lib/ai/` e `src/routes/api/` (`/api/fontes`, `/api/conjuntos`, `/api/icones`, `/api/adicionar`; JSON, ou Markdown com `?formato=md`). O catálogo do Google Fonts é gerado por `node scripts/catalog-google-fonts.mjs`, sem chave de API; o do Iconify vem do pacote `@iconify/collections`.
+Catálogos e endpoints para IA ficam em `src/lib/ai/` e `src/routes/api/` (`/api/fontes`, `/api/conjuntos`, `/api/icones`, `/api/adicionar`, `/api/parecidas`; JSON, ou Markdown com `?formato=md`), além de `/ia`, `/llms.txt` e `/robots.txt`. O catálogo do Google Fonts é gerado por `node scripts/catalog-google-fonts.mjs`, sem chave de API; o do Iconify vem do pacote `@iconify/collections`.
+
+Esses textos para IA levam links absolutos para o app. Ao publicar atrás de um proxy, defina `PUBLIC_BASE_URL` no ambiente do servidor (por exemplo `PUBLIC_BASE_URL=https://atelier.app`): ela vale mais que qualquer cabeçalho. Sem ela, a origem vem do próprio pedido, e os cabeçalhos `X-Forwarded-Host`, `X-Forwarded-Proto` e `X-Forwarded-Prefix` só valem quando são um host com porta, `http` ou `https`, e o prefixo de porta de um preview por caminho. O `/llms.txt` e o `/robots.txt` respondem com `Vary` nesses cabeçalhos, para um cache não servir a origem de um pedido a outro.

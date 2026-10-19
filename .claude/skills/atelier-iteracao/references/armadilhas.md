@@ -127,3 +127,17 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - Cada `Group` tem `key` com os ids dos filhos. Mudou o conjunto de filhos, remonta.
 - Salve tamanhos só quando `onLayoutChanged` traz `meta.isUserInteraction`. Para aplicar tamanhos vindos do store (Igualar), use `layoutEpoch` e `groupRef.setLayout`.
 - O clique duplo nativo do `Separator` só reseta painéis com `defaultSize`. Por isso usamos `disableDoubleClick` e um `div` interno com handler próprio.
+
+## Ponte com IA
+
+- **Copiar copia um estado velho, ou não faz nada no Safari.**
+  - Causa: o Safari só deixa escrever na área de transferência dentro do clique, e um `await` antes do `writeText` perde essa permissão. Montar o texto antes, em segundo plano, deixa a cópia atrasada: a carinha dada logo antes do clique não ia no link.
+  - O que fazer: monte na hora e passe a promessa direto para `copyText`, sem `await` antes. Ele chama `clipboard.write` com um `ClipboardItem` que espera a promessa (ou `writeText` depois de montar, onde não há `ClipboardItem`). `copyText` nunca rejeita: se o navegador recusa, abre o campo para copiar à mão; se nem montar deu, mostra um aviso.
+- **O `/ia` ou o `/api/parecidas` respondem 500 com um link alterado.**
+  - Causa: o retrato vem de fora, na URL, e o resumo e as recomendações leem os campos sem conferir de novo.
+  - O que fazer: `decodeSnapshot` confere o tipo de cada campo e devolve `null` se um não bate. Campo novo em `SnapItem` precisa de uma entrada em `ITEM_FIELDS` (o TypeScript cobra) e de um teste com valor errado.
+- **Os links do `/llms.txt` ou do `/ia` saem com outro host, ou sem o prefixo do preview.**
+  - Causa: `X-Forwarded-Host` e `X-Forwarded-Proto` vêm de quem pede, e o `/llms.txt` e o `/robots.txt` ficam em cache público. Num preview por caminho, o proxy tira o `/hds-…` antes de chegar ao servidor.
+  - O que fazer: monte links no servidor só com `baseOf(request)`, que valida os cabeçalhos, respeita `PUBLIC_BASE_URL` e só aceita prefixo que seja exatamente um id de porta num host de preview. Resposta em cache que leva a origem vai com `VARY_BASE`. Quando o navegador manda um link para o servidor montar outros, mande o prefixo junto, como o `p` do Link para IA.
+- **Navegador sem `CompressionStream("deflate-raw")`** (Safari < 16.4, Firefox < 113, Chrome < 103).
+  - O que fazer: `encodeSnapshot` cai para `~` + base64url do JSON, e `decodeSnapshot` reconhece o `~`. O limite de tamanho continua valendo, então o retrato sai resumido mais cedo. Para testar, apague `globalThis.CompressionStream` no teste.

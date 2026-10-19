@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CommandPalette } from "@/components/library/command-palette";
 import { ImportDialog, type ImportRequest } from "@/components/library/import-dialog";
+import { copyDialogOpen } from "@/components/library/shared/copy";
+import { CopyLayer } from "@/components/library/shared/copy-layer";
 import { Inspector } from "@/components/library/inspector/inspector";
 import { useLibraryFonts } from "@/components/library/shared/use-font-links";
 import { isMacPlatform, useMediaQuery } from "@/components/library/shared/use-media-query";
@@ -106,7 +108,7 @@ export function Atelier() {
     if (!ready) return;
     const mac = isMacPlatform();
     function onKeyDown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.isComposing || modal.current) return;
+      if (event.defaultPrevented || event.isComposing || modal.current || copyDialogOpen()) return;
       const command = matchShortcut(event, mac);
       if (!command) return;
       if (command.type === "quickOpen") {
@@ -173,6 +175,7 @@ export function Atelier() {
         onOpenChange={setPaletteOpen}
         onAddItems={() => setAdding({ mode: "search", kind: useLibrary.getState().kind })}
       />
+      <CopyLayer />
       <ImportDialog request={adding} onClose={() => setAdding(null)} />
     </TooltipProvider>
   );
