@@ -50,6 +50,14 @@ const filter = ignoringAccents((value, search, keywords) => {
   return score < 0.01 ? 0 : score;
 });
 
+/** The tab in front in the active pane: the one in the Tab order there. */
+function activeTab() {
+  const id = CSS.escape(useWorkspace.getState().activePaneId);
+  return document.querySelector<HTMLElement>(
+    `[data-pane-id="${id}"] [role=tab][aria-selected=true]`,
+  );
+}
+
 /** ⌘K: jump to any item, folder or command. ⌘Enter opens an item beside the current pane. */
 export function CommandPalette({
   open,
@@ -76,8 +84,18 @@ export function CommandPalette({
 
   // ⌘/Ctrl+Enter applies to the selection it triggers, not to later ones:
   // opening or closing the palette clears it, whatever was selected.
+  // cmdk's Dialog has no trigger, so Radix gives focus back to nobody: return it
+  // to what had it, or, when that left the page (an item took the collection's
+  // place), to the active tab of the active pane.
   useEffect(() => {
     toSide.current = false;
+    if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    return () => {
+      const back =
+        opener && opener !== document.body && opener.isConnected && !opener.closest("[inert]");
+      (back ? opener : activeTab())?.focus();
+    };
   }, [open]);
 
   const run = (action: () => void) => {

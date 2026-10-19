@@ -144,11 +144,6 @@ export function evaluationStatus(
   return scoredCount(asset).scored > 0 ? "em-avaliacao" : "nao-avaliado";
 }
 
-export function formatScore(value: number | null): string {
-  if (value === null) return "—";
-  return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-}
-
 /** The face a mean shows: rounded half up and kept inside 1–5. */
 export function roundedScore(value: number | null): Score | null {
   if (value === null) return null;
