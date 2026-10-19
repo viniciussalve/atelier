@@ -40,7 +40,7 @@ Módulos puros, testados com `node --experimental-strip-types` como os de `src/l
 | `params.ts`              | Lê a query em português (`categoria=monoespaçada`, `traco=sim`); `int` (nunca NaN) e `listParam` (lista com vírgulas ou repetida)                        | sim   |
 | `format.ts`              | Itens do catálogo em JSON e Markdown, com o trecho `fonte:…`/`icones:…` para o link; `iconsMarkdown` (busca de ícones)                                   | sim   |
 | `links.ts`               | `appBase`/`appUrl`: a origem pública, com o prefixo dos previews por caminho. Use em todo `fetch` e link montado no navegador                            | sim   |
-| `respond.ts`             | Respostas JSON ou Markdown (`?formato=md`), com CORS aberto: são dados públicos                                                                          | —     |
+| `respond.ts`             | Respostas JSON ou Markdown (`?formato=md`), CORS aberto. `cacheControl`: erro nunca vai para cache; sucesso `public`, `private` ou `none`                | sim   |
 | `catalog.server.ts`      | Só no servidor: catálogos embutidos, `resolveAdditions` (confere em paralelo no Google Fonts a família que o catálogo não tem) e `searchIcons` (Iconify) | sim   |
 | `data/google-fonts.json` | Catálogo do Google Fonts, gerado por `scripts/catalog-google-fonts.mjs`. O do Iconify vem do pacote `@iconify/collections`                               | —     |
 
@@ -137,6 +137,6 @@ Em `command-palette.tsx`, acrescente um `<Action icon label shortcut onSelect>` 
 ### Novo endpoint para IA
 
 1. A lógica vai num módulo puro em `src/lib/ai/`, com teste. Se precisar de rede ou dos catálogos, a parte que busca fica em `catalog.server.ts` (ou outro `*.server.ts`), com o `fetch` injetável.
-2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`. Listas na query passam por `listParam`, números por `int`.
+2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`. Escolha o cache no terceiro argumento: `public` (padrão) só para dados do catálogo embutido; `private` ou `none` quando a resposta depende de uma consulta ao vivo. Listas na query passam por `listParam`, números por `int`.
 3. Suba o dev (`server.sh start`) antes do `tsc`: ele regenera `src/routeTree.gen.ts`, que vai no commit.
 4. Confira com `curl` em JSON e em `?formato=md`.

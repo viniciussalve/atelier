@@ -47,6 +47,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **JSON de pacote no servidor quebra com `ERR_IMPORT_ATTRIBUTE_MISSING`.**
   - Causa: o SSR do Vite deixa o pacote para o Node, que exige `with { type: "json" }`. O índice do `@iconify/collections` importa o JSON sem isso.
   - O que fazer: importe o `.json` direto, com o atributo: `import collections from "@iconify/collections/collections.json" with { type: "json" }`.
+- **Um erro ou uma consulta que falhou fica no cache por cinco minutos.**
+  - Causa: `json`/`markdown` mandavam `public, max-age=300` em toda resposta, inclusive 4xx/5xx e resultados de uma consulta ao vivo (Google Fonts, Iconify).
+  - O que fazer: `cacheControl` já manda `no-store` para status ≥ 400. Para sucesso que depende de rede, passe `"none"` (o "não encontrado" do `/api/adicionar` pode ser um timeout) ou `"private"` (`/api/icones`).
 - **O Iconify devolve mais ícones do que o pedido.**
   - Causa: a busca dele tem limite mínimo de 32.
   - O que fazer: peça ao menos 32 e corte no limite pedido (`searchIcons` já faz).

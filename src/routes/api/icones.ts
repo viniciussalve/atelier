@@ -17,7 +17,10 @@ export const Route = createFileRoute("/api/icones")({
           limit: int(params.get("limite")),
         });
         if (!ok) return json({ erro: "O Iconify não respondeu. Tente de novo." }, 502);
-        return wantsMarkdown(request) ? markdown(iconsMarkdown(q, icons)) : json({ icones: icons });
+        // A live search: kept briefly by the client only, never by a shared cache.
+        return wantsMarkdown(request)
+          ? markdown(iconsMarkdown(q, icons), 200, "private")
+          : json({ icones: icons }, 200, "private");
       },
     },
   },
