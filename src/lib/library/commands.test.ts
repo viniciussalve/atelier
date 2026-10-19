@@ -64,3 +64,20 @@ describe("navigate", () => {
     assert.deepEqual(seen, ["jetbrains", "inter", "noto", "roboto"]);
   });
 });
+
+describe("scoreInActivePane", () => {
+  it("pins the preview tab of the item scored from the inspector", () => {
+    m.commands.openItem("roboto", "preview");
+    const pane = () => {
+      const state = m.workspace.useWorkspace.getState();
+      return state.panes[state.activePaneId];
+    };
+    assert.equal(pane().preview, m.model.assetKey("roboto"));
+
+    m.commands.scoreInActivePane("roboto", "leitura", 4);
+
+    assert.equal(pane().preview, null);
+    const roboto = m.store.useLibrary.getState().assets.find((item) => item.id === "roboto");
+    assert.equal(roboto?.criteria.leitura?.value, 4);
+  });
+});

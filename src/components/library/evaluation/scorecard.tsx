@@ -6,6 +6,7 @@ import {
   scaleLabel,
   scoredCount,
 } from "@/lib/library/criteria";
+import { scoreInActivePane } from "@/lib/library/commands";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
@@ -16,7 +17,6 @@ import { VERDICT_SOLID } from "./tones";
 /** The whole evaluation of one item: computed score, verdict, and each criterion. */
 export function Scorecard({ asset }: { asset: Asset }) {
   const updateAsset = useLibrary((state) => state.updateAsset);
-  const setScore = useLibrary((state) => state.setScore);
   const setCriterionNote = useLibrary((state) => state.setCriterionNote);
   const score = overallScore(asset);
   const { scored, total } = scoredCount(asset);
@@ -78,7 +78,7 @@ export function Scorecard({ asset }: { asset: Asset }) {
             variant="full"
             criterion={criterion}
             entry={asset.criteria[criterion.id]}
-            onScore={(value) => setScore(asset.id, criterion.id, value)}
+            onScore={(value) => scoreInActivePane(asset.id, criterion.id, value)}
             onNote={(note) => setCriterionNote(asset.id, criterion.id, note)}
           />
         ))}
