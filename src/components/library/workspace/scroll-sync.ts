@@ -58,5 +58,11 @@ function alignTo(paneId: string) {
 if (typeof window !== "undefined") {
   useWorkspace.subscribe((state, previous) => {
     if (state.sync.scroll && !previous.sync.scroll) alignTo(state.activePaneId);
+    // A closed pane's id can come back for a new pane, which starts at the top.
+    if (state.panes !== previous.panes) {
+      for (const key of ratios.keys()) {
+        if (!Object.hasOwn(state.panes, key.slice(0, key.indexOf("|")))) ratios.delete(key);
+      }
+    }
   });
 }

@@ -16,6 +16,7 @@ import {
   createWorkspace,
   dropAsset,
   dropTab,
+  keepPanes,
   moveTab,
   openCollection,
   openTab,
@@ -464,5 +465,22 @@ describe("roomForItems", () => {
   it("keeps the area when the inspector is closed or already showing", () => {
     assert.deepEqual(roomForItems(area, false, false), area);
     assert.deepEqual(roomForItems(area, true, true), area);
+  });
+});
+
+describe("keepPanes", () => {
+  it("drops the entries of closed panes, so a reused pane id starts clean", () => {
+    let ws = closePane(splitPane(createWorkspace(), "pane-1", "right"), "pane-2");
+    const selections = keepPanes({ "pane-1": "kept", "pane-2": "stale" }, ws.panes);
+    assert.deepEqual(selections, { "pane-1": "kept" });
+    ws = splitPane(ws, "pane-1", "right");
+    assert.ok(ws.panes["pane-2"], "the id comes back");
+    assert.equal(Object.hasOwn(selections, "pane-2"), false);
+  });
+
+  it("returns the same object when every pane is still open", () => {
+    const ws = splitPane(createWorkspace(), "pane-1", "right");
+    const state = { "pane-1": 1, "pane-2": 2 };
+    assert.equal(keepPanes(state, ws.panes), state);
   });
 });

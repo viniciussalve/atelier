@@ -174,6 +174,20 @@ function idGenFor(ws: Workspace): IdGen {
   };
 }
 
+/**
+ * The entries of `byPane` whose pane is still open; the same object when none
+ * is gone. Ids come back after a pane closes (`idGenFor` counts from the panes
+ * left), so state kept by pane id must go with its pane.
+ */
+export function keepPanes<T>(
+  byPane: Record<string, T>,
+  panes: Record<string, unknown>,
+): Record<string, T> {
+  const open = Object.keys(byPane).filter((id) => Object.hasOwn(panes, id));
+  if (open.length === Object.keys(byPane).length) return byPane;
+  return Object.fromEntries(open.map((id) => [id, byPane[id]]));
+}
+
 function withPane(ws: Workspace, pane: Pane, focus = true): Workspace {
   return {
     ...ws,

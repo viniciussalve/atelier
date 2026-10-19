@@ -7,6 +7,7 @@ import {
   alignSettings,
   applySettings,
   createWorkspace,
+  keepPanes,
   reconcile,
   sanitizeWorkspace,
   type PaneSettings,
@@ -84,7 +85,7 @@ export const useWorkspace = create<WorkspaceState>()(
       update: (op) => {
         const current = pickWorkspace(get());
         const next = op(current);
-        if (next !== current) set(next);
+        if (next !== current) set({ ...next, selections: keepPanes(get().selections, next.panes) });
       },
       setSizes: (splitId, layout) => {
         const root = setSizes(get().root, splitId, layout);
