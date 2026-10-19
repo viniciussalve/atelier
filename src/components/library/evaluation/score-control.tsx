@@ -107,18 +107,23 @@ function NoteEditor({
     return () => clearTimeout(timer);
   }, [draft, note, onNote]);
 
-  // Closing the popover (Escape) unmounts the editor before the pause ends: save then.
+  // Closing the popover (Escape) unmounts the editor before the pause ends, and
+  // leaving the page drops the timer without unmounting anything: save in both.
   const pending = useRef({ draft, note, onNote });
   useEffect(() => {
     pending.current = { draft, note, onNote };
   });
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    const flush = () => {
       const { draft: last, note: saved, onNote: save } = pending.current;
       if (last !== saved) save(last);
-    },
-    [],
-  );
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
 
   return (
     <label className="block">
