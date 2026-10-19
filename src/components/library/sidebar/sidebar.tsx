@@ -18,6 +18,7 @@ import { viewCounts } from "@/lib/library/filters";
 import { explorerTree, filterExplorer, type ExplorerNode } from "@/lib/library/folders";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
+import { useWorkspace } from "@/lib/library/workspace";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import type { Kind, View } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,8 @@ export function Sidebar({
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
   const collapseAll = useLibrary((state) => state.collapseAll);
+  // Below 860 px the bar is a drawer: closed, it leaves the Tab order and the accessibility tree.
+  const wide = useWorkspace((state) => state.canSplit);
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState<Draft | null>(null);
 
@@ -78,6 +81,7 @@ export function Sidebar({
   return (
     <aside
       aria-label="Biblioteca"
+      inert={!open && !wide}
       className={cn(
         "fixed inset-y-0 left-0 z-30 flex w-64 shrink-0 flex-col border-r border-border bg-surface transition-transform duration-200 min-[860px]:static min-[860px]:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full",

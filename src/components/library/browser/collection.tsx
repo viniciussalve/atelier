@@ -13,6 +13,7 @@ import { itemCount, viewTitle } from "@/components/library/shared/labels";
 import { beginDrag, compareItems, endDrag, openItem } from "@/lib/library/commands";
 import { activeFilterCount } from "@/lib/library/filters";
 import { useCollection } from "@/lib/library/hooks";
+import { toggleSelection } from "@/lib/library/selection";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset, Display, Kind, SortKey, View } from "@/lib/library/types";
 import { useWorkspace } from "@/lib/library/workspace";
@@ -57,12 +58,8 @@ export function Collection({ paneId }: { paneId: string }) {
   useEffect(() => setSelected(new Set()), [kind, nav.view]);
 
   function toggle(id: string) {
-    setSelected((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_PANES) next.add(id);
-      return next;
-    });
+    const visible = new Set(list.map((item) => item.id));
+    setSelected((current) => toggleSelection(current, id, visible, MAX_PANES));
   }
 
   const handlersFor = (item: Asset): CardHandlers => ({

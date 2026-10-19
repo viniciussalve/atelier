@@ -73,10 +73,10 @@ export function Inspector() {
           <div className="min-h-0 flex-1 overflow-y-auto p-4">
             <p className="mb-4 truncate text-sm text-muted">{asset.name}</p>
             <TabsContent value="avaliacao">
-              <Scorecard asset={asset} />
+              <Scorecard key={asset.id} asset={asset} />
             </TabsContent>
             <TabsContent value="detalhes">
-              <Details asset={asset} />
+              <Details key={asset.id} asset={asset} />
             </TabsContent>
           </div>
         </Tabs>
