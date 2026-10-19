@@ -118,6 +118,13 @@ async function desktop() {
     "Ctrl+K abre o item buscado",
     async () => (await page.getByRole("tab", { name: /^Playfair Display/ }).count()) > 0,
   );
+  await check("Ctrl+K deixa o foco na aba do item aberto, não no body", async () =>
+    page.evaluate(
+      () =>
+        document.activeElement?.getAttribute("role") === "tab" &&
+        /^Playfair Display/.test(document.activeElement.textContent.trim()),
+    ),
+  );
 
   await browser.close();
   return realErrors(errors);
