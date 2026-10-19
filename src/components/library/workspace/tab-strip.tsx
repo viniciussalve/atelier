@@ -1,10 +1,19 @@
+import { useRef, useState, type DragEvent } from "react";
 import { LayoutGrid, X } from "lucide-react";
 import { VerdictDot } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
-import { viewTitle } from "@/components/library/shared/labels";
-import { activate, close, pin } from "@/lib/library/commands";
+import { useTabLabel } from "@/components/library/shared/use-tab-label";
+import {
+  activate,
+  beginDrag,
+  close,
+  dropOnPane,
+  endDrag,
+  moveTabTo,
+  pin,
+} from "@/lib/library/commands";
+import { insertIndex } from "@/lib/library/layout";
 import { useAsset } from "@/lib/library/hooks";
-import { useLibrary } from "@/lib/library/store";
 import { useWorkspace } from "@/lib/library/workspace";
 import { assetIdOf, type Pane, type TabKey } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
@@ -12,11 +21,52 @@ import { cn } from "@/lib/utils";
 export function TabStrip({ pane, focused }: { pane: Pane; focused: boolean }) {
   const lonely = pane.tabs.length === 1 && pane.tabs[0] === "collection";
   const onlyPane = useWorkspace((state) => Object.keys(state.panes).length === 1);
+  const drag = useWorkspace((state) => state.drag);
+  const strip = useRef<HTMLDivElement>(null);
+  const [marker, setMarker] = useState<number | null>(null);
+
+  /** Where a dropped tab lands, and the x of the marker drawn there. */
+  function slotAt(clientX: number): { index: number; x: number } {
+    const tabs = [...(strip.current?.querySelectorAll<HTMLElement>("[data-tab]") ?? [])];
+    const rects = tabs.map((tab) => tab.getBoundingClientRect());
+    const index = insertIndex(
+      rects.map((rect) => rect.left + rect.width / 2),
+      clientX,
+    );
+    const left = strip.current?.getBoundingClientRect().left ?? 0;
+    const edge = index < rects.length ? rects[index].left : (rects.at(-1)?.right ?? left);
+    return { index, x: edge - left + (strip.current?.scrollLeft ?? 0) };
+  }
+
+  function onDragOver(event: DragEvent) {
+    if (!drag) return;
+    event.preventDefault();
+    setMarker(slotAt(event.clientX).x);
+  }
+
+  function onDrop(event: DragEvent) {
+    event.preventDefault();
+    setMarker(null);
+    if (!drag) return;
+    if (drag.type === "tab") {
+      moveTabTo(drag.fromPaneId, drag.key, pane.id, slotAt(event.clientX).index);
+      endDrag();
+    } else {
+      dropOnPane(pane.id, "center");
+    }
+  }
+
   return (
     <div
+      ref={strip}
       role="tablist"
       aria-label="Abas do painel"
-      className="flex min-w-0 flex-1 items-stretch overflow-x-auto"
+      className="relative flex min-w-0 flex-1 items-stretch overflow-x-auto [scrollbar-width:none]"
+      onDragOver={onDragOver}
+      onDragLeave={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setMarker(null);
+      }}
+      onDrop={onDrop}
     >
       {pane.tabs.map((key) => (
         <Tab
@@ -29,6 +79,13 @@ export function TabStrip({ pane, focused }: { pane: Pane; focused: boolean }) {
           closable={!(lonely && onlyPane)}
         />
       ))}
+      {marker !== null ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-1 w-0.5 rounded bg-proof"
+          style={{ left: marker - 1 }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -50,14 +107,11 @@ function Tab({
 }) {
   const assetId = assetIdOf(tabKey);
   const asset = useAsset(assetId);
-  const kind = useLibrary((state) => state.kind);
-  const view = useLibrary((state) => state.nav[state.kind].view);
-  const folders = useLibrary((state) => state.folders);
-  const setDrag = useWorkspace((state) => state.setDrag);
-  const label = assetId ? (asset?.name ?? "Item removido") : viewTitle(view, folders, kind);
+  const label = useTabLabel(tabKey);
 
   return (
     <div
+      data-tab
       className={cn(
         "group relative flex max-w-56 min-w-0 shrink-0 items-center border-r border-border",
         active ? "bg-bg text-fg" : "text-muted hover:bg-elevated/50 hover:text-fg",
@@ -79,10 +133,10 @@ function Tab({
         onDragStart={(event) => {
           if (assetId) event.dataTransfer.setData("text/asset-id", assetId);
           else event.dataTransfer.setData("text/plain", label);
-          event.dataTransfer.effectAllowed = "move";
-          setDrag({ type: "tab", fromPaneId: paneId, key: tabKey });
+          event.dataTransfer.effectAllowed = "copyMove";
+          beginDrag({ type: "tab", fromPaneId: paneId, key: tabKey });
         }}
-        onDragEnd={() => setDrag(null)}
+        onDragEnd={endDrag}
         onClick={() => activate(paneId, tabKey)}
         onDoubleClick={() => pin(paneId, tabKey)}
         onAuxClick={(event) => {

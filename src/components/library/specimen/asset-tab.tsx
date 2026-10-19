@@ -28,9 +28,9 @@ export function AssetTab({ paneId, assetId }: { paneId: string; assetId: string 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex items-center gap-2 border-b border-border px-4 py-2">
-        <h2 className="min-w-0 truncate text-sm font-medium">{asset.name}</h2>
-        <VerdictBadge verdict={asset.verdict} />
-        <span className="ml-auto text-xs text-muted tabular-nums">
+        <h2 className="min-w-0 flex-1 truncate text-sm font-medium @sm:flex-none">{asset.name}</h2>
+        <VerdictBadge verdict={asset.verdict} className="hidden @xs:inline-flex" />
+        <span className="ml-auto hidden text-xs whitespace-nowrap text-muted tabular-nums @sm:inline">
           {index >= 0 ? `${index + 1} de ${list.length}` : "Fora da lista atual"}
         </span>
         <IconButton

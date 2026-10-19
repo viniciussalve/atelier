@@ -2,7 +2,7 @@ import { useRef, useState, type DragEvent, type MouseEvent } from "react";
 import { ChevronRight } from "lucide-react";
 import { VerdictDot } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
-import { openItem, showView } from "@/lib/library/commands";
+import { beginDrag, endDrag, openItem, showView } from "@/lib/library/commands";
 import { type ExplorerNode } from "@/lib/library/folders";
 import { useActiveAsset } from "@/lib/library/hooks";
 import { useLibrary } from "@/lib/library/store";
@@ -137,7 +137,7 @@ function FolderRow({
     setDropping(false);
     const assetId = event.dataTransfer.getData(ASSET_MIME);
     if (assetId) assignFolder(assetId, folder.id);
-    useWorkspace.getState().setDrag(null);
+    endDrag();
   }
 
   return (
@@ -248,7 +248,6 @@ function Leaf({
   );
   const unassignFolder = useLibrary((state) => state.unassignFolder);
   const canSplit = useWorkspace((state) => state.canSplit);
-  const setDrag = useWorkspace((state) => state.setDrag);
 
   function onClick(event: MouseEvent) {
     openItem(asset.id, event.metaKey || event.ctrlKey ? "side" : "preview");
@@ -269,9 +268,9 @@ function Leaf({
         onDragStart={(event) => {
           event.dataTransfer.setData(ASSET_MIME, asset.id);
           event.dataTransfer.effectAllowed = "copyMove";
-          setDrag({ type: "asset", assetId: asset.id });
+          beginDrag({ type: "asset", assetId: asset.id });
         }}
-        onDragEnd={() => setDrag(null)}
+        onDragEnd={endDrag}
         onClick={onClick}
         onDoubleClick={() => openItem(asset.id, "pin")}
         aria-current={active ? "true" : undefined}

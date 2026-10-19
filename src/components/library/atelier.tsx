@@ -31,9 +31,11 @@ export function Atelier() {
     };
   }, []);
 
+  // Only after rehydrating: any write before that would persist the defaults
+  // over the saved workspace.
   useEffect(() => {
-    useWorkspace.getState().setCanSplit(wide);
-  }, [wide]);
+    if (ready) useWorkspace.getState().setCanSplit(wide);
+  }, [ready, wide]);
 
   if (!ready) return <ShellFrame />;
 

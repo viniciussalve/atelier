@@ -10,7 +10,7 @@ import {
 import { Segmented } from "@/components/ui/segmented";
 import { Tooltip } from "@/components/ui/tooltip";
 import { itemCount, viewTitle } from "@/components/library/shared/labels";
-import { compareItems, openItem } from "@/lib/library/commands";
+import { beginDrag, compareItems, endDrag, openItem } from "@/lib/library/commands";
 import { activeFilterCount } from "@/lib/library/filters";
 import { useCollection } from "@/lib/library/hooks";
 import { useLibrary } from "@/lib/library/store";
@@ -47,7 +47,6 @@ export function Collection({ paneId }: { paneId: string }) {
   const setSort = useLibrary((state) => state.setSort);
   const setDisplay = useLibrary((state) => state.setDisplay);
   const clearFilters = useLibrary((state) => state.clearFilters);
-  const setDrag = useWorkspace((state) => state.setDrag);
   const canSplit = useWorkspace((state) => state.canSplit);
   const { list, total } = useCollection(kind);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
@@ -75,9 +74,9 @@ export function Collection({ paneId }: { paneId: string }) {
     onDragStart: (event: DragEvent) => {
       event.dataTransfer.setData("text/asset-id", item.id);
       event.dataTransfer.effectAllowed = "copyMove";
-      setDrag({ type: "asset", assetId: item.id });
+      beginDrag({ type: "asset", assetId: item.id });
     },
-    onDragEnd: () => setDrag(null),
+    onDragEnd: endDrag,
   });
 
   const visibleSelection = list.filter((item) => selected.has(item.id)).map((item) => item.id);

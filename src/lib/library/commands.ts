@@ -7,7 +7,7 @@ import { collectionList } from "./filters.ts";
 import type { DropZone, Edge } from "./layout.ts";
 import { useLibrary } from "./store.ts";
 import type { CriterionId, Kind, Score, View } from "./types.ts";
-import { useWorkspace } from "./workspace.ts";
+import { useWorkspace, type DragPayload } from "./workspace.ts";
 import {
   activateTab,
   assetIdOf,
@@ -18,6 +18,7 @@ import {
   dropAsset,
   dropTab,
   focusPane,
+  moveTab,
   openCollection,
   openTab,
   openToSide,
@@ -103,10 +104,34 @@ export function navigate(paneId: string, assetId: string, step: -1 | 1) {
   ws().update((state) => replaceTab(state, paneId, assetKey(assetId), assetKey(next)));
 }
 
+let dragTimer: ReturnType<typeof setTimeout> | undefined;
+
+/**
+ * Marks a drag as started. Deferred a tick: changing the page under the
+ * pointer inside `dragstart` (the drop overlays appear) can cancel the drag.
+ */
+export function beginDrag(payload: DragPayload) {
+  clearTimeout(dragTimer);
+  dragTimer = setTimeout(() => ws().setDrag(payload), 0);
+}
+
+export function endDrag() {
+  clearTimeout(dragTimer);
+  ws().setDrag(null);
+}
+
+export function moveTabTo(from: string, key: TabKey, to: string, index: number) {
+  ws().update((state) => moveTab(state, from, key, to, index));
+}
+
+export function equalizeAll() {
+  ws().equalize();
+}
+
 /** Drops whatever is being dragged onto a pane. */
 export function dropOnPane(paneId: string, zone: DropZone) {
   const drag = ws().drag;
-  ws().setDrag(null);
+  endDrag();
   if (!drag) return;
   if (drag.type === "asset") {
     lib().markUsed(drag.assetId);
