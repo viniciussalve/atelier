@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { PanelRightClose } from "lucide-react";
 import { Scorecard } from "@/components/library/evaluation/scorecard";
 import { IconButton } from "@/components/ui/icon-button";
@@ -23,6 +24,18 @@ export function Inspector() {
   const tab = useWorkspace((state) => state.inspectorTab);
   const setTab = useWorkspace((state) => state.setInspectorTab);
   const setOpen = useWorkspace((state) => state.setInspector);
+
+  // As a drawer it covers the screen: Escape closes it, unless a menu or
+  // popover inside it took the key first (Radix marks it as handled).
+  useEffect(() => {
+    if (wide || !open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented) setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [wide, open, setOpen]);
+
   if (!asset || !open) return null;
 
   return (

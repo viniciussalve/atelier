@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { matchShortcut, shortcutLabel, type ShortcutEvent } from "./shortcuts.ts";
+import { matchShortcut, rovingTarget, shortcutLabel, type ShortcutEvent } from "./shortcuts.ts";
 
 const key = (patch: Partial<ShortcutEvent>): ShortcutEvent => ({
   key: "",
@@ -81,5 +81,25 @@ describe("shortcutLabel", () => {
     assert.equal(shortcutLabel("quickOpen", false), "Ctrl+K");
     assert.equal(shortcutLabel("splitDown", true), "⇧⌘\\");
     assert.equal(shortcutLabel("closeTab", false), "Alt+W");
+  });
+});
+
+describe("rovingTarget", () => {
+  it("moves along a row of tabs with the arrows, wrapping at the ends", () => {
+    assert.equal(rovingTarget("ArrowRight", 0, 3), 1);
+    assert.equal(rovingTarget("ArrowRight", 2, 3), 0);
+    assert.equal(rovingTarget("ArrowLeft", 0, 3), 2);
+    assert.equal(rovingTarget("ArrowLeft", 2, 3), 1);
+  });
+
+  it("jumps to the first and last with Home and End", () => {
+    assert.equal(rovingTarget("Home", 2, 3), 0);
+    assert.equal(rovingTarget("End", 0, 3), 2);
+  });
+
+  it("ignores other keys and empty rows", () => {
+    assert.equal(rovingTarget("ArrowDown", 0, 3), null);
+    assert.equal(rovingTarget("Enter", 0, 3), null);
+    assert.equal(rovingTarget("ArrowRight", 0, 0), null);
   });
 });

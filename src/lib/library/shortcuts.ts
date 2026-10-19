@@ -66,3 +66,23 @@ export function shortcutLabel(type: Command["type"], isMac: boolean, paneIndex =
   if (type === "focusPane") return isMac ? `⌥${paneIndex + 1}` : `Alt+${paneIndex + 1}`;
   return isMac ? LABELS[type].mac : LABELS[type].other;
 }
+
+/**
+ * Where focus goes in a row of tabs for a key, as the ARIA tabs pattern
+ * expects: ← → move and wrap, Home and End jump. null for any other key.
+ */
+export function rovingTarget(key: string, index: number, count: number): number | null {
+  if (count === 0) return null;
+  switch (key) {
+    case "ArrowRight":
+      return (index + 1) % count;
+    case "ArrowLeft":
+      return (index - 1 + count) % count;
+    case "Home":
+      return 0;
+    case "End":
+      return count - 1;
+    default:
+      return null;
+  }
+}

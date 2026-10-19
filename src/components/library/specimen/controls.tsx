@@ -1,7 +1,9 @@
+import * as RadioGroup from "@radix-ui/react-radio-group";
 import { GROUNDS } from "@/components/library/shared/grounds";
 import type { PaneSettings } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
 
+/** Radix radio group: one Tab stop, the arrows move and choose. */
 export function GroundPicker({
   value,
   onChange,
@@ -10,16 +12,19 @@ export function GroundPicker({
   onChange: (value: PaneSettings["ground"]) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label="Fundo da prova" className="flex gap-1">
+    <RadioGroup.Root
+      value={value}
+      onValueChange={(next) => onChange(next as PaneSettings["ground"])}
+      orientation="horizontal"
+      aria-label="Fundo da prova"
+      className="flex gap-1"
+    >
       {GROUNDS.map((item) => (
-        <button
+        <RadioGroup.Item
           key={item.id}
-          type="button"
-          role="radio"
-          aria-checked={value === item.id}
+          value={item.id}
           aria-label={item.label}
           title={item.label}
-          onClick={() => onChange(item.id)}
           className={cn(
             "grid size-6 place-items-center rounded-md border text-[11px] font-medium",
             item.surface,
@@ -27,9 +32,9 @@ export function GroundPicker({
           )}
         >
           A
-        </button>
+        </RadioGroup.Item>
       ))}
-    </div>
+    </RadioGroup.Root>
   );
 }
 

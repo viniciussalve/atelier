@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from "react";
+import { useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { LayoutGrid, X } from "lucide-react";
 import { VerdictDot } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/library/commands";
 import { insertIndex } from "@/lib/library/layout";
 import { useAsset } from "@/lib/library/hooks";
+import { rovingTarget } from "@/lib/library/shortcuts";
 import { useWorkspace } from "@/lib/library/workspace";
 import { assetIdOf, type Pane, type TabKey } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,17 @@ export function TabStrip({ pane, focused }: { pane: Pane; focused: boolean }) {
     }
   }
 
+  // Only the active tab is in the Tab order; the arrows, Home and End move between tabs.
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const tabs = [...(strip.current?.querySelectorAll<HTMLElement>("[role=tab]") ?? [])];
+    const index = tabs.indexOf(event.target as HTMLElement);
+    const next = index < 0 ? null : rovingTarget(event.key, index, tabs.length);
+    if (next === null) return;
+    event.preventDefault();
+    tabs[next].focus();
+    activate(pane.id, pane.tabs[next]);
+  }
+
   return (
     <div
       ref={strip}
@@ -67,6 +79,7 @@ export function TabStrip({ pane, focused }: { pane: Pane; focused: boolean }) {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setMarker(null);
       }}
       onDrop={onDrop}
+      onKeyDown={onKeyDown}
     >
       {pane.tabs.map((key) => (
         <Tab
@@ -127,6 +140,7 @@ function Tab({
         type="button"
         role="tab"
         aria-selected={active}
+        tabIndex={active ? 0 : -1}
         aria-label={asset ? withVerdict(label, asset.verdict) : label}
         title={preview ? `${label} (prévia: clique duas vezes para fixar)` : label}
         draggable
@@ -155,6 +169,7 @@ function Tab({
         <button
           type="button"
           aria-label={`Fechar ${label}`}
+          tabIndex={active ? 0 : -1}
           onClick={() => close(paneId, tabKey)}
           className={cn(
             "mr-1.5 grid size-5 shrink-0 place-items-center rounded text-subtle hover:bg-elevated hover:text-fg",
