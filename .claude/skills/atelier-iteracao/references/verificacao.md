@@ -66,6 +66,10 @@ const { open, goto, shot, check, realErrors } = require(process.env.ATELIER_E2E 
   - Painéis do layout: `[data-panel]`. Um split aninhado também conta como painel.
   - Nota: role `radio` com nome "Leitura: 3, Bom".
   - Nota geral: `[aria-label='Nota geral'] p`.
+- **Abas do painel e abas da prova são `tab` as duas.** Dentro de um painel, `getByRole("tab")` acha também Prova, Pesos, Glifos e Info. Para as abas do painel, use `getByRole("tablist", { name: "Abas do painel" }).getByRole("tab")`.
+- **Setas num `RadioGroup` ou `ToggleGroup` do Radix** (seletor de fundo, nota): o Radix move o foco num `setTimeout` e só marca a opção se a tecla ainda estiver descida.
+  - Segure a tecla como uma pessoa: `page.keyboard.press("ArrowRight", { delay: 50 })`.
+  - Sem isso, o teste falha de vez em quando: o foco vai para a opção certa, mas a anterior continua marcada.
 - **Ao clicar para focar um painel**, clique no título (`h2`) e não numa coordenada: uma coordenada cai fácil em cima de um controle de nota.
 - **Para arrastar uma divisória**, use `page.mouse.down`/`move({ steps: 8 })`/`up` sobre a `boundingBox` do `[data-separator]`.
 - **Para arrastar um item até um painel**, use `locator.dragTo(painel, { targetPosition: { x: largura - 10, y: altura / 2 } })`. A borda divide, o centro abre.
