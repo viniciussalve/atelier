@@ -22,7 +22,10 @@ export type InspectorTab = "avaliacao" | "detalhes";
 
 type WorkspaceState = Workspace & {
   sync: SyncFlags;
+  /** Inspector column on wide screens. */
   inspectorOpen: boolean;
+  /** Inspector drawer on narrow screens; starts closed, not persisted. */
+  inspectorDrawer: boolean;
   inspectorTab: InspectorTab;
   /** What is being dragged right now; not persisted. */
   drag: DragPayload | null;
@@ -35,7 +38,8 @@ type WorkspaceState = Workspace & {
   equalize: (splitId?: string) => void;
   updateSettings: (paneId: string, patch: Partial<PaneSettings>) => void;
   setSync: (key: SyncKey, on: boolean) => void;
-  setInspectorOpen: (open: boolean) => void;
+  /** Opens or closes the inspector in whichever form the screen uses. */
+  setInspector: (open: boolean) => void;
   setInspectorTab: (tab: InspectorTab) => void;
   setDrag: (drag: DragPayload | null) => void;
   setCanSplit: (canSplit: boolean) => void;
@@ -63,6 +67,7 @@ export const useWorkspace = create<WorkspaceState>()(
       ...createWorkspace(),
       sync: DEFAULT_SYNC,
       inspectorOpen: true,
+      inspectorDrawer: false,
       inspectorTab: "avaliacao",
       drag: null,
       layoutEpoch: 0,
@@ -90,7 +95,8 @@ export const useWorkspace = create<WorkspaceState>()(
             ? { sync, ...alignSettings(pickWorkspace(state), state.activePaneId, key) }
             : { sync };
         }),
-      setInspectorOpen: (inspectorOpen) => set({ inspectorOpen }),
+      setInspector: (open) =>
+        set((state) => (state.canSplit ? { inspectorOpen: open } : { inspectorDrawer: open })),
       setInspectorTab: (inspectorTab) => set({ inspectorTab }),
       setDrag: (drag) => set({ drag }),
       setCanSplit: (canSplit) => set({ canSplit }),
