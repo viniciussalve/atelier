@@ -5,6 +5,7 @@ import {
   filterExplorer,
   folderPath,
   folderScope,
+  ignoringAccents,
   normalizeText,
   type ExplorerNode,
 } from "./folders.ts";
@@ -110,5 +111,34 @@ describe("filterExplorer", () => {
 describe("normalizeText", () => {
   it("drops accents and case", () => {
     assert.equal(normalizeText("Ilustração ÂÊ"), "ilustracao ae");
+  });
+});
+
+describe("ignoringAccents", () => {
+  // Stand-in for cmdk's scorer: 1 when every search character appears in order.
+  const inOrder = (value: string, search: string, keywords: string[] = []) => {
+    const text = [value, ...keywords].join(" ");
+    let at = 0;
+    for (const char of search) {
+      at = text.indexOf(char, at);
+      if (at < 0) return 0;
+      at += 1;
+    }
+    return 1;
+  };
+  const score = ignoringAccents(inOrder);
+
+  it("finds accented names and keywords from plain input", () => {
+    assert.equal(score("pasta Títulos f-display", "titulos"), 1);
+    assert.equal(score("IBM Plex Sans", "tecnica", ["técnica"]), 1);
+  });
+
+  it("still finds them typed with accents, in any case", () => {
+    assert.equal(score("pasta Títulos f-display", "TÍTULOS"), 1);
+    assert.equal(score("pasta Titulos", "títulos"), 1);
+  });
+
+  it("keeps a miss a miss", () => {
+    assert.equal(score("pasta Títulos", "ilustracao"), 0);
   });
 });

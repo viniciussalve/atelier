@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { equalize, setSizes, type Sizes } from "./layout.ts";
+import type { Selection } from "./selection.ts";
 import {
   DEFAULT_SYNC,
   alignSettings,
@@ -33,6 +34,8 @@ type WorkspaceState = Workspace & {
   layoutEpoch: number;
   /** False on narrow screens, where only the active pane shows. */
   canSplit: boolean;
+  /** Each pane's comparison selection, kept while an item is open over the collection; not persisted. */
+  selections: Record<string, Selection>;
   update: (op: (ws: Workspace) => Workspace) => void;
   setSizes: (splitId: string, layout: Sizes) => void;
   equalize: (splitId?: string) => void;
@@ -43,6 +46,7 @@ type WorkspaceState = Workspace & {
   setInspectorTab: (tab: InspectorTab) => void;
   setDrag: (drag: DragPayload | null) => void;
   setCanSplit: (canSplit: boolean) => void;
+  setSelection: (paneId: string, selection: Selection) => void;
   reconcile: (assetIds: Set<string>) => void;
 };
 
@@ -72,6 +76,7 @@ export const useWorkspace = create<WorkspaceState>()(
       drag: null,
       layoutEpoch: 0,
       canSplit: true,
+      selections: {},
       update: (op) => {
         const current = pickWorkspace(get());
         const next = op(current);
@@ -100,6 +105,8 @@ export const useWorkspace = create<WorkspaceState>()(
       setInspectorTab: (inspectorTab) => set({ inspectorTab }),
       setDrag: (drag) => set({ drag }),
       setCanSplit: (canSplit) => set({ canSplit }),
+      setSelection: (paneId, selection) =>
+        set((state) => ({ selections: { ...state.selections, [paneId]: selection } })),
       reconcile: (assetIds) => set((state) => reconcile(pickWorkspace(state), assetIds)),
     }),
     {

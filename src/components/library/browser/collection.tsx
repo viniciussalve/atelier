@@ -1,4 +1,4 @@
-import { useEffect, useState, type DragEvent, type MouseEvent, type ReactNode } from "react";
+import { useMemo, type DragEvent, type MouseEvent, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, Grid2x2, List, Search, X } from "lucide-react";
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import { itemCount, viewTitle } from "@/components/library/shared/labels";
 import { beginDrag, compareItems, endDrag, openItem } from "@/lib/library/commands";
 import { activeFilterCount } from "@/lib/library/filters";
 import { useCollection } from "@/lib/library/hooks";
-import { toggleSelection } from "@/lib/library/selection";
+import { selectionIn, selectionScope, toggleSelection } from "@/lib/library/selection";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset, Display, Kind, SortKey, View } from "@/lib/library/types";
 import { useWorkspace } from "@/lib/library/workspace";
@@ -50,16 +50,18 @@ export function Collection({ paneId }: { paneId: string }) {
   const clearFilters = useLibrary((state) => state.clearFilters);
   const canSplit = useWorkspace((state) => state.canSplit);
   const { list, total } = useCollection(kind);
-  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  // Kept per pane in the workspace, so opening an item over the collection keeps it.
+  const scope = selectionScope(kind, nav.view);
+  const saved = useWorkspace((state) => state.selections[paneId]);
+  const setSelection = useWorkspace((state) => state.setSelection);
+  const selected = useMemo(() => selectionIn(saved, scope), [saved, scope]);
+  const setSelected = (next: Set<string>) => setSelection(paneId, { scope, ids: [...next] });
   const sortLocked = nav.view.type === "recent";
   const filtered = activeFilterCount(nav.filters) > 0 || nav.query.trim().length > 0;
 
-  // A selection belongs to one library and view.
-  useEffect(() => setSelected(new Set()), [kind, nav.view]);
-
   function toggle(id: string) {
     const visible = new Set(list.map((item) => item.id));
-    setSelected((current) => toggleSelection(current, id, visible, MAX_PANES));
+    setSelected(toggleSelection(selected, id, visible, MAX_PANES));
   }
 
   const handlersFor = (item: Asset): CardHandlers => ({

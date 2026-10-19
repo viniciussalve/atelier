@@ -34,6 +34,15 @@ export function normalizeText(value: string): string {
   return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
+/** How well `search` matches `value` and its `keywords`; 0 hides it (the shape of cmdk's filter). */
+export type SearchScore = (value: string, search: string, keywords?: string[]) => number;
+
+/** A scorer that ignores accents and case on both sides, like the sidebar and collection searches. */
+export function ignoringAccents(score: SearchScore): SearchScore {
+  return (value, search, keywords) =>
+    score(normalizeText(value), normalizeText(search), keywords?.map(normalizeText));
+}
+
 /**
  * The sidebar tree for one library. An item sits under a folder only when no
  * subfolder of that folder also holds it, so a branch never repeats an item;

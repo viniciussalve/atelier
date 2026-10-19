@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { Command } from "cmdk";
+import { Command, defaultFilter } from "cmdk";
 import {
   Columns2,
   Equal,
@@ -24,7 +24,7 @@ import {
   showView,
   split,
 } from "@/lib/library/commands";
-import { folderPath } from "@/lib/library/folders";
+import { folderPath, ignoringAccents } from "@/lib/library/folders";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset, Kind } from "@/lib/library/types";
@@ -34,6 +34,9 @@ const item =
   "flex h-9 cursor-default items-center gap-2.5 rounded-md px-2 text-sm text-muted outline-none select-none data-[selected=true]:bg-elevated data-[selected=true]:text-fg [&_svg]:size-4 [&_svg]:shrink-0";
 const heading =
   "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-subtle";
+
+// cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar.
+const filter = ignoringAccents(defaultFilter);
 
 /** ⌘K: jump to any item, folder or command. ⌘Enter opens an item beside the current pane. */
 export function CommandPalette({
@@ -96,6 +99,7 @@ export function CommandPalette({
       open={open}
       onOpenChange={onOpenChange}
       label="Abrir item, pasta ou comando"
+      filter={filter}
       loop
       overlayClassName="fixed inset-0 z-50 bg-ink/70"
       contentClassName="fixed top-[12vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-surface text-fg shadow-[0_24px_64px_rgb(0_0_0/0.5)]"
