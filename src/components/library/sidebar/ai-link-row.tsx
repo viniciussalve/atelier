@@ -8,7 +8,7 @@ import { Tooltip } from "@/components/ui/tooltip";
  * Pinned at the top of the bar: copies the "Link para IA", which carries the
  * library and the instructions an AI needs. The label says when it is copied.
  */
-export function AiLinkRow({ link }: { link: string }) {
+export function AiLinkRow() {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!copied) return;
@@ -16,9 +16,10 @@ export function AiLinkRow({ link }: { link: string }) {
     return () => clearTimeout(timer);
   }, [copied]);
 
+  // Built now, from the library as it is, and handed over still in the making:
+  // the copy has to start inside the click.
   const copy = async () => {
-    const text = link || (await buildAiLink());
-    if (await copyText(text, { title: "Link para IA" })) setCopied(true);
+    setCopied(await copyText(buildAiLink(), { title: "Link para IA" }));
   };
 
   return (

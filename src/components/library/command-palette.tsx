@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
-import { aiContextText, buildAiLink } from "@/components/library/shared/ai-link";
+import { buildAiContext, buildAiLink } from "@/components/library/shared/ai-link";
 import { copyText } from "@/components/library/shared/copy";
 import { KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
@@ -63,14 +63,11 @@ export function CommandPalette({
   open,
   onOpenChange,
   onAddItems,
-  aiLink,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Opens the add dialog; called a frame after the palette closes. */
   onAddItems: () => void;
-  /** The "Link para IA", kept current by the shell. */
-  aiLink: string;
 }) {
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
@@ -195,22 +192,27 @@ export function CommandPalette({
           <Action
             icon={<Sparkles />}
             label="Copiar link para IA"
+            // Built from the library as it is now; the copy starts inside the selection.
             onSelect={() =>
-              run(async () => {
-                const link = aiLink || (await buildAiLink());
-                await copyText(link, { notice: "Link para IA copiado", title: "Link para IA" });
-              })
+              run(
+                () =>
+                  void copyText(buildAiLink(), {
+                    notice: "Link para IA copiado",
+                    title: "Link para IA",
+                  }),
+              )
             }
           />
           <Action
             icon={<FileText />}
             label="Copiar contexto para IA como texto"
             onSelect={() =>
-              run(() =>
-                copyText(aiContextText(), {
-                  notice: "Contexto para IA copiado",
-                  title: "Contexto para IA",
-                }),
+              run(
+                () =>
+                  void copyText(buildAiContext(), {
+                    notice: "Contexto para IA copiado",
+                    title: "Contexto para IA",
+                  }),
               )
             }
           />

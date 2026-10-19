@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CommandPalette } from "@/components/library/command-palette";
 import { ImportDialog, type ImportRequest } from "@/components/library/import-dialog";
-import { useAiLink } from "@/components/library/shared/ai-link";
 import { copyDialogOpen } from "@/components/library/shared/copy";
 import { CopyLayer } from "@/components/library/shared/copy-layer";
 import { Inspector } from "@/components/library/inspector/inspector";
@@ -75,7 +74,6 @@ export function Atelier() {
   const wide = useMediaQuery("(min-width: 860px)");
   const routerNavigate = useNavigate();
   useLibraryFonts();
-  const aiLink = useAiLink();
 
   useEffect(() => {
     let alive = true;
@@ -155,7 +153,6 @@ export function Atelier() {
             setNavOpen(false);
             setPaletteOpen(true);
           }}
-          aiLink={aiLink}
         />
         {navOpen ? (
           // Clicking outside, Escape, or choosing a view or item closes it.
@@ -177,7 +174,6 @@ export function Atelier() {
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
         onAddItems={() => setAdding({ mode: "search", kind: useLibrary.getState().kind })}
-        aiLink={aiLink}
       />
       <CopyLayer />
       <ImportDialog request={adding} onClose={() => setAdding(null)} />
