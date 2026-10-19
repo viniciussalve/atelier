@@ -144,29 +144,98 @@ function streamOf(bytes: Uint8Array<ArrayBuffer>): ReadableStream<BufferSource> 
   });
 }
 
+/**
+ * Marks a snapshot sent without compression. base64url never has "~", so a
+ * link that starts with it cannot be a compressed one.
+ */
+const PLAIN = "~";
+
+/**
+ * The snapshot as URL-safe text: deflated, or, where the browser cannot
+ * compress (Safari < 16.4, Firefox < 113, Chrome < 103), plain behind `~`.
+ */
 export async function encodeSnapshot(snapshot: Snapshot): Promise<string> {
   const json = new TextEncoder().encode(JSON.stringify(snapshot));
-  const compressed = streamOf(json).pipeThrough(new CompressionStream("deflate-raw"));
-  return toBase64Url(await readAll(compressed, Number.POSITIVE_INFINITY));
+  if (typeof CompressionStream === "function") {
+    try {
+      const compressed = streamOf(json).pipeThrough(new CompressionStream("deflate-raw"));
+      return toBase64Url(await readAll(compressed, Number.POSITIVE_INFINITY));
+    } catch {
+      // "deflate-raw" came later than CompressionStream in some browsers.
+    }
+  }
+  return PLAIN + toBase64Url(json);
 }
 
+type Check = (value: unknown) => boolean;
+
+const isString: Check = (value) => typeof value === "string";
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+const isScore: Check = (value) =>
+  Number.isInteger(value) && Number(value) >= 1 && Number(value) <= 5;
+const isVerdict: Check = (value) => value === "usar" || value === "revisar" || value === "evitar";
+const listOf =
+  (check: Check): Check =>
+  (value) =>
+    Array.isArray(value) && value.every(check);
+const recordOf =
+  (check: Check): Check =>
+  (value) =>
+    isRecord(value) && Object.values(value).every(check);
+
+/** The type of each field an item may carry; anything else in the link is not ours. */
+const ITEM_FIELDS: Record<keyof SnapItem, Check> = {
+  n: isString,
+  k: isString,
+  v: isVerdict,
+  g: isScore,
+  c: recordOf(isScore),
+  o: recordOf(isString),
+  t: listOf(isString),
+  p: listOf(isString),
+  s: listOf(isString),
+  l: isString,
+  y: isString,
+  w: isString,
+  x: isString,
+};
+
+function isItem(value: unknown): value is SnapItem {
+  if (!isRecord(value) || !isString(value.n)) return false;
+  return Object.entries(ITEM_FIELDS).every(
+    ([key, check]) => value[key] === undefined || check(value[key]),
+  );
+}
+
+/**
+ * Every field in its type: the link comes from outside, and the brief and the
+ * recommendations read the fields without checking them again.
+ */
 function isSnapshot(value: unknown): value is Snapshot {
-  if (!value || typeof value !== "object") return false;
-  const snapshot = value as Partial<Snapshot>;
-  const items = (list: unknown) =>
-    Array.isArray(list) &&
-    list.every((item) => item && typeof item === "object" && typeof item.n === "string");
-  return snapshot.v === 1 && items(snapshot.fontes) && items(snapshot.icones);
+  return (
+    isRecord(value) &&
+    value.v === 1 &&
+    isString(value.em) &&
+    listOf(isItem)(value.fontes) &&
+    listOf(isItem)(value.icones) &&
+    (value.resumido === undefined || value.resumido === true)
+  );
+}
+
+async function inflate(text: string): Promise<Uint8Array> {
+  if (text.startsWith(PLAIN)) return fromBase64Url(text.slice(PLAIN.length));
+  const inflated = streamOf(fromBase64Url(text)).pipeThrough(
+    new DecompressionStream("deflate-raw"),
+  );
+  return readAll(inflated, MAX_JSON_BYTES);
 }
 
 /** The snapshot in a link, or null when the text is cut, tampered with or too large. */
 export async function decodeSnapshot(text: string): Promise<Snapshot | null> {
-  if (!text || text.length > MAX_ENCODED || !/^[A-Za-z0-9_-]+$/.test(text)) return null;
+  if (!text || text.length > MAX_ENCODED || !/^~?[A-Za-z0-9_-]+$/.test(text)) return null;
   try {
-    const inflated = streamOf(fromBase64Url(text)).pipeThrough(
-      new DecompressionStream("deflate-raw"),
-    );
-    const json = new TextDecoder().decode(await readAll(inflated, MAX_JSON_BYTES));
+    const json = new TextDecoder("utf-8", { fatal: true }).decode(await inflate(text));
     const value: unknown = JSON.parse(json);
     return isSnapshot(value) ? value : null;
   } catch {
