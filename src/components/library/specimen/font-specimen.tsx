@@ -135,10 +135,6 @@ export function FontWeights({ asset, settings }: { asset: Asset; settings: PaneS
           </p>
         </div>
       ))}
-      <p className="text-xs opacity-60">
-        Pesos declarados: {asset.weights || "não informados"}. Pesos que a fonte não tem aparecem
-        sintetizados pelo navegador.
-      </p>
     </div>
   );
 }

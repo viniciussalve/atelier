@@ -208,15 +208,13 @@ export function Collection({ paneId }: { paneId: string }) {
 
       {visibleSelection.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2 border-t border-proof/40 bg-surface px-4 py-2">
-          <p className="text-sm">
+          <p className="text-sm tabular-nums">
             {visibleSelection.length === 1
               ? "1 selecionado"
               : `${visibleSelection.length} selecionados`}
-            <span className="ml-2 text-xs text-muted">
-              {visibleSelection.length < 2
-                ? "Escolha outro para comparar."
-                : `Até ${MAX_PANES} por vez.`}
-            </span>
+            {visibleSelection.length >= MAX_PANES ? (
+              <span className="ml-2 text-xs text-muted">Máximo de {MAX_PANES}</span>
+            ) : null}
           </p>
           <button
             type="button"
@@ -228,6 +226,7 @@ export function Collection({ paneId }: { paneId: string }) {
           <button
             type="button"
             disabled={visibleSelection.length < 2 || !canSplit}
+            title={visibleSelection.length < 2 ? "Escolha pelo menos 2" : undefined}
             onClick={() => {
               compareItems(visibleSelection);
               setSelected(new Set());

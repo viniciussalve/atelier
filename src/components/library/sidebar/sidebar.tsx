@@ -108,16 +108,13 @@ export function Sidebar({
       )}
     >
       <div className="flex flex-col gap-3 px-3 pt-4 pb-3">
-        <div className="flex items-start gap-2 px-1">
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-semibold tracking-tight">Atelier</p>
-            <p className="text-xs text-muted">Avaliação de artefatos</p>
-          </div>
+        <div className="flex items-center gap-2 px-1">
+          <p className="min-w-0 flex-1 text-[15px] font-semibold tracking-tight">Atelier</p>
           <button
             type="button"
             onClick={onQuickOpen}
             aria-label="Abrir item, pasta ou comando"
-            className="mt-0.5 inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-xs text-muted hover:border-muted hover:text-fg"
+            className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-xs text-muted hover:border-muted hover:text-fg"
           >
             <Command className="size-3.5" />
             {/* In the drawer the close button takes its room. */}
