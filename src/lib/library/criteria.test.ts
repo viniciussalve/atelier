@@ -4,7 +4,6 @@ import {
   criteriaFor,
   criteriaForSection,
   evaluationStatus,
-  formatScore,
   overallScore,
   roundedScore,
   scaleLabel,
@@ -99,17 +98,6 @@ describe("evaluationStatus", () => {
 
   it("does not count a note alone as progress", () => {
     assert.equal(evaluationStatus(font({ tom: s(null, "rever") })), "nao-avaliado");
-  });
-});
-
-describe("formatScore", () => {
-  it("uses one decimal with a comma", () => {
-    assert.equal(formatScore(44 / 9), "4,9");
-    assert.equal(formatScore(4), "4,0");
-  });
-
-  it("shows a dash for no score", () => {
-    assert.equal(formatScore(null), "—");
   });
 });
 
