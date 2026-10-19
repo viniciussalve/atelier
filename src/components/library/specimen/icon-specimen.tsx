@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExternalLink, Plus, X } from "lucide-react";
 import { Glyph } from "@/components/library/icons";
 import { groundOf } from "@/components/library/shared/grounds";
+import { externalLink } from "@/lib/library/format";
 import { isIconName, useLibrary } from "@/lib/library/store";
 import type { Asset } from "@/lib/library/types";
 import type { IconSpecimenTab, PaneSettings } from "@/lib/library/workspace-model";
@@ -29,7 +30,8 @@ export function IconSpecimen({
   if (tab === "amostras") {
     return (
       <SpecimenSection title="Amostras" section="amostras" {...section}>
-        <Samples {...props} size={settings.iconSize} />
+        {/* Keyed by set: a name typed for one must not be added to the next. */}
+        <Samples key={asset.id} {...props} size={settings.iconSize} />
       </SpecimenSection>
     );
   }
@@ -52,6 +54,7 @@ function Samples({ asset, color, size }: { asset: Asset; color: string; size: nu
   const removeSample = useLibrary((state) => state.removeSample);
   const [draft, setDraft] = useState("");
   const valid = isIconName(draft);
+  const link = externalLink(asset.url);
 
   return (
     <div className="space-y-6">
@@ -96,9 +99,9 @@ function Samples({ asset, color, size }: { asset: Asset; color: string; size: nu
             <Plus className="size-3.5" /> Adicionar
           </button>
         </form>
-        {asset.url ? (
+        {link ? (
           <a
-            href={asset.url}
+            href={link}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 text-sm opacity-70 hover:opacity-100"

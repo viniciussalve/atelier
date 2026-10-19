@@ -3,7 +3,7 @@ import { ExternalLink, Plus, X } from "lucide-react";
 import { Field, Property } from "@/components/library/shared/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { folderPath } from "@/lib/library/folders";
-import { formatDate } from "@/lib/library/format";
+import { externalLink, formatDate } from "@/lib/library/format";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset } from "@/lib/library/types";
 
@@ -25,7 +25,7 @@ export function Details({ asset }: { asset: Asset }) {
     .filter((folder) => !asset.folderIds.includes(folder.id))
     .map((folder) => ({ folder, path: folderPath(folders, folder.id).join(" / ") }))
     .sort((a, b) => a.path.localeCompare(b.path, "pt-BR"));
-  const link = /^https?:\/\//.test(asset.url) ? asset.url : null;
+  const link = externalLink(asset.url);
 
   return (
     <div className="space-y-5">
