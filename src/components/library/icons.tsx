@@ -19,6 +19,8 @@ export function SetGlyphs({
           alt=""
           width={size}
           height={size}
+          loading="lazy"
+          draggable={false}
           src={`https://api.iconify.design/${prefix}/${name}.svg?color=${paint}`}
           style={{ width: size, height: size }}
         />
