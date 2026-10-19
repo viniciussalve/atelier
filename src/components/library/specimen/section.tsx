@@ -3,6 +3,7 @@ import { ScoreControl } from "@/components/library/evaluation/score-control";
 import { score } from "@/lib/library/commands";
 import { criteriaForSection } from "@/lib/library/criteria";
 import { useLibrary } from "@/lib/library/store";
+import { cn } from "@/lib/utils";
 import type { Asset, SpecimenSection as SectionId } from "@/lib/library/types";
 
 /**
@@ -35,7 +36,8 @@ export function SpecimenSection({
         {repeated ? null : <h3 className="text-xs font-medium opacity-60">{title}</h3>}
         {criteria.length ? (
           <div
-            className="ml-auto flex flex-wrap justify-end gap-2"
+            // Without a title the marks take its place on the left, so the header does not open with a gap.
+            className={cn("flex flex-wrap gap-2", repeated ? "" : "ml-auto justify-end")}
             style={{ fontFamily: "var(--font-sans)" }}
           >
             {criteria.map((criterion) => (
