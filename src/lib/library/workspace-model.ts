@@ -47,8 +47,8 @@ function fits(ws: Workspace, paneId: string, edge: Edge, area?: Box): boolean {
 }
 
 export type TabKey = "collection" | `asset:${string}`;
-export type FontSpecimenTab = "prova" | "pesos" | "glifos" | "info";
-export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes" | "info";
+export type FontSpecimenTab = "prova" | "pesos" | "glifos";
+export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes";
 
 export type PaneSettings = {
   sampleText: string;
@@ -74,8 +74,8 @@ export type Workspace = { root: LayoutNode; panes: Record<string, Pane>; activeP
 export type SyncKey = "text" | "size" | "ground" | "tab" | "scroll";
 export type SyncFlags = Record<SyncKey, boolean>;
 
-export const FONT_TABS: FontSpecimenTab[] = ["prova", "pesos", "glifos", "info"];
-export const ICON_TABS: IconSpecimenTab[] = ["amostras", "tamanhos", "componentes", "info"];
+export const FONT_TABS: FontSpecimenTab[] = ["prova", "pesos", "glifos"];
+export const ICON_TABS: IconSpecimenTab[] = ["amostras", "tamanhos", "componentes"];
 const GROUND_IDS: PreviewGround[] = ["paper", "mist", "ink", "navy", "sand"];
 
 export const FONT_SIZE_RANGE = { min: 12, max: 28 } as const;
@@ -624,6 +624,15 @@ function sanitizeSettings(raw: unknown): PaneSettings {
       ? (value.iconTab as IconSpecimenTab)
       : defaults.iconTab,
   };
+}
+
+/**
+ * zustand `persist` migration for the workspace store. v2 starts with the inspector
+ * closed; v1 saved it open for everyone, since that was the default, so close it once.
+ */
+export function migrateWorkspace(persisted: unknown, version: number): unknown {
+  if (!isObject(persisted)) return persisted;
+  return version < 2 ? { ...persisted, inspectorOpen: false } : persisted;
 }
 
 /** Rebuilds a workspace from persisted data, or null when it cannot be trusted. */

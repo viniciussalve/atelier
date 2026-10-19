@@ -24,20 +24,17 @@ import { cn } from "@/lib/utils";
 import { GroundPicker, SizeSlider } from "./controls";
 import { FontGlyphs, FontProof, FontWeights } from "./font-specimen";
 import { IconSpecimen } from "./icon-specimen";
-import { SpecimenInfo } from "./info";
 
 const FONT_TABS: { id: FontSpecimenTab; label: string }[] = [
   { id: "prova", label: "Prova" },
   { id: "pesos", label: "Pesos" },
   { id: "glifos", label: "Glifos" },
-  { id: "info", label: "Info" },
 ];
 
 const ICON_TABS: { id: IconSpecimenTab; label: string }[] = [
   { id: "amostras", label: "Amostras" },
   { id: "tamanhos", label: "Tamanhos" },
   { id: "componentes", label: "Componentes" },
-  { id: "info", label: "Info" },
 ];
 
 export function AssetTab({ paneId, assetId }: { paneId: string; assetId: string }) {
@@ -127,7 +124,7 @@ export function AssetTab({ paneId, assetId }: { paneId: string; assetId: string 
           </TabsList>
         </Tabs>
         <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 py-1">
-          {tab === "info" ? null : asset.kind === "font" ? (
+          {asset.kind === "font" ? (
             <SizeSlider
               label="Corpo"
               value={settings.fontSize}
@@ -169,14 +166,13 @@ function Body({
   tab: FontSpecimenTab | IconSpecimenTab;
   onSettings: (patch: Partial<PaneSettings>) => void;
 }) {
-  if (tab === "info") return <SpecimenInfo asset={asset} />;
   if (asset.kind === "icon") {
     return (
       <IconSpecimen
         asset={asset}
         paneId={paneId}
         settings={settings}
-        tab={tab as Exclude<IconSpecimenTab, "info">}
+        tab={tab as IconSpecimenTab}
       />
     );
   }

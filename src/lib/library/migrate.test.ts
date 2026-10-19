@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { overallScore } from "./criteria.ts";
 import { migrateLibrary } from "./migrate.ts";
+import { DEFAULT_PREVIEW } from "./preview.ts";
 import { defaultLibrary, seedAssets, seedFolders } from "./seed.ts";
 
 const v3Asset = (patch: Record<string, unknown>) => ({
@@ -100,6 +101,43 @@ describe("migrateLibrary from v1", () => {
     assert.ok(data.assets.some((item) => item.id === "x"));
     assert.ok(!data.assets.some((item) => item.id === "old-icon"));
     assert.ok(data.assets.some((item) => item.id === "lucide"));
+  });
+});
+
+describe("migrateLibrary from v4", () => {
+  const v4 = () => {
+    const data = defaultLibrary();
+    const { preview: _preview, ...font } = data.nav.font;
+    const { preview: _iconPreview, ...icon } = data.nav.icon;
+    return {
+      ...data,
+      kind: "icon",
+      expanded: ["f-sans"],
+      nav: {
+        font: { ...font, display: "list", sort: { key: "score", dir: "desc" } },
+        icon: { ...icon, view: { type: "folder", id: "gone" } },
+      },
+    };
+  };
+
+  it("keeps the saved navigation and adds the default preview", () => {
+    const data = migrateLibrary(v4(), 4);
+    assert.equal(data.kind, "icon");
+    assert.deepEqual(data.expanded, ["f-sans"]);
+    assert.equal(data.nav.font.display, "list");
+    assert.deepEqual(data.nav.font.sort, { key: "score", dir: "desc" });
+    assert.deepEqual(data.nav.font.preview, DEFAULT_PREVIEW.font);
+    assert.deepEqual(data.nav.icon.preview, DEFAULT_PREVIEW.icon);
+  });
+
+  it("resets a view pointing at a deleted folder", () => {
+    assert.deepEqual(migrateLibrary(v4(), 4).nav.icon.view, { type: "all" });
+  });
+
+  it("falls back to defaults for a broken nav field", () => {
+    const broken = { ...v4(), nav: { font: { display: "mosaico", sort: "x" }, icon: null } };
+    const data = migrateLibrary(broken, 4);
+    assert.deepEqual(data.nav, defaultLibrary().nav);
   });
 });
 

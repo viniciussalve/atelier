@@ -6,7 +6,7 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Barra lateral.** Escolha a biblioteca (Fontes ou Ícones). Vistas rápidas: Tudo, Recentes, Para avaliar, Sem pasta e Sem tag. Abaixo fica o explorador de pastas: um item aparece só na pasta mais funda de cada ramo, as pastas começam recolhidas e o filtro do topo procura em pastas e itens. Arraste um item para uma pasta para incluí-lo nela.
 
-**Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação.
+**Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação. Como no Google Fonts, cada item aparece desenhado na própria fonte: escreva em "Escreva para testar" e ajuste o corpo para mudar todos os cards e linhas de uma vez. Nos ícones, o controle muda o tamanho das amostras. Texto e corpo ficam salvos por biblioteca.
 
 - Filtros: veredito, status, nota mínima, tags, licença, estilo e formato. Cada opção mostra quantos itens tem com os outros filtros aplicados.
 - Ordenação: nome, nota, veredito, modificado e uso recente.
@@ -21,14 +21,14 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Provas.**
 
-- Fontes: Prova, Pesos, Glifos e Info.
-- Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos, Componentes e Info.
+- Fontes: Prova, Pesos e Glifos.
+- Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos e Componentes.
 
 **Adicionar.** No ⌘K, "Adicionar fonte ou conjunto…" busca no Google Fonts e no Iconify. Um link `/?adicionar=fonte:Inter Tight,icones:lucide&motivo=…`, o formato que uma IA escreve, abre o mesmo diálogo com as sugestões já marcadas. Nada entra sem confirmar. Sugestões de IA levam a tag `ia` e o motivo nas notas, e aparecem em Para avaliar.
 
 **Conversa com IA.** No topo da barra, "Link para IA" copia um link com a biblioteca e as instruções; cole numa IA com acesso à web. Ela lê o que você avaliou, busca e recomenda por semelhança, e responde com um link de adicionar. Para IA sem acesso à web, use "Copiar contexto para IA como texto" no ⌘K. As instruções gerais ficam em `/llms.txt`, apontado pelo `robots.txt` e pela cabeça da página, sem aparecer na tela. O link leva a biblioteca dentro da URL: quem tiver o link lê a biblioteca. Clientes MCP (Claude, ChatGPT, Cursor, Claude Code) podem se conectar a `/mcp`, sem login, e usar as mesmas buscas como ferramentas.
 
-**Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe uma carinha, de Muito ruim a Ótimo, e, se quiser, uma nota escrita. A nota geral é a carinha da média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a carinha do critério que ela mede, para avaliar olhando o espécime.
+**Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe uma carinha, de Muito ruim a Ótimo, e, se quiser, uma nota escrita. A nota geral é a carinha da média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Os critérios são avaliados só na prova: cada seção traz a carinha do critério que ela mede, e o lápis ao lado mostra o peso, o que observar e a nota escrita. O inspetor começa fechado; o botão "Avaliar" abre a coluna com a nota geral, um resumo de cada critério, o veredito e os detalhes do item.
 
 | Atalho (Mac / outros) | Ação                              |
 | --------------------- | --------------------------------- |

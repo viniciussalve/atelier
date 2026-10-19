@@ -83,12 +83,16 @@ export type SortKey = "name" | "score" | "modified" | "recent" | "verdict";
 export type SortSpec = { key: SortKey; dir: "asc" | "desc" };
 export type Display = "grid" | "list";
 
+/** The text and size every card and row of the collection draws its specimen with. */
+export type CollectionPreview = { text: string; size: number };
+
 export type KindNav = {
   view: View;
   query: string;
   filters: Filters;
   sort: SortSpec;
   display: Display;
+  preview: CollectionPreview;
 };
 
 export type PreviewGround = "paper" | "mist" | "ink" | "navy" | "sand";

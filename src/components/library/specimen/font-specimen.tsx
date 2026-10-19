@@ -5,9 +5,6 @@ import type { PaneSettings } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
 import { SpecimenSection } from "./section";
 
-const READING =
-  "A pessoa pergunta, o agente responde, e o parágrafo que fica na tela precisa aguentar a leitura. Veja o desenho do a, do g e do s, o espaço entre as linhas, e se uma resposta de três ou quatro frases continua confortável. Números como 10 e 100 não podem parecer letras, nem a palavra Ilustração.";
-
 const SIZES = [12, 14, 16, 20, 28, 40];
 
 /** The proof sheet for a font. Sizes are in em of the pane's "Corpo", except the fixed-size rows. */
@@ -39,15 +36,15 @@ export function FontProof({
       </SpecimenSection>
 
       <SpecimenSection title="Leitura" section="leitura" {...section}>
-        <p className="max-w-[62ch] text-[1.0625em] leading-relaxed" style={face}>
-          {READING}
-        </p>
+        {/* The paragraph is the text field: click it to write your own. */}
         <textarea
           value={settings.sampleText}
           onChange={(event) => onSettings({ sampleText: event.target.value })}
           aria-label="Texto de prova, editável"
+          placeholder="Escreva o texto da prova"
           rows={4}
-          className="mt-4 block w-full max-w-[62ch] resize-y rounded-md border border-dashed border-current/20 bg-transparent px-3 py-2 leading-relaxed outline-none focus:border-current/50"
+          spellCheck={false}
+          className="-mx-2 block w-[calc(100%+1rem)] max-w-[calc(62ch+1rem)] resize-none rounded-md bg-transparent px-2 py-1 text-[1.0625em] leading-relaxed [field-sizing:content] placeholder:opacity-40 hover:bg-current/[0.04] focus:bg-current/[0.06]"
           style={face}
         />
       </SpecimenSection>
@@ -135,10 +132,6 @@ export function FontWeights({ asset, settings }: { asset: Asset; settings: PaneS
           </p>
         </div>
       ))}
-      <p className="text-xs opacity-60">
-        Pesos declarados: {asset.weights || "não informados"}. Pesos que a fonte não tem aparecem
-        sintetizados pelo navegador.
-      </p>
     </div>
   );
 }

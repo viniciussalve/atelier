@@ -21,7 +21,7 @@ export function IconSpecimen({
   asset: Asset;
   paneId: string;
   settings: PaneSettings;
-  tab: Exclude<IconSpecimenTab, "info">;
+  tab: IconSpecimenTab;
 }) {
   const ground = groundOf(settings.ground);
   const section = { asset, paneId, onPaper: !ground.dark };
@@ -110,9 +110,6 @@ function Samples({ asset, color, size }: { asset: Asset; color: string; size: nu
           </a>
         ) : null}
       </div>
-      <p className="max-w-[60ch] text-xs opacity-60">
-        Adicione os ícones de que o produto precisa. Os que o conjunto não tem aparecem tracejados.
-      </p>
     </div>
   );
 }

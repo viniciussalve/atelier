@@ -1,7 +1,22 @@
 import { criteriaFor, isScore } from "./criteria.ts";
-import { defaultNav } from "./filters.ts";
+import { EMPTY_FILTERS, defaultNav } from "./filters.ts";
+import { sanitizePreview } from "./preview.ts";
 import { defaultLibrary, seedAssets, seedFolders } from "./seed.ts";
-import type { Asset, CriterionScore, Folder, Kind, LibraryData, Scorecard, View } from "./types.ts";
+import type {
+  Asset,
+  CriterionScore,
+  EvaluationStatus,
+  Filters,
+  Folder,
+  Kind,
+  KindNav,
+  LibraryData,
+  Scorecard,
+  SortKey,
+  SortSpec,
+  Verdict,
+  View,
+} from "./types.ts";
 
 type Persisted = Record<string, unknown>;
 
@@ -72,7 +87,44 @@ function validView(view: unknown, folders: Folder[], kind: Kind): view is View {
   return ["all", "recent", "pending", "uncategorized", "untagged"].includes(view.type as string);
 }
 
-/** zustand `persist` migration for the library store, from any earlier version to v4. */
+const SORT_KEYS: SortKey[] = ["name", "score", "modified", "recent", "verdict"];
+
+function isStringList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === "string");
+}
+
+function sanitizeFilters(raw: unknown): Filters {
+  if (!isObject(raw)) return EMPTY_FILTERS;
+  const list = <T extends string>(value: unknown) => (isStringList(value) ? (value as T[]) : []);
+  return {
+    verdict: list<Verdict>(raw.verdict),
+    status: list<EvaluationStatus>(raw.status),
+    minScore: isScore(raw.minScore) ? raw.minScore : null,
+    tags: list(raw.tags),
+    license: list(raw.license),
+    style: list(raw.style),
+    format: list(raw.format),
+  };
+}
+
+/** A v4+ saved nav with every field checked; the preview arrived in v5. */
+function sanitizeNav(raw: unknown, kind: Kind, folders: Folder[]): KindNav {
+  const fallback = defaultNav()[kind];
+  if (!isObject(raw)) return fallback;
+  const sort = isObject(raw.sort) ? raw.sort : {};
+  const validSort =
+    SORT_KEYS.includes(sort.key as SortKey) && (sort.dir === "asc" || sort.dir === "desc");
+  return {
+    view: validView(raw.view, folders, kind) ? raw.view : fallback.view,
+    query: "",
+    filters: sanitizeFilters(raw.filters),
+    sort: validSort ? (sort as SortSpec) : fallback.sort,
+    display: raw.display === "list" ? "list" : "grid",
+    preview: sanitizePreview(kind, raw.preview),
+  };
+}
+
+/** zustand `persist` migration for the library store, from any earlier version to v5. */
 export function migrateLibrary(persisted: unknown, version: number): LibraryData {
   if (!isObject(persisted)) return defaultLibrary();
   const folders: Folder[] = Array.isArray(persisted.folders)
@@ -100,6 +152,19 @@ export function migrateLibrary(persisted: unknown, version: number): LibraryData
     ),
   }));
   const kind: Kind = persisted.kind === "icon" ? "icon" : "font";
+  if (version >= 4) {
+    const saved = isObject(persisted.nav) ? persisted.nav : {};
+    return {
+      kind,
+      nav: {
+        font: sanitizeNav(saved.font, "font", allFolders),
+        icon: sanitizeNav(saved.icon, "icon", allFolders),
+      },
+      expanded: isStringList(persisted.expanded) ? persisted.expanded : [],
+      folders: allFolders,
+      assets: upgraded,
+    };
+  }
   const nav = defaultNav();
   if (validView(persisted.view, allFolders, kind))
     nav[kind] = { ...nav[kind], view: persisted.view };
