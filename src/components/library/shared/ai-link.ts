@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { libraryBrief } from "@/lib/ai/brief";
-import { appBase, appUrl } from "@/lib/ai/links";
+import { aiLinkUrl, appBase } from "@/lib/ai/links";
 import { fitSnapshot, snapshotOf } from "@/lib/ai/snapshot";
 import { useLibrary } from "@/lib/library/store";
 
 /** The "Link para IA" for the current library: `/ia?b=<snapshot>`. */
 export async function buildAiLink(): Promise<string> {
   const { encoded } = await fitSnapshot(useLibrary.getState(), new Date().toISOString());
-  return appUrl(window.location, `/ia?b=${encoded}`);
+  return aiLinkUrl(window.location, encoded);
 }
 
 /**

@@ -1,4 +1,5 @@
 /** Responses of the AI-facing endpoints: JSON by default, Markdown on `?formato=md`. */
+import { publicBase } from "./public-base.ts";
 
 const SHARED = {
   // Read-only public data: any page or agent may read it.
@@ -30,11 +31,19 @@ export function markdown(
   });
 }
 
-/** The public origin of a request, behind the proxies that forward it. */
-export function baseOf(request: Request): string {
-  const url = new URL(request.url);
-  const first = (value: string | null) => value?.split(",")[0]?.trim() || undefined;
-  const host = first(request.headers.get("x-forwarded-host")) ?? url.host;
-  const proto = first(request.headers.get("x-forwarded-proto")) ?? url.protocol.replace(":", "");
-  return `${proto}://${host}`;
+/**
+ * The public base of a request (see `publicBase`): `PUBLIC_BASE_URL` when set,
+ * else the origin behind the proxies that forward it, plus the port prefix on
+ * path-based previews. `linkPrefix` is `p` from the Link para IA.
+ */
+export function baseOf(request: Request, linkPrefix?: string | null): string {
+  return publicBase({
+    url: request.url,
+    headers: request.headers,
+    linkPrefix,
+    configured: typeof process === "undefined" ? undefined : process.env.PUBLIC_BASE_URL,
+  });
 }
+
+/** For cached responses whose body embeds `baseOf`: one copy per forwarded origin. */
+export const VARY_BASE = { vary: "X-Forwarded-Host, X-Forwarded-Proto, X-Forwarded-Prefix" };

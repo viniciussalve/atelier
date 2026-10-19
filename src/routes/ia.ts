@@ -11,8 +11,10 @@ export const Route = createFileRoute("/ia")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const base = baseOf(request);
-        const encoded = new URL(request.url).searchParams.get("b");
+        const params = new URL(request.url).searchParams;
+        // `p`: the preview port prefix, which the proxy strips; `baseOf` checks it.
+        const base = baseOf(request, params.get("p"));
+        const encoded = params.get("b");
         if (!encoded) return markdown(guide(base), 200, PRIVATE);
         const snapshot = await decodeSnapshot(encoded);
         if (!snapshot) {
