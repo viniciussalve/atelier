@@ -57,12 +57,12 @@ Rotas de servidor em `src/routes/api/`: `fontes`, `conjuntos`, `icones` e `adici
 | `specimen/`           | `asset-tab.tsx` (cabeçalho do item, abas da prova, controles, área rolável), `font-specimen.tsx` (FontProof, FontWeights, FontGlyphs), `icon-specimen.tsx`, `info.tsx`, `section.tsx` (seção com a nota do critério) e `controls.tsx` |
 | `evaluation/`         | `score-control.tsx` (cinco carinhas, nas variantes inline e full), `scorecard.tsx`, `badges.tsx` (`ScoreFace`, `ScoreBadge`) e `tones.ts` (classes por veredito, `withVerdict`)                                                       |
 | `inspector/`          | `inspector.tsx` (coluna ou gaveta, abas) e `details.tsx`                                                                                                                                                                              |
-| `shared/`             | `grounds.ts` (fundos e cor de tinta), `labels.ts`, `use-tab-label.ts`, `use-media-query.ts`, `use-font-links.ts` (folhas das fontes adicionadas) e `field.tsx`                                                                        |
+| `shared/`             | `grounds.ts` (fundos e cor de tinta), `labels.ts`, `use-tab-label.ts`, `use-media-query.ts`, `use-font-links.ts` (folhas das fontes adicionadas), `active-tab.ts` (aba da frente no painel ativo) e `field.tsx`                       |
 | `import-dialog.tsx`   | Diálogo de adicionar: lista as sugestões de um link `?adicionar=` ou busca no catálogo (comando do ⌘K). Só grava ao confirmar                                                                                                         |
 | `command-palette.tsx` | Paleta ⌘K (cmdk)                                                                                                                                                                                                                      |
 | `icons.tsx`           | `Glyph` (img do Iconify com aviso de "não encontrado") e `SetGlyphs`                                                                                                                                                                  |
 
-`src/components/ui/` tem wrappers Radix já estilizados: tooltip, icon-button (rótulo obrigatório), dropdown-menu, popover, confirm-dialog (destrutivo), dialog (`Modal`), segmented e tabs, além de `face-icon` (as carinhas). Use-os em vez de criar outros.
+`src/components/ui/` tem wrappers Radix já estilizados: tooltip, icon-button (rótulo obrigatório), dropdown-menu, popover, confirm-dialog (destrutivo), dialog (`Modal`, que devolve o foco a quem abriu ou a `fallbackFocus`), segmented e tabs, além de `face-icon` (as carinhas) e `return-focus.ts` (`returnFocus`, o mesmo retorno de foco para overlays sem gatilho, como a paleta). Use-os em vez de criar outros.
 
 ## Fluxo de dados
 
