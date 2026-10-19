@@ -8,7 +8,7 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação. Como no Google Fonts, cada item aparece desenhado na própria fonte: escreva em "Escreva para testar" e ajuste o corpo para mudar todos os cards e linhas de uma vez. Nos ícones, o controle muda o tamanho das amostras. Texto e corpo ficam salvos por biblioteca.
 
-- Filtros: veredito, status, nota mínima, tags, licença, estilo e formato. Cada opção mostra quantos itens tem com os outros filtros aplicados.
+- Filtros, no botão "Filtros": veredito, status, nota mínima, tags, licença, estilo e formato. Cada opção mostra quantos itens tem com os outros filtros aplicados. Os filtros ativos aparecem como chips embaixo do cabeçalho, cada um com seu X, e "Limpar filtros" tira todos.
 - Ordenação: nome, nota, veredito, modificado e uso recente.
 - Marque de dois a seis itens e use "Comparar lado a lado".
 

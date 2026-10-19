@@ -32,7 +32,7 @@ import { useWorkspace } from "@/lib/library/workspace";
 import { MAX_PANES } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
 import { AssetCard, AssetRow, type CardHandlers } from "./asset-card";
-import { FilterBar } from "./filter-bar";
+import { ActiveFilters, FilterButton } from "./filter-bar";
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: "name", label: "Nome" },
@@ -94,7 +94,7 @@ export function Collection({ paneId }: { paneId: string }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 pt-3 pb-2">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 pt-3 pb-3">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-medium">{viewTitle(nav.view, folders, kind)}</h1>
           <p className="text-xs text-muted tabular-nums">
@@ -131,6 +131,7 @@ export function Collection({ paneId }: { paneId: string }) {
             </button>
           ) : null}
         </label>
+        <FilterButton kind={kind} />
         <SortMenu
           kind={kind}
           sortKey={nav.sort.key}
@@ -149,7 +150,7 @@ export function Collection({ paneId }: { paneId: string }) {
           ]}
         />
       </div>
-      <FilterBar kind={kind} />
+      <ActiveFilters kind={kind} />
 
       <div className="relative min-h-0 flex-1 overflow-y-auto">
         {list.length === 0 ? (

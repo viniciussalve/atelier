@@ -40,8 +40,11 @@ async function desktop() {
         .count()) === 1,
   );
 
-  await page.getByRole("button", { name: /^Veredito/ }).click();
-  await page.getByRole("checkbox", { name: /Usar/ }).check();
+  await page.getByRole("button", { name: /^Filtros/ }).click();
+  await page
+    .getByRole("region", { name: "Veredito" })
+    .getByRole("checkbox", { name: /Usar/ })
+    .check();
   await check(
     "filtro Veredito = Usar mostra 2 de 9",
     async () => (await textOf(page.locator("main h1 + p").first())) === "2 de 9 fontes",
