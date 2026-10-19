@@ -61,3 +61,5 @@ A lógica fica em módulos puros com testes em `src/lib/library/`:
 A interface fica em `src/components/library/`.
 
 Catálogos e endpoints para IA ficam em `src/lib/ai/` e `src/routes/api/` (`/api/fontes`, `/api/conjuntos`, `/api/icones`, `/api/adicionar`, `/api/parecidas`; JSON, ou Markdown com `?formato=md`), além de `/ia`, `/llms.txt`, `/robots.txt` e o servidor MCP em `/mcp`. O catálogo do Google Fonts é gerado por `node scripts/catalog-google-fonts.mjs`, sem chave de API; o do Iconify vem do pacote `@iconify/collections`.
+
+Esses textos para IA levam links absolutos para o app. Ao publicar atrás de um proxy, defina `PUBLIC_BASE_URL` no ambiente do servidor (por exemplo `PUBLIC_BASE_URL=https://atelier.app`): ela vale mais que qualquer cabeçalho. Sem ela, a origem vem do próprio pedido, e os cabeçalhos `X-Forwarded-Host`, `X-Forwarded-Proto` e `X-Forwarded-Prefix` só valem quando são um host com porta, `http` ou `https`, e o prefixo de porta de um preview por caminho. O `/llms.txt` e o `/robots.txt` respondem com `Vary` nesses cabeçalhos, para um cache não servir a origem de um pedido a outro.

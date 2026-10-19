@@ -54,14 +54,11 @@ export function Sidebar({
   onClose,
   onNavigate,
   onQuickOpen,
-  aiLink,
 }: {
   open: boolean;
   onClose: () => void;
   onNavigate: () => void;
   onQuickOpen: () => void;
-  /** The "Link para IA", kept current by the shell. */
-  aiLink: string;
 }) {
   const kind = useLibrary((state) => state.kind);
   const view = useLibrary((state) => state.nav[state.kind].view);
@@ -182,7 +179,7 @@ export function Sidebar({
       </div>
 
       <nav aria-label="Vistas e pastas" className="flex-1 overflow-y-auto px-2 pb-4">
-        <AiLinkRow link={aiLink} />
+        <AiLinkRow />
         {searching ? null : (
           <section aria-label="Vistas" className="mb-4">
             <p className="px-2 pb-1 text-xs font-medium text-muted">Vistas</p>

@@ -1,20 +1,44 @@
 /** Responses of the AI-facing endpoints: JSON by default, Markdown on `?formato=md`. */
+import { publicBase } from "./public-base.ts";
 
-const SHARED = {
-  // Read-only public data: any page or agent may read it.
-  "access-control-allow-origin": "*",
-  "cache-control": "public, max-age=300",
-};
+/**
+ * How long a successful answer may be reused:
+ * - "public": bundled catalog data, which only a deploy changes; anyone may keep it.
+ * - "private": a live lookup (Iconify's search); only the client keeps it, briefly,
+ *   so a shared cache never hands one moment's answer to everyone.
+ * - "none": an answer a retry must check again (a family Google did not confirm).
+ */
+export type Caching = "public" | "private" | "none";
+
+/** Errors are never kept: the next try has to reach the server. */
+export function cacheControl(status: number, caching: Caching = "public"): string {
+  if (status >= 400 || caching === "none") return "no-store";
+  return caching === "private" ? "private, max-age=60" : "public, max-age=300";
+}
+
+function headers(contentType: string, status: number, caching: Caching) {
+  return {
+    "content-type": contentType,
+    // Read-only public data: any page or agent may read it.
+    "access-control-allow-origin": "*",
+    "cache-control": cacheControl(status, caching),
+  };
+}
 
 export function wantsMarkdown(request: Request): boolean {
   const format = new URL(request.url).searchParams.get("formato");
   return format === "md" || format === "markdown" || format === "texto";
 }
 
-export function json(body: unknown, status = 200): Response {
+export function json(
+  body: unknown,
+  status = 200,
+  caching: Caching = "public",
+  extra: Record<string, string> = {},
+): Response {
   return new Response(JSON.stringify(body, null, 2), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8", ...SHARED },
+    headers: { ...headers("application/json; charset=utf-8", status, caching), ...extra },
   });
 }
 
@@ -22,19 +46,28 @@ export function json(body: unknown, status = 200): Response {
 export function markdown(
   body: string,
   status = 200,
-  headers: Record<string, string> = {},
+  caching: Caching = "public",
+  extra: Record<string, string> = {},
 ): Response {
   return new Response(body, {
     status,
-    headers: { "content-type": "text/plain; charset=utf-8", ...SHARED, ...headers },
+    headers: { ...headers("text/plain; charset=utf-8", status, caching), ...extra },
   });
 }
 
-/** The public origin of a request, behind the proxies that forward it. */
-export function baseOf(request: Request): string {
-  const url = new URL(request.url);
-  const first = (value: string | null) => value?.split(",")[0]?.trim() || undefined;
-  const host = first(request.headers.get("x-forwarded-host")) ?? url.host;
-  const proto = first(request.headers.get("x-forwarded-proto")) ?? url.protocol.replace(":", "");
-  return `${proto}://${host}`;
+/**
+ * The public base of a request (see `publicBase`): `PUBLIC_BASE_URL` when set,
+ * else the origin behind the proxies that forward it, plus the port prefix on
+ * path-based previews. `linkPrefix` is `p` from the Link para IA.
+ */
+export function baseOf(request: Request, linkPrefix?: string | null): string {
+  return publicBase({
+    url: request.url,
+    headers: request.headers,
+    linkPrefix,
+    configured: typeof process === "undefined" ? undefined : process.env.PUBLIC_BASE_URL,
+  });
 }
+
+/** For cached responses whose body embeds `baseOf`: one copy per forwarded origin. */
+export const VARY_BASE = { vary: "X-Forwarded-Host, X-Forwarded-Proto, X-Forwarded-Prefix" };

@@ -47,6 +47,12 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **JSON de pacote no servidor quebra com `ERR_IMPORT_ATTRIBUTE_MISSING`.**
   - Causa: o SSR do Vite deixa o pacote para o Node, que exige `with { type: "json" }`. O índice do `@iconify/collections` importa o JSON sem isso.
   - O que fazer: importe o `.json` direto, com o atributo: `import collections from "@iconify/collections/collections.json" with { type: "json" }`.
+- **Um erro ou uma consulta que falhou fica no cache por cinco minutos.**
+  - Causa: `json`/`markdown` mandavam `public, max-age=300` em toda resposta, inclusive 4xx/5xx e resultados de uma consulta ao vivo (Google Fonts, Iconify).
+  - O que fazer: `cacheControl` já manda `no-store` para status ≥ 400. Para sucesso que depende de rede, passe `"none"` (o "não encontrado" do `/api/adicionar` pode ser um timeout) ou `"private"` (`/api/icones`).
+- **O Iconify devolve mais ícones do que o pedido.**
+  - Causa: a busca dele tem limite mínimo de 32.
+  - O que fazer: peça ao menos 32 e corte no limite pedido (`searchIcons` já faz).
 - **Rota de servidor nova não existe para o `tsc`.**
   - Causa: o `src/routeTree.gen.ts` só se refaz quando o dev ou o build rodam.
   - O que fazer: suba o dev antes do typecheck e commite o arquivo gerado (ele está no `.prettierignore`).
@@ -109,6 +115,8 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Fundo escuro de gaveta**: use um `div aria-hidden` com `onClick`, não um botão com o mesmo nome do "Fechar". A gaveta oferece outro jeito de sair: o botão de fechar ou Escape.
 - **Gaveta sobre a página é modal.** Ao abrir, o foco entra nela e o resto fica fora do Tab e da árvore de acessibilidade. Ao fechar, o foco volta a quem abriu.
   - O inspetor usa `Dialog` do Radix. Sem `Dialog.Trigger`, o Radix devolve o foco ao `body`, então guarde quem abriu em `onOpenAutoFocus`.
+  - Mas o Radix **não chama `onOpenAutoFocus`** quando um campo dentro tem `autoFocus` (o foco já está lá). O `Modal` de `ui/dialog.tsx` guarda quem abriu num `useLayoutEffect`, que roda antes de o portal montar o conteúdo. Para diálogos novos, use o `Modal` em vez de repetir isso.
+  - Quem abriu pode não servir mais: saiu da página (um item tomou o lugar da coleção), ficou sob `inert` (a gaveta fechou) ou era o `body` (diálogo aberto por link). `returnFocus` (`ui/return-focus.ts`) cai então no `fallbackFocus`; na biblioteca, passe `activeTab` (`shared/active-tab.ts`). Quando fechar abre outra coisa na frente (confirmar o diálogo de adicionar), ponha o foco nela com `onCloseAutoFocus` e `event.preventDefault()`.
   - A barra fica montada (desliza com transição), então usa `inert` no `<main>` e move o foco num efeito.
   - Para conferir a árvore, leia a do Chromium (`Accessibility.getFullAXTree` via CDP): o `getByRole` do Playwright não considera `inert`.
 - **Papéis ARIA prometem comportamento.** `tree`, `tablist` e `radiogroup` sem navegação por setas confundem leitor de tela. Na dúvida, use botões com `aria-expanded`, `aria-pressed` ou `aria-current`.
@@ -119,3 +127,17 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - Cada `Group` tem `key` com os ids dos filhos. Mudou o conjunto de filhos, remonta.
 - Salve tamanhos só quando `onLayoutChanged` traz `meta.isUserInteraction`. Para aplicar tamanhos vindos do store (Igualar), use `layoutEpoch` e `groupRef.setLayout`.
 - O clique duplo nativo do `Separator` só reseta painéis com `defaultSize`. Por isso usamos `disableDoubleClick` e um `div` interno com handler próprio.
+
+## Ponte com IA
+
+- **Copiar copia um estado velho, ou não faz nada no Safari.**
+  - Causa: o Safari só deixa escrever na área de transferência dentro do clique, e um `await` antes do `writeText` perde essa permissão. Montar o texto antes, em segundo plano, deixa a cópia atrasada: a carinha dada logo antes do clique não ia no link.
+  - O que fazer: monte na hora e passe a promessa direto para `copyText`, sem `await` antes. Ele chama `clipboard.write` com um `ClipboardItem` que espera a promessa (ou `writeText` depois de montar, onde não há `ClipboardItem`). `copyText` nunca rejeita: se o navegador recusa, abre o campo para copiar à mão; se nem montar deu, mostra um aviso.
+- **O `/ia` ou o `/api/parecidas` respondem 500 com um link alterado.**
+  - Causa: o retrato vem de fora, na URL, e o resumo e as recomendações leem os campos sem conferir de novo.
+  - O que fazer: `decodeSnapshot` confere o tipo de cada campo e devolve `null` se um não bate. Campo novo em `SnapItem` precisa de uma entrada em `ITEM_FIELDS` (o TypeScript cobra) e de um teste com valor errado.
+- **Os links do `/llms.txt` ou do `/ia` saem com outro host, ou sem o prefixo do preview.**
+  - Causa: `X-Forwarded-Host` e `X-Forwarded-Proto` vêm de quem pede, e o `/llms.txt` e o `/robots.txt` ficam em cache público. Num preview por caminho, o proxy tira o `/hds-…` antes de chegar ao servidor.
+  - O que fazer: monte links no servidor só com `baseOf(request)`, que valida os cabeçalhos, respeita `PUBLIC_BASE_URL` e só aceita prefixo que seja exatamente um id de porta num host de preview. Resposta em cache que leva a origem vai com `VARY_BASE`. Quando o navegador manda um link para o servidor montar outros, mande o prefixo junto, como o `p` do Link para IA.
+- **Navegador sem `CompressionStream("deflate-raw")`** (Safari < 16.4, Firefox < 113, Chrome < 103).
+  - O que fazer: `encodeSnapshot` cai para `~` + base64url do JSON, e `decodeSnapshot` reconhece o `~`. O limite de tamanho continua valendo, então o retrato sai resumido mais cedo. Para testar, apague `globalThis.CompressionStream` no teste.

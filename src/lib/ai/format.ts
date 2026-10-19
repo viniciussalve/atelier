@@ -57,3 +57,11 @@ export function matchLine(label: string, score: number, reasons: string[], add: 
   const percent = Math.round(Math.max(0, score) * 100);
   return `- ${label} (${percent}%): ${reasons.join("; ") || "pouco em comum"}. Adicionar: \`${add}\``;
 }
+
+/** Icon names found by a search ("lucide:house"), ready to paste. */
+export function iconsMarkdown(query: string, icons: string[]): string {
+  return listMarkdown(
+    `Ícones para “${query}”`,
+    icons.map((icon) => `- \`${icon}\``),
+  );
+}

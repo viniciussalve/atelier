@@ -1,6 +1,6 @@
 /**
- * Reading the query strings of the AI-facing endpoints (/api/fontes, /api/conjuntos),
- * which accept the Portuguese names an AI is likely to write.
+ * Reading the query strings of the AI-facing endpoints (/api/fontes, /api/conjuntos,
+ * /api/icones), which accept the Portuguese names an AI is likely to write.
  */
 import { normalizeText } from "../library/folders.ts";
 import type { FontCategory, FontQuery, IconSetQuery } from "./catalog.ts";
@@ -30,9 +30,23 @@ export function flag(value: string | null): boolean | undefined {
   return undefined;
 }
 
+/** A whole number, or not set: "x" never becomes NaN. */
 export function int(value: string | null): number | undefined {
   const number = Number.parseInt(value ?? "", 10);
   return Number.isFinite(number) ? number : undefined;
+}
+
+/**
+ * A list given as "lucide,tabler" or repeated (`params.getAll("conjuntos")`):
+ * trimmed, lowercased, without blanks or repeats, at most `max` entries.
+ */
+export function listParam(value: unknown, max = 16): string[] {
+  const parts = (Array.isArray(value) ? value : [value])
+    .filter((part): part is string => typeof part === "string")
+    .flatMap((part) => part.split(","))
+    .map((part) => part.trim().toLowerCase())
+    .filter(Boolean);
+  return [...new Set(parts)].slice(0, max);
 }
 
 function text(value: string | null): string | undefined {

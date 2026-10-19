@@ -21,7 +21,8 @@ export const Route = createRootRoute({
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       // For AIs reading the page: what the Atelier is and how to help (no visible UI).
-      { rel: "alternate", type: "text/markdown", href: "/llms.txt", title: "Instruções para IAs" },
+      // Relative: the page lives at the root, so it resolves under a preview port prefix too.
+      { rel: "alternate", type: "text/markdown", href: "llms.txt", title: "Instruções para IAs" },
       // Every weight each library font declares, so the Pesos tab shows real cuts.
       { rel: "stylesheet", href: googleFontsHref(seedAssets) },
     ],

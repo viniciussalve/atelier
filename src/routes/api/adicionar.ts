@@ -13,10 +13,15 @@ export const Route = createFileRoute("/api/adicionar")({
       GET: async ({ request }) => {
         const specs = parseAddList(new URL(request.url).searchParams.get("itens") ?? "");
         const { assets, missing } = await resolveAdditions(specs, new Date().toISOString());
-        return json({
-          itens: assets,
-          naoEncontrados: missing.map((spec) => formatAddList([spec])),
-        });
+        // "Not found" may be Google Fonts timing out: trying again must ask again.
+        return json(
+          {
+            itens: assets,
+            naoEncontrados: missing.map((spec) => formatAddList([spec])),
+          },
+          200,
+          "none",
+        );
       },
     },
   },
