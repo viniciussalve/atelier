@@ -18,6 +18,7 @@ import {
   dropAsset,
   dropTab,
   keepPanes,
+  migrateWorkspace,
   moveTab,
   openCollection,
   openTab,
@@ -359,6 +360,18 @@ describe("reconcile", () => {
     valid(ws);
     assert.equal(leaves(ws.root).length, 2);
     assert.ok(!Object.values(ws.panes).some((p) => p.tabs.includes(assetKey("1"))));
+  });
+});
+
+describe("migrateWorkspace", () => {
+  it("closes the inspector saved open before it started closed", () => {
+    const saved = { root: { type: "pane", id: "pane-1" }, inspectorOpen: true };
+    assert.deepEqual(migrateWorkspace(saved, 1), { ...saved, inspectorOpen: false });
+  });
+
+  it("keeps a current choice and tolerates garbage", () => {
+    assert.deepEqual(migrateWorkspace({ inspectorOpen: true }, 2), { inspectorOpen: true });
+    assert.equal(migrateWorkspace(null, 1), null);
   });
 });
 

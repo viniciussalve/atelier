@@ -76,6 +76,9 @@ async function desktop() {
 
   const overall = page.locator("[aria-label='Nota geral'] p").first();
   await panes(page).first().locator("h2").first().click();
+  // O inspetor começa fechado: abra-o para ler a nota geral.
+  await panes(page).first().getByRole("button", { name: "Avaliar", exact: true }).click();
+  await page.waitForTimeout(300);
   const was = await textOf(overall);
   await panes(page).first().getByRole("radio", { name: "Leitura: Ok" }).click();
   await page.waitForTimeout(300);
@@ -179,6 +182,7 @@ async function migration() {
     .getByRole("button", { name: /^Antiga/ })
     .first()
     .click();
+  await page.getByRole("button", { name: "Avaliar", exact: true }).click();
   await page.waitForTimeout(300);
   await check(
     "migração v3: nota 4 em estrelas vira a carinha Bom",

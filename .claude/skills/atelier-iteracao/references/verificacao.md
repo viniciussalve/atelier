@@ -65,7 +65,7 @@ const { open, goto, shot, check, realErrors } = require(process.env.ATELIER_E2E 
   - Divisórias: `[data-separator]`.
   - Painéis do layout: `[data-panel]`. Um split aninhado também conta como painel.
   - Nota: role `radio` com nome "Leitura: Ok" (a palavra da carinha).
-  - Nota geral: `[aria-label='Nota geral'] p`.
+  - Nota geral: `[aria-label='Nota geral'] p`. Ela fica no inspetor, que começa fechado: clique em "Avaliar" antes de ler.
 - **Abas do painel e abas da prova são `tab` as duas.** Dentro de um painel, `getByRole("tab")` acha também Prova, Pesos e Glifos. Para as abas do painel, use `getByRole("tablist", { name: "Abas do painel" }).getByRole("tab")`.
 - **Setas num `RadioGroup` ou `ToggleGroup` do Radix** (seletor de fundo, nota): o Radix move o foco num `setTimeout` e só marca a opção se a tecla ainda estiver descida.
   - Segure a tecla como uma pessoa: `page.keyboard.press("ArrowRight", { delay: 50 })`.

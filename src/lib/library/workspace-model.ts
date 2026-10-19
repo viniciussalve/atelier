@@ -626,6 +626,15 @@ function sanitizeSettings(raw: unknown): PaneSettings {
   };
 }
 
+/**
+ * zustand `persist` migration for the workspace store. v2 starts with the inspector
+ * closed; v1 saved it open for everyone, since that was the default, so close it once.
+ */
+export function migrateWorkspace(persisted: unknown, version: number): unknown {
+  if (!isObject(persisted)) return persisted;
+  return version < 2 ? { ...persisted, inspectorOpen: false } : persisted;
+}
+
 /** Rebuilds a workspace from persisted data, or null when it cannot be trusted. */
 export function sanitizeWorkspace(raw: unknown): Workspace | null {
   if (!isObject(raw)) return null;

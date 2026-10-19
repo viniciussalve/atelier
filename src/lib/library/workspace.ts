@@ -9,6 +9,7 @@ import {
   assetIdOf,
   createWorkspace,
   keepPanes,
+  migrateWorkspace,
   reconcile,
   sanitizeWorkspace,
   type PaneSettings,
@@ -71,7 +72,7 @@ export const useWorkspace = create<WorkspaceState>()(
     (set, get) => ({
       ...createWorkspace(),
       sync: DEFAULT_SYNC,
-      inspectorOpen: true,
+      inspectorOpen: false,
       inspectorDrawer: false,
       drag: null,
       layoutEpoch: 0,
@@ -119,7 +120,8 @@ export const useWorkspace = create<WorkspaceState>()(
     }),
     {
       name: "atelier-workspace",
-      version: 1,
+      version: 2,
+      migrate: migrateWorkspace,
       skipHydration: true,
       partialize: (state) => ({
         ...pickWorkspace(state),
