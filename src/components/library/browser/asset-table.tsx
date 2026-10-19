@@ -28,7 +28,8 @@ export function AssetTable({
   handlersFor: (asset: Asset) => CardHandlers;
 }) {
   const header = (key: SortKey | null, label: string, className?: string) => {
-    const current = key && sort.key === key;
+    // In Recentes the rows follow recent use, not the saved sort: no column claims the order.
+    const current = !sortLocked && key && sort.key === key;
     return (
       <th
         scope="col"

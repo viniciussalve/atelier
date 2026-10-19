@@ -96,8 +96,9 @@ export function Atelier() {
 
   useEffect(() => {
     if (!navOpen) return;
+    // A menu or dialog open inside the bar takes Escape first (Radix marks it as handled).
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setNavOpen(false);
+      if (event.key === "Escape" && !event.defaultPrevented) setNavOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
