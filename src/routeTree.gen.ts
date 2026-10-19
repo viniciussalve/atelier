@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IaRouteImport } from './routes/ia'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ApiAdicionarRouteImport } from './routes/api/adicionar'
 import { Route as ApiConjuntosRouteImport } from './routes/api/conjuntos'
@@ -32,6 +33,11 @@ const IaRoute = IaRouteImport.update({
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   id: '/llms.txt',
   path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ia': typeof IaRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ia': typeof IaRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ia': typeof IaRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ia'
     | '/llms.txt'
+    | '/mcp'
     | '/robots.txt'
     | '/api/adicionar'
     | '/api/conjuntos'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ia'
     | '/llms.txt'
+    | '/mcp'
     | '/robots.txt'
     | '/api/adicionar'
     | '/api/conjuntos'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ia'
     | '/llms.txt'
+    | '/mcp'
     | '/robots.txt'
     | '/api/adicionar'
     | '/api/conjuntos'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   IaRoute: typeof IaRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  McpRoute: typeof McpRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   ApiAdicionarRoute: typeof ApiAdicionarRoute
   ApiConjuntosRoute: typeof ApiConjuntosRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/llms.txt'
       fullPath: '/llms.txt'
       preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   IaRoute: IaRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  McpRoute: McpRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   ApiAdicionarRoute: ApiAdicionarRoute,
   ApiConjuntosRoute: ApiConjuntosRoute,

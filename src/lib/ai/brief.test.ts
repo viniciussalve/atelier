@@ -60,6 +60,10 @@ describe("guide and robotsTxt", () => {
     assert.match(text, /Link para IA/);
     assert.match(text, /https:\/\/atelier\.app\/api\/fontes\?/);
     assert.doesNotMatch(text, /\*\*Inter\*\*:/);
+    assert.match(
+      text,
+      /## MCP\n\nAs mesmas buscas existem como ferramentas MCP em https:\/\/atelier\.app\/mcp/,
+    );
   });
 
   it("allows everything and points to llms.txt", () => {

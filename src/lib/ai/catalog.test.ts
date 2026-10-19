@@ -116,3 +116,10 @@ describe("findFont and findIconSet", () => {
     assert.equal(findIconSet(iconSetsFrom(ICON_INFO), "LUCIDE")?.name, "Lucide");
   });
 });
+
+describe("search limits", () => {
+  it("uses the default when the limit is not a number", () => {
+    assert.equal(searchFonts(FONTS, { limit: Number.NaN }).length, FONTS.length);
+    assert.equal(searchIconSets(iconSetsFrom(ICON_INFO), { limit: Number.NaN }).length, 4);
+  });
+});

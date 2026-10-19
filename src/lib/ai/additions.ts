@@ -35,6 +35,11 @@ const KINDS: Record<string, Kind> = {
   conjunto: "icon",
 };
 
+/** "fonte", "icones", "ícone", "icons", "conjunto"… → the kind; anything else → undefined. */
+export function kindFrom(text: unknown): Kind | undefined {
+  return typeof text === "string" ? KINDS[normalizeText(text.trim())] : undefined;
+}
+
 /** Letters, digits, spaces and the few marks Google Fonts names use ("M PLUS 1p", "Noto Sans JP"). */
 const FAMILY = /^[\p{L}\p{N}][\p{L}\p{N} .'&+-]{0,79}$/u;
 const PREFIX = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -46,7 +51,7 @@ export function parseAddList(value: string): AddSpec[] {
   for (const part of value.split(/[,;\n]+/)) {
     const colon = part.indexOf(":");
     if (colon < 0) continue;
-    const kind = KINDS[normalizeText(part.slice(0, colon).trim())];
+    const kind = kindFrom(part.slice(0, colon));
     let key = part
       .slice(colon + 1)
       .trim()
