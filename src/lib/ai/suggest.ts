@@ -29,7 +29,8 @@ export type Suggestion =
   | { ok: false; status: number; error: string };
 
 const fail = (status: number, error: string): Suggestion => ({ ok: false, status, error });
-const clamp = (limit: number | undefined) => Math.min(30, Math.max(1, limit ?? 10));
+const clamp = (limit: number | undefined) =>
+  Math.min(30, Math.max(1, Math.floor(limit !== undefined && Number.isFinite(limit) ? limit : 10)));
 
 export async function similarTo(
   query: { fonte?: string; conjunto?: string; amostras?: string[]; limite?: number },
@@ -64,6 +65,15 @@ export async function similarTo(
 const NOTHING_LIKED =
   "Ainda não há nada marcado Usar ou com carinha Bom ou melhor. Avalie alguns itens para ter recomendações.";
 
+/** Why there is nothing to recommend: no liked items, or liked items the catalogs lack. */
+function nothingToCompare(liked: string[], where: string): Suggestion {
+  if (liked.length === 0) return fail(422, NOTHING_LIKED);
+  return fail(
+    422,
+    `O que a pessoa marcou Usar ou com carinha Bom ou melhor (${liked.join(", ")}) não está no catálogo do ${where}, então não dá para comparar por semelhança. Busque por nome ou categoria.`,
+  );
+}
+
 /** Catalog items for this library's taste, leaving out what it already has. */
 export async function recommendFor(
   snapshot: Snapshot,
@@ -88,7 +98,7 @@ export async function recommendFor(
         similarWord: "parecido com",
       },
     );
-    if (sets.length === 0) return fail(422, NOTHING_LIKED);
+    if (sets.length === 0) return nothingToCompare(taste.liked, "Iconify");
     const liked = new Set(taste.liked);
     const names = [
       ...new Set(
@@ -119,7 +129,7 @@ export async function recommendFor(
     (font) => font.family,
     { exclude: snapshot.fontes.map((item) => item.k ?? item.n), limit },
   );
-  if (fonts.length === 0) return fail(422, NOTHING_LIKED);
+  if (fonts.length === 0) return nothingToCompare(taste.liked, "Google Fonts");
   return { ok: true, title: "Fontes recomendadas para esta biblioteca", fonts, sets: [] };
 }
 

@@ -6,7 +6,9 @@
  */
 
 export const MODERN_VERSION = "2026-07-28";
-export const LEGACY_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"];
+// 2025-03-26 is left out on purpose: its clients may send JSON-RPC batches, which
+// this server answers one message at a time.
+export const LEGACY_VERSIONS = ["2025-11-25", "2025-06-18"];
 export const SUPPORTED_VERSIONS = [MODERN_VERSION, ...LEGACY_VERSIONS];
 
 const VERSION_META = "io.modelcontextprotocol/protocolVersion";

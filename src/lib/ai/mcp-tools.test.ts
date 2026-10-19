@@ -110,3 +110,36 @@ describe("atelier MCP tools", () => {
     assert.equal((result.structuredContent?.criterios as unknown[]).length, 8);
   });
 });
+
+describe("tool arguments an AI may get wrong", () => {
+  it("ignores a limit or grid that is not a number instead of returning nothing", async () => {
+    const fonts = await callTool("buscar_fontes", { consulta: "inter", limite: "dez" });
+    assert.match(fonts.content[0].text, /\*\*Inter\*\*/);
+    const similar = await callTool("parecidas", { fonte: "Inter", limite: "x" });
+    assert.match(similar.content[0].text, /\*\*Inter Tight\*\*/);
+    const sets = await callTool("buscar_conjuntos", { grade: "abc" });
+    assert.match(sets.content[0].text, /`lucide`/);
+    const encoded = await encodeSnapshot(snapshotOf(defaultLibrary(), "2026-10-19T12:00:00.000Z"));
+    const recs = await callTool("recomendar", { link: encoded, tipo: "fontes", limite: "5x" });
+    assert.equal(recs.isError, false);
+  });
+
+  it("reads the same kind names the add link accepts, and skips broken items", async () => {
+    const result = await callTool("link_para_adicionar", {
+      itens: [
+        { tipo: "icone", nome: "lucide" },
+        { tipo: "conjunto", nome: "mingcute" },
+        { tipo: "font", nome: "Inter Tight" },
+        null,
+        "fonte:Caveat",
+        { tipo: "cor", nome: "azul" },
+      ],
+    });
+    assert.equal(result.isError, false);
+    assert.equal(
+      result.structuredContent?.link,
+      "https://atelier.app/?adicionar=icones:lucide,icones:mingcute,fonte:Inter%20Tight,fonte:Caveat",
+    );
+    assert.match(result.content[0].text, /tipo “cor” não é fonte nem ícones/);
+  });
+});

@@ -111,7 +111,8 @@ function rank(text: string, query: string): number {
 }
 
 function clampLimit(limit: number | undefined): number {
-  return Math.min(100, Math.max(1, Math.floor(limit ?? 20)));
+  const value = limit !== undefined && Number.isFinite(limit) ? limit : 20;
+  return Math.min(100, Math.max(1, Math.floor(value)));
 }
 
 export type FontQuery = {

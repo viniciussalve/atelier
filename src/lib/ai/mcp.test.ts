@@ -48,6 +48,17 @@ describe("handleMcp, 2025 clients", () => {
     });
   });
 
+  it("does not offer 2025-03-26, whose clients may send batches", async () => {
+    const reply = await call({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: { protocolVersion: "2025-03-26" },
+    });
+    assert.equal(result(reply).protocolVersion, "2025-11-25");
+    assert.equal(SUPPORTED_VERSIONS.includes("2025-03-26"), false);
+  });
+
   it("offers its newest 2025 version for an unknown one", async () => {
     const reply = await call({
       jsonrpc: "2.0",

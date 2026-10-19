@@ -3,7 +3,14 @@
  * endpoints, plus reading a "Link para IA" and writing an add link. Catalogs and
  * network lookups come in as dependencies, so the tools are testable offline.
  */
-import { addLink, formatAddList, parseAddList, resolveSpecs, type AddSpec } from "./additions.ts";
+import {
+  addLink,
+  formatAddList,
+  kindFrom,
+  parseAddList,
+  resolveSpecs,
+  type AddSpec,
+} from "./additions.ts";
 import { libraryBrief, scaleAndCriteria } from "./brief.ts";
 import { searchFonts, searchIconSets } from "./catalog.ts";
 import { fontJson, fontLine, iconSetJson, iconSetLine, listMarkdown } from "./format.ts";
@@ -31,12 +38,11 @@ export type ToolDeps = SuggestDeps & {
 
 const str = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : undefined;
-const num = (value: unknown) =>
-  typeof value === "number" && Number.isFinite(value)
-    ? value
-    : typeof value === "string" && value.trim()
-      ? Number(value)
-      : undefined;
+/** A finite number, or undefined: "dez" or "5x" must not become NaN and empty every list. */
+const num = (value: unknown) => {
+  const number = typeof value === "string" && value.trim() ? Number(value) : value;
+  return typeof number === "number" && Number.isFinite(number) ? number : undefined;
+};
 const bool = (value: unknown) =>
   typeof value === "boolean" ? value : typeof value === "string" ? flag(value) : undefined;
 const names = (value: unknown) =>
@@ -273,29 +279,44 @@ export function atelierTools(deps: ToolDeps): Tool[] {
       },
       annotations: READ_ONLY,
       run: async (args) => {
-        const asked = Array.isArray(args.itens) ? args.itens : [];
-        const wanted: AddSpec[] = asked.flatMap((entry) => {
+        const asked: unknown[] = Array.isArray(args.itens) ? args.itens : [];
+        const skipped: string[] = [];
+        const wanted: AddSpec[] = asked.flatMap((entry): AddSpec[] => {
+          // "fonte:Inter" as a plain string, as in the link itself.
+          if (typeof entry === "string") return parseAddList(entry);
+          if (!entry || typeof entry !== "object") return [];
           const item = entry as { tipo?: unknown; nome?: unknown };
           const key = str(item.nome);
           if (!key) return [];
-          return [{ kind: item.tipo === "icones" ? "icon" : "font", key } as AddSpec];
+          const kind = kindFrom(item.tipo);
+          if (!kind) {
+            skipped.push(
+              `- O tipo “${String(item.tipo)}” não é fonte nem ícones; “${key}” ficou de fora.`,
+            );
+            return [];
+          }
+          return [{ kind, key }];
         });
         const specs = parseAddList(formatAddList(wanted));
         const { missing } = resolveSpecs(specs, { fonts: deps.fonts, sets: deps.sets }, "");
         // An unknown prefix fails for sure; an unknown family may still be on Google Fonts.
         const kept = specs.filter((spec) => spec.kind === "font" || !missing.includes(spec));
         if (kept.length === 0) {
+          const why = skipped.length ? `\n\n${skipped.join("\n")}` : "";
           return {
-            text: "Nenhum item válido. Use famílias do Google Fonts e prefixos do Iconify.",
+            text: `Nenhum item válido. Use famílias do Google Fonts e prefixos do Iconify.${why}`,
             isError: true,
           };
         }
         const link = addLink(deps.base, kept, str(args.motivo));
-        const notes = missing.map((spec) =>
-          spec.kind === "font"
-            ? `- “${spec.key}” não está no catálogo embutido; o Atelier confere no Google Fonts ao abrir.`
-            : `- O conjunto “${spec.key}” não existe no Iconify e ficou de fora.`,
-        );
+        const notes = [
+          ...skipped,
+          ...missing.map((spec) =>
+            spec.kind === "font"
+              ? `- “${spec.key}” não está no catálogo embutido; o Atelier confere no Google Fonts ao abrir.`
+              : `- O conjunto “${spec.key}” não existe no Iconify e ficou de fora.`,
+          ),
+        ];
         return {
           text: `Link para a pessoa abrir e confirmar:\n\n${link}\n${notes.length ? `\n${notes.join("\n")}\n` : ""}`,
           structured: { link, itens: formatAddList(kept).split(","), avisos: notes },

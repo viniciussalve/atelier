@@ -61,3 +61,26 @@ describe("recommendFor", () => {
     assert.equal(result.ok, false);
   });
 });
+
+describe("recommendFor, when the liked items are outside the catalogs", () => {
+  it("says the catalogs do not have them, instead of asking for evaluations", async () => {
+    const custom = {
+      v: 1 as const,
+      em: "2026-10-19T12:00:00.000Z",
+      fontes: [{ n: "Marca Sans", k: "Marca Sans", v: "usar" as const }],
+      icones: [],
+    };
+    const result = await recommendFor(custom, "fontes", 3, deps);
+    assert.equal(result.ok, false);
+    assert.ok(!result.ok && /Marca Sans/.test(result.error) && /catálogo/.test(result.error));
+    assert.ok(!result.ok && !/Ainda não há nada marcado/.test(result.error));
+  });
+
+  it("treats a limit that is not a number as the default", async () => {
+    const snapshot = snapshotOf(defaultLibrary(), "2026-10-19T12:00:00.000Z");
+    const result = await recommendFor(snapshot, "fontes", Number.NaN, deps);
+    assert.ok(result.ok && result.fonts.length > 0);
+    const similar = await similarTo({ fonte: "Inter", limite: Number.NaN }, deps);
+    assert.ok(similar.ok && similar.fonts.length > 0);
+  });
+});
