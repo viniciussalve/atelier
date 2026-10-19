@@ -10,6 +10,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Três testes de `scripts/with-app-env.test.mjs` falham.**
   - Causa: falta `.grok/app-env.json`, um arquivo da plataforma que está no `.gitignore`.
   - O que fazer: o `setup.sh` cria o arquivo localmente.
+- **O dev não sobe ou o SSR quebra importando `grok-pwa-plugin.mjs` ou `preview-host-bridge`.**
+  - Causa: esses dois arquivos são da plataforma e não estão no repositório.
+  - O que fazer: o `setup.sh` copia substitutos vazios de `scripts/stubs/` e os deixa fora do git. Não os commite: no repositório, eles esconderiam os arquivos reais da plataforma.
 - **O Playwright não abre localhost e mostra uma página de "agent-proxy relay".**
   - Causa: o Chromium manda o loopback pelo proxy.
   - O que fazer: rode com `PLAYWRIGHT_DISABLE_FORCED_CHROMIUM_PROXIED_LOOPBACK=1`, que o `e2e/run.sh` já define.

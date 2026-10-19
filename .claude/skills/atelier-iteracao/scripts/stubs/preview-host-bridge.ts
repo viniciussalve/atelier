@@ -1,8 +1,9 @@
 /**
- * Stand-in for the platform's preview bridge, which is not part of this
- * repository. `components/preview-host-bridge.tsx` imports it on every route,
- * so without this file SSR fails. It installs nothing: the real bridge can
- * replace this file at the same path.
+ * Stand-in for the platform's preview bridge (`src/lib/preview-host-bridge.ts`),
+ * which is not part of this repository. `components/preview-host-bridge.tsx`
+ * imports it on every route, so without it SSR fails outside the platform.
+ * `setup.sh` copies this file there when it is missing, outside git. It
+ * installs nothing.
  */
 
 export type PreviewHostBridgeOptions = {

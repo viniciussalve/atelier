@@ -31,11 +31,12 @@ Os scripts citados ficam em `scripts/`, na pasta desta skill (no repositório, `
 bash $SKILL/scripts/setup.sh
 ```
 
-O script é idempotente e faz três coisas:
+O script é idempotente e faz quatro coisas:
 
 - instala as dependências com `--legacy-peer-deps`, porque o `npm install` puro trava num bug do npm;
 - cria o `.grok/app-env.json` local, sem o qual três testes falham;
-- tira o `package-lock.json` do git.
+- copia substitutos vazios de `src/lib/preview-host-bridge.ts` e `scripts/grok-pwa-plugin.mjs`, arquivos da plataforma sem os quais o dev não sobe;
+- tira do git o `package-lock.json` e esses substitutos.
 
 Rode-o ao começar, mesmo que pareça desnecessário: é barato e evita perder tempo com falhas que não são suas.
 
