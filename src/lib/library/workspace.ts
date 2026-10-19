@@ -6,6 +6,7 @@ import {
   DEFAULT_SYNC,
   alignSettings,
   applySettings,
+  assetIdOf,
   createWorkspace,
   keepPanes,
   reconcile,
@@ -85,7 +86,14 @@ export const useWorkspace = create<WorkspaceState>()(
       update: (op) => {
         const current = pickWorkspace(get());
         const next = op(current);
-        if (next !== current) set({ ...next, selections: keepPanes(get().selections, next.panes) });
+        if (next === current) return;
+        const active = next.panes[next.activePaneId]?.active;
+        set({
+          ...next,
+          selections: keepPanes(get().selections, next.panes),
+          // The drawer shows the item in front; with none it closes, or the next item would open under it.
+          inspectorDrawer: get().inspectorDrawer && !!active && assetIdOf(active) !== null,
+        });
       },
       setSizes: (splitId, layout) => {
         const root = setSizes(get().root, splitId, layout);

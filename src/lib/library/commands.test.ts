@@ -113,3 +113,19 @@ describe("compareItems", () => {
     }
   });
 });
+
+describe("inspector drawer", () => {
+  it("closes when the active pane stops showing an item", () => {
+    const { useWorkspace } = m.workspace;
+    useWorkspace.setState({ canSplit: false, inspectorDrawer: false });
+    m.commands.openItem("inter", "pin");
+    useWorkspace.getState().setInspector(true);
+    assert.equal(useWorkspace.getState().inspectorDrawer, true);
+
+    // Alt+W in the drawer closes the item and brings the collection to front.
+    const state = useWorkspace.getState();
+    m.commands.close(state.activePaneId, state.panes[state.activePaneId].active);
+    assert.equal(activeItem(), null);
+    assert.equal(useWorkspace.getState().inspectorDrawer, false);
+  });
+});
