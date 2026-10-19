@@ -10,14 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as IaRouteImport } from './routes/ia'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ApiAdicionarRouteImport } from './routes/api/adicionar'
 import { Route as ApiConjuntosRouteImport } from './routes/api/conjuntos'
 import { Route as ApiFontesRouteImport } from './routes/api/fontes'
 import { Route as ApiIconesRouteImport } from './routes/api/icones'
+import { Route as ApiParecidasRouteImport } from './routes/api/parecidas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IaRoute = IaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdicionarRoute = ApiAdicionarRouteImport.update({
@@ -40,50 +59,92 @@ const ApiIconesRoute = ApiIconesRouteImport.update({
   path: '/api/icones',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiParecidasRoute = ApiParecidasRouteImport.update({
+  id: '/api/parecidas',
+  path: '/api/parecidas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ia': typeof IaRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
   '/api/fontes': typeof ApiFontesRoute
   '/api/icones': typeof ApiIconesRoute
+  '/api/parecidas': typeof ApiParecidasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ia': typeof IaRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
   '/api/fontes': typeof ApiFontesRoute
   '/api/icones': typeof ApiIconesRoute
+  '/api/parecidas': typeof ApiParecidasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ia': typeof IaRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/api/adicionar': typeof ApiAdicionarRoute
   '/api/conjuntos': typeof ApiConjuntosRoute
   '/api/fontes': typeof ApiFontesRoute
   '/api/icones': typeof ApiIconesRoute
+  '/api/parecidas': typeof ApiParecidasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/api/adicionar' | '/api/conjuntos' | '/api/fontes' | '/api/icones'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/adicionar' | '/api/conjuntos' | '/api/fontes' | '/api/icones'
-  id:
-    | '__root__'
     | '/'
+    | '/ia'
+    | '/llms.txt'
+    | '/robots.txt'
     | '/api/adicionar'
     | '/api/conjuntos'
     | '/api/fontes'
     | '/api/icones'
+    | '/api/parecidas'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/ia'
+    | '/llms.txt'
+    | '/robots.txt'
+    | '/api/adicionar'
+    | '/api/conjuntos'
+    | '/api/fontes'
+    | '/api/icones'
+    | '/api/parecidas'
+  id:
+    | '__root__'
+    | '/'
+    | '/ia'
+    | '/llms.txt'
+    | '/robots.txt'
+    | '/api/adicionar'
+    | '/api/conjuntos'
+    | '/api/fontes'
+    | '/api/icones'
+    | '/api/parecidas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  IaRoute: typeof IaRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   ApiAdicionarRoute: typeof ApiAdicionarRoute
   ApiConjuntosRoute: typeof ApiConjuntosRoute
   ApiFontesRoute: typeof ApiFontesRoute
   ApiIconesRoute: typeof ApiIconesRoute
+  ApiParecidasRoute: typeof ApiParecidasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -93,6 +154,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ia': {
+      id: '/ia'
+      path: '/ia'
+      fullPath: '/ia'
+      preLoaderRoute: typeof IaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/adicionar': {
@@ -123,15 +205,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIconesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/parecidas': {
+      id: '/api/parecidas'
+      path: '/api/parecidas'
+      fullPath: '/api/parecidas'
+      preLoaderRoute: typeof ApiParecidasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  IaRoute: IaRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   ApiAdicionarRoute: ApiAdicionarRoute,
   ApiConjuntosRoute: ApiConjuntosRoute,
   ApiFontesRoute: ApiFontesRoute,
   ApiIconesRoute: ApiIconesRoute,
+  ApiParecidasRoute: ApiParecidasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

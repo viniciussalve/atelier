@@ -19,9 +19,22 @@ export function json(body: unknown, status = 200): Response {
 }
 
 /** Plain text, so a browser shows it instead of downloading a .md file. */
-export function markdown(body: string, status = 200): Response {
+export function markdown(
+  body: string,
+  status = 200,
+  headers: Record<string, string> = {},
+): Response {
   return new Response(body, {
     status,
-    headers: { "content-type": "text/plain; charset=utf-8", ...SHARED },
+    headers: { "content-type": "text/plain; charset=utf-8", ...SHARED, ...headers },
   });
+}
+
+/** The public origin of a request, behind the proxies that forward it. */
+export function baseOf(request: Request): string {
+  const url = new URL(request.url);
+  const first = (value: string | null) => value?.split(",")[0]?.trim() || undefined;
+  const host = first(request.headers.get("x-forwarded-host")) ?? url.host;
+  const proto = first(request.headers.get("x-forwarded-proto")) ?? url.protocol.replace(":", "");
+  return `${proto}://${host}`;
 }

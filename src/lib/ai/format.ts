@@ -51,3 +51,9 @@ export function iconSetLine(set: CatalogIconSet): string {
 export function listMarkdown(title: string, lines: string[]): string {
   return `# ${title}\n\n${lines.length ? lines.join("\n") : "Nada encontrado."}\n`;
 }
+
+/** One similar or recommended item: "- **Inter Tight** (85%): reasons. Adicionar: `fonte:Inter Tight`". */
+export function matchLine(label: string, score: number, reasons: string[], add: string): string {
+  const percent = Math.round(Math.max(0, score) * 100);
+  return `- ${label} (${percent}%): ${reasons.join("; ") || "pouco em comum"}. Adicionar: \`${add}\``;
+}

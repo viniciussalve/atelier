@@ -12,6 +12,7 @@ import {
   type CatalogIconSet,
   type IconifyInfoLike,
 } from "./catalog.ts";
+import { coverageFrom, type Coverage } from "./similarity.ts";
 import type { Asset } from "../library/types.ts";
 
 export const FONTS = fontData as CatalogFont[];
@@ -74,4 +75,32 @@ export async function searchIcons(
   } catch {
     return { icons: [], ok: false };
   }
+}
+
+/** Which of `names` each set has, asked to Iconify per set; sets that do not answer are left out. */
+export async function coverageOf(
+  prefixes: string[],
+  names: string[],
+  fetchImpl: Fetch = fetch,
+): Promise<Record<string, Coverage>> {
+  if (names.length === 0) return {};
+  const icons = names.map(encodeURIComponent).join(",");
+  const answers = await Promise.all(
+    prefixes.map(async (prefix) => {
+      try {
+        const response = await fetchImpl(
+          `https://api.iconify.design/${prefix}.json?icons=${icons}`,
+          {
+            signal: AbortSignal.timeout(4000),
+          },
+        );
+        if (!response.ok) return null;
+        const body = (await response.json()) as Parameters<typeof coverageFrom>[0];
+        return [prefix, coverageFrom(body, names)] as const;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return Object.fromEntries(answers.filter((answer) => answer !== null));
 }

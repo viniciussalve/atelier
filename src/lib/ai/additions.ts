@@ -67,12 +67,15 @@ export function formatAddList(specs: AddSpec[]): string {
   return specs.map((spec) => `${spec.kind === "font" ? "fonte" : "icones"}:${spec.key}`).join(",");
 }
 
-/** The link that opens the Atelier at `base` (see `appBase`) with the add dialog filled in. */
+/**
+ * The link that opens the Atelier at `base` (see `appBase`) with the add dialog
+ * filled in. `:` and `,` stay readable, so an AI can copy the shape.
+ */
 export function addLink(base: string, specs: AddSpec[], reason = ""): string {
-  const url = new URL(`${base.replace(/\/+$/, "")}/`);
-  url.searchParams.set("adicionar", formatAddList(specs));
-  if (reason.trim()) url.searchParams.set("motivo", reason.trim());
-  return url.toString();
+  const readable = (text: string) =>
+    encodeURIComponent(text).replace(/%3A/gi, ":").replace(/%2C/gi, ",");
+  const motivo = reason.trim() ? `&motivo=${encodeURIComponent(reason.trim())}` : "";
+  return `${base.replace(/\/+$/, "")}/?adicionar=${readable(formatAddList(specs))}${motivo}`;
 }
 
 function specKey(spec: AddSpec): string {

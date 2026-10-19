@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { Command, defaultFilter } from "cmdk";
 import {
   Columns2,
+  FileText,
   Equal,
   Folder,
   LayoutGrid,
@@ -11,9 +12,12 @@ import {
   Search,
   Type,
   Shapes,
+  Sparkles,
   X,
 } from "lucide-react";
 import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
+import { aiContextText, buildAiLink } from "@/components/library/shared/ai-link";
+import { copyText } from "@/components/library/shared/copy";
 import { KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import {
@@ -51,11 +55,14 @@ export function CommandPalette({
   open,
   onOpenChange,
   onAddItems,
+  aiLink,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Opens the add dialog; called a frame after the palette closes. */
   onAddItems: () => void;
+  /** The "Link para IA", kept current by the shell. */
+  aiLink: string;
 }) {
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
@@ -166,6 +173,28 @@ export function CommandPalette({
             label="Adicionar fonte ou conjunto…"
             // The palette gives focus back as it closes; the dialog opens after that.
             onSelect={() => run(() => requestAnimationFrame(onAddItems))}
+          />
+          <Action
+            icon={<Sparkles />}
+            label="Copiar link para IA"
+            onSelect={() =>
+              run(async () => {
+                const link = aiLink || (await buildAiLink());
+                await copyText(link, { notice: "Link para IA copiado", title: "Link para IA" });
+              })
+            }
+          />
+          <Action
+            icon={<FileText />}
+            label="Copiar contexto para IA como texto"
+            onSelect={() =>
+              run(() =>
+                copyText(aiContextText(), {
+                  notice: "Contexto para IA copiado",
+                  title: "Contexto para IA",
+                }),
+              )
+            }
           />
           <Action
             icon={<LayoutGrid />}

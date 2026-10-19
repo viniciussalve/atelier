@@ -59,6 +59,10 @@ describe("formatAddList and addLink", () => {
 
   it("builds a link the app reads back", () => {
     const link = addLink("https://atelier.app", [...specs], "Parecidas com Inter");
+    assert.equal(
+      link,
+      "https://atelier.app/?adicionar=fonte:DM%20Sans,icones:lucide&motivo=Parecidas%20com%20Inter",
+    );
     const url = new URL(link);
     assert.equal(url.pathname, "/");
     assert.deepEqual(parseAddList(url.searchParams.get("adicionar") ?? ""), specs);

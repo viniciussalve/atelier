@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { iconSetsFrom } from "./catalog.ts";
-import { fontJson, fontLine, iconSetLine, listMarkdown } from "./format.ts";
+import { fontJson, fontLine, iconSetLine, listMarkdown, matchLine } from "./format.ts";
 import { FONTS, ICON_INFO } from "./test-fixtures.ts";
 
 describe("catalog Markdown", () => {
@@ -23,5 +23,23 @@ describe("catalog Markdown", () => {
 
   it("says when nothing matched", () => {
     assert.equal(listMarkdown("Fontes", []), "# Fontes\n\nNada encontrado.\n");
+  });
+});
+
+describe("matchLine", () => {
+  it("shows the score as a percentage with the reasons", () => {
+    assert.equal(
+      matchLine(
+        "**Inter Tight**",
+        0.853,
+        ["mesma categoria (Sans serif)", "variável"],
+        "fonte:Inter Tight",
+      ),
+      "- **Inter Tight** (85%): mesma categoria (Sans serif); variável. Adicionar: `fonte:Inter Tight`",
+    );
+    assert.equal(
+      matchLine("**X**", -0.2, [], "fonte:X"),
+      "- **X** (0%): pouco em comum. Adicionar: `fonte:X`",
+    );
   });
 });
