@@ -35,6 +35,21 @@ describe("matchShortcut", () => {
     );
   });
 
+  it("finds the backslash key on ISO layouts like ABNT2", () => {
+    // ABNT2 puts \ | on IntlBackslash; its Backslash position types ] }.
+    assert.deepEqual(
+      matchShortcut(key({ key: "\\", code: "IntlBackslash", ctrlKey: true }), false),
+      {
+        type: "splitRight",
+      },
+    );
+    assert.deepEqual(
+      matchShortcut(key({ key: "|", code: "IntlBackslash", ctrlKey: true, shiftKey: true }), false),
+      { type: "splitDown" },
+    );
+    assert.equal(matchShortcut(key({ key: "]", code: "Backslash", ctrlKey: true }), false), null);
+  });
+
   it("closes a tab with Alt+W and focuses panes with Alt+digits by key position", () => {
     assert.deepEqual(matchShortcut(key({ key: "∑", code: "KeyW", altKey: true }), true), {
       type: "closeTab",

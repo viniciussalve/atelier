@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Columns2,
   FolderMinus,
@@ -36,6 +36,8 @@ export function FolderActions({
   const assets = useLibrary((state) => state.assets);
   const deleteFolder = useLibrary((state) => state.deleteFolder);
   const [confirming, setConfirming] = useState(false);
+  // Naming actions open an input; the menu must not pull focus back to its trigger.
+  const naming = useRef(false);
   const subfolders = descendantIds(folders, folder.id).length;
   const scope = new Set(folderScope(folders, folder.id));
   const items = assets.filter((item) => item.folderIds.some((id) => scope.has(id))).length;
@@ -61,11 +63,27 @@ export function FolderActions({
         <DropdownMenuTrigger aria-label={`Ações da pasta ${folder.name}`} className={trigger}>
           <MoreHorizontal className="size-4" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={onNewSubfolder}>
+        <DropdownMenuContent
+          align="end"
+          onCloseAutoFocus={(event) => {
+            if (naming.current) event.preventDefault();
+            naming.current = false;
+          }}
+        >
+          <DropdownMenuItem
+            onSelect={() => {
+              naming.current = true;
+              onNewSubfolder();
+            }}
+          >
             <FolderPlus /> Nova subpasta
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={onRename}>
+          <DropdownMenuItem
+            onSelect={() => {
+              naming.current = true;
+              onRename();
+            }}
+          >
             <Pencil /> Renomear
           </DropdownMenuItem>
           <DropdownMenuSeparator />

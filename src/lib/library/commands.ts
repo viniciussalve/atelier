@@ -97,10 +97,13 @@ export function neighborItem(assetId: string, step: -1 | 1): string | null {
   return list[index + step]?.id ?? null;
 }
 
+/**
+ * Steps to the previous or next item. Browsing does not count as use: marking
+ * each step would reorder Recentes under the arrows and bounce between two items.
+ */
 export function navigate(paneId: string, assetId: string, step: -1 | 1) {
   const next = neighborItem(assetId, step);
   if (!next) return;
-  lib().markUsed(next);
   ws().update((state) => replaceTab(state, paneId, assetKey(assetId), assetKey(next)));
 }
 

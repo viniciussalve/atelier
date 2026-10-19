@@ -31,7 +31,11 @@ export function matchShortcut(event: ShortcutEvent, isMac: boolean): Command | n
   if (mod && !event.altKey) {
     if (!event.shiftKey && (event.code === "KeyK" || event.key.toLowerCase() === "k"))
       return { type: "quickOpen" };
-    if (event.code === "Backslash") return { type: event.shiftKey ? "splitDown" : "splitRight" };
+    // By character: the \ key sits on Backslash in US layouts but on
+    // IntlBackslash in ISO ones like ABNT2, where Backslash types ].
+    if (event.key === "\\" || event.key === "|") {
+      return { type: event.shiftKey ? "splitDown" : "splitRight" };
+    }
     return null;
   }
 

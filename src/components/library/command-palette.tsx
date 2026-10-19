@@ -55,8 +55,12 @@ export function CommandPalette({
     action();
   };
 
-  const openAsset = (asset: Asset) =>
-    run(() => openItem(asset.id, toSide.current && canSplit ? "side" : "pin"));
+  // ⌘/Ctrl+Enter applies to the selection it triggers, not to later ones.
+  const openAsset = (asset: Asset) => {
+    const side = toSide.current && canSplit;
+    toSide.current = false;
+    run(() => openItem(asset.id, side ? "side" : "pin"));
+  };
 
   const group = (kind: Kind) => (
     <Command.Group heading={KIND_LABEL[kind]} className={heading}>
@@ -92,7 +96,7 @@ export function CommandPalette({
       overlayClassName="fixed inset-0 z-50 bg-ink/70"
       contentClassName="fixed top-[12vh] left-1/2 z-50 w-[min(36rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-surface text-fg shadow-[0_24px_64px_rgb(0_0_0/0.5)]"
       onKeyDown={(event) => {
-        if (event.key === "Enter") toSide.current = event.metaKey || event.ctrlKey;
+        toSide.current = event.key === "Enter" && (event.metaKey || event.ctrlKey);
       }}
     >
       <div className="flex items-center gap-2 border-b border-border px-3">

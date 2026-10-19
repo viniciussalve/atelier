@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type DragEvent, type MouseEvent } from "react";
 import { ChevronRight } from "lucide-react";
 import { VerdictDot } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
@@ -190,7 +190,10 @@ function FolderRow({
           </span>
           <FolderActions
             folder={folder}
-            onNewSubfolder={() => onDraft({ mode: "create", parentId: folder.id })}
+            onNewSubfolder={() => {
+              setExpanded(folder.id, true);
+              onDraft({ mode: "create", parentId: folder.id });
+            }}
             onRename={() => onDraft({ mode: "rename", folderId: folder.id })}
           />
         </div>
@@ -318,6 +321,14 @@ function NameInput({
   const [value, setValue] = useState(initial);
   // Enter submits and then the input blurs as it unmounts; act only once.
   const settled = useRef(false);
+  const input = useRef<HTMLInputElement>(null);
+
+  // Focus after the frame: when a menu opened this input, its focus handling
+  // runs as it closes and would otherwise take focus back.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => input.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   function finish(save: boolean) {
     if (settled.current) return;
@@ -339,7 +350,7 @@ function NameInput({
       }}
     >
       <input
-        autoFocus
+        ref={input}
         value={value}
         placeholder={placeholder}
         aria-label={placeholder}

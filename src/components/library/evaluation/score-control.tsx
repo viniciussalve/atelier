@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { Info, PenLine } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -106,6 +106,19 @@ function NoteEditor({
     const timer = setTimeout(() => onNote(draft), 400);
     return () => clearTimeout(timer);
   }, [draft, note, onNote]);
+
+  // Closing the popover (Escape) unmounts the editor before the pause ends: save then.
+  const pending = useRef({ draft, note, onNote });
+  useEffect(() => {
+    pending.current = { draft, note, onNote };
+  });
+  useEffect(
+    () => () => {
+      const { draft: last, note: saved, onNote: save } = pending.current;
+      if (last !== saved) save(last);
+    },
+    [],
+  );
 
   return (
     <label className="block">
