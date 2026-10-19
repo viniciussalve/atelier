@@ -44,6 +44,13 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Teste que importa um store precisa de `localStorage`.**
   - O que fazer: copie o padrão de `commands.test.ts`. Ele cria um `localStorage` em memória e só então importa os módulos, com `await import(...)`.
 
+- **JSON de pacote no servidor quebra com `ERR_IMPORT_ATTRIBUTE_MISSING`.**
+  - Causa: o SSR do Vite deixa o pacote para o Node, que exige `with { type: "json" }`. O índice do `@iconify/collections` importa o JSON sem isso.
+  - O que fazer: importe o `.json` direto, com o atributo: `import collections from "@iconify/collections/collections.json" with { type: "json" }`.
+- **Rota de servidor nova não existe para o `tsc`.**
+  - Causa: o `src/routeTree.gen.ts` só se refaz quando o dev ou o build rodam.
+  - O que fazer: suba o dev antes do typecheck e commite o arquivo gerado (ele está no `.prettierignore`).
+
 ## React e zustand
 
 - **"Maximum update depth exceeded" ou loop de renderização.**
@@ -79,6 +86,10 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Um modificador "vaza" para a próxima ação.**
   - Causa: um ref guarda, por exemplo, ⌘Enter na paleta e nunca é zerado.
   - O que fazer: leia o modificador e zere-o na mesma seleção.
+
+- **Uma fonte adicionada some junto com as outras.**
+  - Causa: o `css2` do Google Fonts responde 400 para a requisição inteira se uma família ou um peso não existe.
+  - O que fazer: um `<link>` por família (`fontAssetHref`), com os pesos do catálogo; família desconhecida vai sem eixo.
 
 ## Teclado
 

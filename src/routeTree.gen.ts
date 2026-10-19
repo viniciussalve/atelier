@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiAdicionarRouteImport } from './routes/api/adicionar'
+import { Route as ApiConjuntosRouteImport } from './routes/api/conjuntos'
+import { Route as ApiFontesRouteImport } from './routes/api/fontes'
+import { Route as ApiIconesRouteImport } from './routes/api/icones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdicionarRoute = ApiAdicionarRouteImport.update({
+  id: '/api/adicionar',
+  path: '/api/adicionar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiConjuntosRoute = ApiConjuntosRouteImport.update({
+  id: '/api/conjuntos',
+  path: '/api/conjuntos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFontesRoute = ApiFontesRouteImport.update({
+  id: '/api/fontes',
+  path: '/api/fontes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIconesRoute = ApiIconesRouteImport.update({
+  id: '/api/icones',
+  path: '/api/icones',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/adicionar': typeof ApiAdicionarRoute
+  '/api/conjuntos': typeof ApiConjuntosRoute
+  '/api/fontes': typeof ApiFontesRoute
+  '/api/icones': typeof ApiIconesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/adicionar': typeof ApiAdicionarRoute
+  '/api/conjuntos': typeof ApiConjuntosRoute
+  '/api/fontes': typeof ApiFontesRoute
+  '/api/icones': typeof ApiIconesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/adicionar': typeof ApiAdicionarRoute
+  '/api/conjuntos': typeof ApiConjuntosRoute
+  '/api/fontes': typeof ApiFontesRoute
+  '/api/icones': typeof ApiIconesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/api/adicionar' | '/api/conjuntos' | '/api/fontes' | '/api/icones'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/adicionar' | '/api/conjuntos' | '/api/fontes' | '/api/icones'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/adicionar'
+    | '/api/conjuntos'
+    | '/api/fontes'
+    | '/api/icones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiAdicionarRoute: typeof ApiAdicionarRoute
+  ApiConjuntosRoute: typeof ApiConjuntosRoute
+  ApiFontesRoute: typeof ApiFontesRoute
+  ApiIconesRoute: typeof ApiIconesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/adicionar': {
+      id: '/api/adicionar'
+      path: '/api/adicionar'
+      fullPath: '/api/adicionar'
+      preLoaderRoute: typeof ApiAdicionarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conjuntos': {
+      id: '/api/conjuntos'
+      path: '/api/conjuntos'
+      fullPath: '/api/conjuntos'
+      preLoaderRoute: typeof ApiConjuntosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/fontes': {
+      id: '/api/fontes'
+      path: '/api/fontes'
+      fullPath: '/api/fontes'
+      preLoaderRoute: typeof ApiFontesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/icones': {
+      id: '/api/icones'
+      path: '/api/icones'
+      fullPath: '/api/icones'
+      preLoaderRoute: typeof ApiIconesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiAdicionarRoute: ApiAdicionarRoute,
+  ApiConjuntosRoute: ApiConjuntosRoute,
+  ApiFontesRoute: ApiFontesRoute,
+  ApiIconesRoute: ApiIconesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

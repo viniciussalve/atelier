@@ -4,7 +4,7 @@
 
 - [Mapa](#mapa)
 - [Fluxo de dados](#fluxo-de-dados)
-- [Receitas](#receitas): critério, faceta de filtro, vista rápida, aba de prova, atalho, comando da paleta, configuração sincronizável, operação de painel, campo persistido.
+- [Receitas](#receitas): critério, faceta de filtro, vista rápida, aba de prova, atalho, comando da paleta, configuração sincronizável, operação de painel, campo persistido, endpoint para IA.
 
 ## Mapa
 
@@ -20,14 +20,31 @@
 | `workspace-model.ts` | Painéis e abas: `openTab` (com prévia), `closeTab`, `splitPane`, `moveTab`, `dropTab`, `dropAsset`, `openToSide`, `compare`, `applySettings` (sincronia), `reconcile`, `sanitizeWorkspace`, `checkWorkspace`                      | sim                   |
 | `migrate.ts`         | `migrateLibrary`, para qualquer versão anterior do store da biblioteca                                                                                                                                                            | sim                   |
 | `seed.ts`            | Pastas e itens iniciais no formato atual, `defaultLibrary()`                                                                                                                                                                      | via `migrate.test.ts` |
-| `fonts.ts`           | `parseWeights`, `weightName`, `googleFontsHref` (usado no `__root.tsx`)                                                                                                                                                           | sim                   |
+| `fonts.ts`           | `parseWeights`, `weightName`, `googleFontsHref` (sementes, no `__root.tsx`), `googleFontHref`/`fontAssetHref` (um link por fonte adicionada)                                                                                      | sim                   |
 | `shortcuts.ts`       | `matchShortcut` (puro), `shortcutLabel`                                                                                                                                                                                           | sim                   |
 | `format.ts`          | `formatDate`                                                                                                                                                                                                                      | sim                   |
 | `store.ts`           | Store zustand da biblioteca (persist `atelier-library`, **versão 4**)                                                                                                                                                             | —                     |
 | `workspace.ts`       | Store zustand dos painéis (persist `atelier-workspace`, versão 1). Também guarda `drag`, `layoutEpoch` e `canSplit`, que não são persistidos                                                                                      | —                     |
-| `commands.ts`        | Ações que tocam os dois stores: `openItem`, `showView`, `compareItems`, `navigate`, `dropOnPane`, `score`, `split`, `beginDrag`/`endDrag`…                                                                                        | `commands.test.ts`    |
+| `commands.ts`        | Ações que tocam os dois stores: `openItem`, `showView`, `addItems`, `compareItems`, `navigate`, `dropOnPane`, `score`, `split`, `beginDrag`/`endDrag`…                                                                            | `commands.test.ts`    |
 | `hooks.ts`           | `useAsset`, `usePane`, `useActivePane`, `useActiveAsset`, `useCollection`                                                                                                                                                         | —                     |
 | `test-fixtures.ts`   | `asset()` e `folder()` para testes                                                                                                                                                                                                | —                     |
+
+### `src/lib/ai/`: catálogos e ponte com IA
+
+Módulos puros, testados com `node --experimental-strip-types` como os de `src/lib/library/` (imports relativos com `.ts`, `import type`). Recebem os catálogos como argumento; os testes usam `test-fixtures.ts`.
+
+| Arquivo                  | O que faz                                                                                                                                                | Teste |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `catalog.ts`             | Tipos `CatalogFont` e `CatalogIconSet`, `iconSetsFrom` (Iconify), `searchFonts`, `searchIconSets`, `findFont`, `findIconSet`, `iconSetStyle`             | sim   |
+| `additions.ts`           | A lista `adicionar` (`parseAddList`, `formatAddList`, `addLink`), `fontAsset`/`iconSetAsset`, `resolveSpecs`, `assetKeyOf`, `mergeNewAssets`, `AI_TAG`   | sim   |
+| `params.ts`              | Lê a query dos endpoints em português (`categoria=monoespaçada`, `traco=sim`)                                                                            | sim   |
+| `format.ts`              | Itens do catálogo em JSON e Markdown, com o trecho `fonte:…`/`icones:…` para o link                                                                      | sim   |
+| `links.ts`               | `appBase`/`appUrl`: a origem pública, com o prefixo dos previews por caminho. Use em todo `fetch` e link montado no navegador                            | sim   |
+| `respond.ts`             | Respostas JSON ou Markdown (`?formato=md`), com CORS aberto: são dados públicos                                                                          | —     |
+| `catalog.server.ts`      | Só no servidor: os catálogos embutidos, `resolveAdditions` (confere no Google Fonts a família que o catálogo não tem) e `searchIcons` (busca do Iconify) | —     |
+| `data/google-fonts.json` | Catálogo do Google Fonts, gerado por `scripts/catalog-google-fonts.mjs`. O do Iconify vem do pacote `@iconify/collections`                               | —     |
+
+Rotas de servidor em `src/routes/api/`: `fontes`, `conjuntos`, `icones` e `adicionar`.
 
 ### `src/components/library/`: interface
 
@@ -40,11 +57,12 @@
 | `specimen/`           | `asset-tab.tsx` (cabeçalho do item, abas da prova, controles, área rolável), `font-specimen.tsx` (FontProof, FontWeights, FontGlyphs), `icon-specimen.tsx`, `info.tsx`, `section.tsx` (seção com a nota do critério) e `controls.tsx` |
 | `evaluation/`         | `score-control.tsx` (cinco carinhas, nas variantes inline e full), `scorecard.tsx`, `badges.tsx` (`ScoreFace`, `ScoreBadge`) e `tones.ts` (classes por veredito, `withVerdict`)                                                       |
 | `inspector/`          | `inspector.tsx` (coluna ou gaveta, abas) e `details.tsx`                                                                                                                                                                              |
-| `shared/`             | `grounds.ts` (fundos e cor de tinta), `labels.ts`, `use-tab-label.ts`, `use-media-query.ts` e `field.tsx`                                                                                                                             |
+| `shared/`             | `grounds.ts` (fundos e cor de tinta), `labels.ts`, `use-tab-label.ts`, `use-media-query.ts`, `use-font-links.ts` (folhas das fontes adicionadas) e `field.tsx`                                                                        |
+| `import-dialog.tsx`   | Diálogo de adicionar: lista as sugestões de um link `?adicionar=` ou busca no catálogo (comando do ⌘K). Só grava ao confirmar                                                                                                         |
 | `command-palette.tsx` | Paleta ⌘K (cmdk)                                                                                                                                                                                                                      |
 | `icons.tsx`           | `Glyph` (img do Iconify com aviso de "não encontrado") e `SetGlyphs`                                                                                                                                                                  |
 
-`src/components/ui/` tem wrappers Radix já estilizados: tooltip, icon-button (rótulo obrigatório), dropdown-menu, popover, confirm-dialog, segmented e tabs. Use-os em vez de criar outros.
+`src/components/ui/` tem wrappers Radix já estilizados: tooltip, icon-button (rótulo obrigatório), dropdown-menu, popover, confirm-dialog (destrutivo), dialog (`Modal`), segmented e tabs, além de `face-icon` (as carinhas). Use-os em vez de criar outros.
 
 ## Fluxo de dados
 
@@ -115,3 +133,10 @@ Em `command-palette.tsx`, acrescente um `<Action icon label shortcut onSelect>` 
 2. Biblioteca: estenda `migrateLibrary` e cubra o caso antigo em `migrate.test.ts`.
 3. Espaço de trabalho: `sanitizeWorkspace` tolera campos ausentes e completa os valores padrão; teste em `workspace-model.test.ts`.
 4. No PR, diga o que acontece com os dados de quem já usa.
+
+### Novo endpoint para IA
+
+1. A lógica vai num módulo puro em `src/lib/ai/`, com teste. Se precisar de rede ou dos catálogos, a parte que busca fica em `catalog.server.ts` (ou outro `*.server.ts`), com o `fetch` injetável.
+2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`.
+3. Suba o dev (`server.sh start`) antes do `tsc`: ele regenera `src/routeTree.gen.ts`, que vai no commit.
+4. Confira com `curl` em JSON e em `?formato=md`.

@@ -1,6 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { googleFontsHref, parseWeights, primaryFamily, weightName } from "./fonts.ts";
+import {
+  fontAssetHref,
+  googleFontHref,
+  googleFontsHref,
+  parseWeights,
+  primaryFamily,
+  weightName,
+} from "./fonts.ts";
 import { seedAssets } from "./seed.ts";
 
 describe("parseWeights", () => {
@@ -41,6 +48,35 @@ describe("googleFontsHref", () => {
     assert.equal(
       googleFontsHref(seedAssets),
       "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600&family=Roboto:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap",
+    );
+  });
+});
+
+describe("googleFontHref", () => {
+  it("asks for one family with its weights", () => {
+    assert.equal(
+      googleFontHref("Inter Tight", [700, 400]),
+      "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;700&display=swap",
+    );
+  });
+
+  it("asks for the default cut when the weights are unknown", () => {
+    assert.equal(
+      googleFontHref("M PLUS 1p", []),
+      "https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap",
+    );
+  });
+});
+
+describe("fontAssetHref", () => {
+  it("reads the first family and the declared weights", () => {
+    assert.equal(
+      fontAssetHref({ family: '"Space Mono", monospace', weights: "400, 700" }),
+      "https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap",
+    );
+    assert.equal(
+      fontAssetHref({ family: '"Brand New", sans-serif', weights: "" }),
+      "https://fonts.googleapis.com/css2?family=Brand+New&display=swap",
     );
   });
 });

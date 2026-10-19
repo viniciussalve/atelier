@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { CommandPalette } from "@/components/library/command-palette";
+import { ImportDialog, type ImportRequest } from "@/components/library/import-dialog";
 import { Inspector } from "@/components/library/inspector/inspector";
+import { useLibraryFonts } from "@/components/library/shared/use-font-links";
 import { isMacPlatform, useMediaQuery } from "@/components/library/shared/use-media-query";
 import { Sidebar } from "@/components/library/sidebar/sidebar";
 import { Workspace } from "@/components/library/workspace/workspace";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { parseAddList } from "@/lib/ai/additions";
 import { close, focusPaneAt, navigate, split } from "@/lib/library/commands";
 import { matchShortcut, type Command } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
@@ -18,6 +22,15 @@ const ARROW_WIDGETS =
 function isTyping(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   return !!target.closest("input, textarea, select, [contenteditable=true]");
+}
+
+/** `?adicionar=fonte:Inter,icones:lucide&motivo=…`, the link an AI writes with its suggestions. */
+function linkedSuggestions(): ImportRequest | null {
+  // Read raw: the router's search parsing would turn a numeric `motivo` into a number.
+  const params = new URLSearchParams(window.location.search);
+  const specs = parseAddList(params.get("adicionar") ?? "");
+  if (specs.length === 0) return null;
+  return { mode: "link", specs, reason: params.get("motivo")?.trim() ?? "" };
 }
 
 function runShortcut(command: Command) {
@@ -50,7 +63,15 @@ export function Atelier() {
   const [ready, setReady] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [adding, setAdding] = useState<ImportRequest | null>(null);
+  // Shortcuts would act on the page behind the add dialog.
+  const modal = useRef(false);
+  useEffect(() => {
+    modal.current = adding !== null;
+  }, [adding]);
   const wide = useMediaQuery("(min-width: 860px)");
+  const routerNavigate = useNavigate();
+  useLibraryFonts();
 
   useEffect(() => {
     let alive = true;
@@ -59,7 +80,9 @@ export function Atelier() {
       await useWorkspace.persist.rehydrate();
       const ids = new Set(useLibrary.getState().assets.map((item) => item.id));
       useWorkspace.getState().reconcile(ids);
-      if (alive) setReady(true);
+      if (!alive) return;
+      setAdding(linkedSuggestions());
+      setReady(true);
     })();
     return () => {
       alive = false;
@@ -72,11 +95,18 @@ export function Atelier() {
     if (ready) useWorkspace.getState().setCanSplit(wide);
   }, [ready, wide]);
 
+  // The link did its job once read: reloading should not ask again.
+  useEffect(() => {
+    if (ready && new URLSearchParams(window.location.search).has("adicionar")) {
+      void routerNavigate({ to: "/", search: {}, replace: true });
+    }
+  }, [ready, routerNavigate]);
+
   useEffect(() => {
     if (!ready) return;
     const mac = isMacPlatform();
     function onKeyDown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.isComposing) return;
+      if (event.defaultPrevented || event.isComposing || modal.current) return;
       const command = matchShortcut(event, mac);
       if (!command) return;
       if (command.type === "quickOpen") {
@@ -138,7 +168,12 @@ export function Atelier() {
           <Inspector />
         </main>
       </div>
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onAddItems={() => setAdding({ mode: "search", kind: useLibrary.getState().kind })}
+      />
+      <ImportDialog request={adding} onClose={() => setAdding(null)} />
     </TooltipProvider>
   );
 }

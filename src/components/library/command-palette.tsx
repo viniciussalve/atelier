@@ -6,6 +6,7 @@ import {
   Folder,
   LayoutGrid,
   PanelRight,
+  Plus,
   Rows2,
   Search,
   Type,
@@ -43,9 +44,12 @@ const filter = ignoringAccents(defaultFilter);
 export function CommandPalette({
   open,
   onOpenChange,
+  onAddItems,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Opens the add dialog; called a frame after the palette closes. */
+  onAddItems: () => void;
 }) {
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
@@ -150,6 +154,12 @@ export function CommandPalette({
             icon={<Shapes />}
             label="Ir para Ícones"
             onSelect={() => run(() => showLibrary("icon"))}
+          />
+          <Action
+            icon={<Plus />}
+            label="Adicionar fonte ou conjunto…"
+            // The palette gives focus back as it closes; the dialog opens after that.
+            onSelect={() => run(() => requestAnimationFrame(onAddItems))}
           />
           <Action
             icon={<LayoutGrid />}

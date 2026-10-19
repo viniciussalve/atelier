@@ -129,3 +129,45 @@ describe("inspector drawer", () => {
     assert.equal(useWorkspace.getState().inspectorDrawer, false);
   });
 });
+
+describe("addItems", () => {
+  const newSet = (id: string, iconKey: string) => ({
+    ...m.store.useLibrary.getState().assets.find((asset) => asset.kind === "icon")!,
+    id,
+    name: id,
+    iconKey,
+    format: iconKey,
+    tags: [],
+    criteria: {},
+    verdict: "" as const,
+  });
+
+  it("adds what is new, marks AI suggestions and opens the first one to evaluate", () => {
+    const { useLibrary } = m.store;
+    const before = useLibrary.getState().assets.length;
+    const added = m.commands.addItems(
+      [newSet("mingcute", "mingcute"), newSet("lucide", "lucide")],
+      {
+        fromAi: true,
+        reason: "Grade 24 como o Lucide",
+      },
+    );
+    assert.deepEqual(added, ["mingcute"], "Lucide is already in the library");
+
+    const state = useLibrary.getState();
+    assert.equal(state.assets.length, before + 1);
+    const item = state.assets.find((asset) => asset.id === "mingcute");
+    assert.deepEqual(item?.tags, ["ia"]);
+    assert.equal(item?.notes, "Grade 24 como o Lucide");
+    assert.equal(state.kind, "icon");
+    assert.deepEqual(state.nav.icon.view, { type: "pending" });
+    assert.equal(activeItem(), "mingcute");
+  });
+
+  it("adds without the AI tag from the add command and does nothing twice", () => {
+    const added = m.commands.addItems([newSet("solar", "solar")]);
+    assert.deepEqual(m.store.useLibrary.getState().assets.find((a) => a.id === "solar")?.tags, []);
+    assert.deepEqual(added, ["solar"]);
+    assert.deepEqual(m.commands.addItems([newSet("solar", "solar")]), []);
+  });
+});
