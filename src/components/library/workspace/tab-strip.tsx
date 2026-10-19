@@ -49,11 +49,12 @@ export function TabStrip({ pane, focused }: { pane: Pane; focused: boolean }) {
     event.preventDefault();
     setMarker(null);
     if (!drag) return;
+    const { index } = slotAt(event.clientX);
     if (drag.type === "tab") {
-      moveTabTo(drag.fromPaneId, drag.key, pane.id, slotAt(event.clientX).index);
+      moveTabTo(drag.fromPaneId, drag.key, pane.id, index);
       endDrag();
     } else {
-      dropOnPane(pane.id, "center");
+      dropOnPane(pane.id, "center", index);
     }
   }
 

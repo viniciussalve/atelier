@@ -210,15 +210,22 @@ export function activateTab(ws: Workspace, paneId: string, key: TabKey): Workspa
   return withPane(ws, { ...pane, active: key });
 }
 
-/** Opens `key` in a pane: reuses the preview tab for previews, inserts after the active tab otherwise. */
+/**
+ * Opens `key` in a pane: reuses the preview tab for previews, inserts after the
+ * active tab otherwise. `at` is a slot in the tab strip (a drop there): the tab
+ * goes in at it, or moves to it if already open.
+ */
 export function openTab(
   ws: Workspace,
   paneId: string,
   key: TabKey,
-  options: { preview: boolean },
+  options: { preview: boolean; at?: number },
 ): Workspace {
   const pane = ws.panes[paneId];
   if (!pane) return ws;
+  if (options.at !== undefined && pane.tabs.includes(key)) {
+    return moveTab(ws, paneId, key, paneId, options.at);
+  }
   const asPreview = options.preview && key !== "collection";
   let tabs = pane.tabs;
   let preview = pane.preview;
@@ -228,7 +235,7 @@ export function openTab(
     tabs = tabs.map((tab) => (tab === preview ? key : tab));
     preview = key;
   } else {
-    const at = tabs.indexOf(pane.active) + 1;
+    const at = options.at ?? tabs.indexOf(pane.active) + 1;
     tabs = [...tabs.slice(0, at), key, ...tabs.slice(at)];
     if (asPreview) preview = key;
   }
@@ -378,17 +385,18 @@ export function dropTab(
   return splitPane(removed, to, zone, [key]);
 }
 
-/** Drops an item dragged from the sidebar or the collection. */
+/** Drops an item dragged from the sidebar or the collection; `at` is a slot in the tab strip. */
 export function dropAsset(
   ws: Workspace,
   assetId: string,
   to: string,
   zone: DropZone,
   area?: Box,
+  at?: number,
 ): Workspace {
   const key = assetKey(assetId);
   if (zone === "center" || paneCount(ws) >= MAX_PANES || !fits(ws, to, zone, area))
-    return openTab(ws, to, key, { preview: false });
+    return openTab(ws, to, key, { preview: false, at });
   return splitPane(ws, to, zone, [key]);
 }
 

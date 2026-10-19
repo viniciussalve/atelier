@@ -142,14 +142,14 @@ export function equalizeAll() {
   ws().equalize();
 }
 
-/** Drops whatever is being dragged onto a pane. */
-export function dropOnPane(paneId: string, zone: DropZone) {
+/** Drops whatever is being dragged onto a pane; `at` is a slot in its tab strip, for items. */
+export function dropOnPane(paneId: string, zone: DropZone, at?: number) {
   const drag = ws().drag;
   endDrag();
   if (!drag) return;
   if (drag.type === "asset") {
     lib().markUsed(drag.assetId);
-    ws().update((state) => dropAsset(state, drag.assetId, paneId, zone, roomFor(true)));
+    ws().update((state) => dropAsset(state, drag.assetId, paneId, zone, roomFor(true), at));
   } else {
     ws().update((state) =>
       dropTab(state, drag.fromPaneId, drag.key, paneId, zone, roomFor(drag.key !== "collection")),

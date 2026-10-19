@@ -257,6 +257,25 @@ describe("dropAsset", () => {
     assert.equal(shape(valid(ws).root), "V[P,P]");
     assert.deepEqual(pane(ws, 1).tabs, [b]);
   });
+
+  it("dropped on the tab strip, lands at the slot the marker showed", () => {
+    let ws = createWorkspace();
+    const id = ws.activePaneId;
+    ws = openTab(openTab(ws, id, a, { preview: false }), id, b, { preview: false });
+    assert.deepEqual(pane(ws).tabs, ["collection", a, b]);
+    ws = dropAsset(ws, "c", id, "center", undefined, 0);
+    assert.deepEqual(pane(valid(ws)).tabs, [c, "collection", a, b]);
+    assert.equal(pane(ws).active, c);
+  });
+
+  it("dropped on the tab strip, moves an open item to the slot", () => {
+    let ws = createWorkspace();
+    const id = ws.activePaneId;
+    ws = openTab(openTab(ws, id, a, { preview: false }), id, b, { preview: true });
+    ws = dropAsset(ws, "b", id, "center", undefined, 1);
+    assert.deepEqual(pane(valid(ws)).tabs, ["collection", b, a]);
+    assert.equal(pane(ws).preview, null);
+  });
 });
 
 describe("openToSide", () => {
