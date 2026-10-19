@@ -32,7 +32,7 @@
       "id": 2,
       "name": "copiar-avaliacao",
       "prompt": "Quero copiar a avaliação de uma fonte ou conjunto de ícones pra colar no Slack: nome, nota geral, veredito e cada critério com a nota e a observação, se tiver. Coloca um botão \"Copiar avaliação\" no inspetor. Pode seguir sem me perguntar.",
-      "expected_output": "Botão \"Copiar avaliação\" no inspetor que copia um texto com nome, nota geral no formato pt-BR, veredito e critérios com nota e observação; a formatação mora numa função pura testada; checagens limpas, verificação no navegador e commit local em pt-BR.",
+      "expected_output": "Botão \"Copiar avaliação\" no inspetor que copia um texto com nome, nota geral como palavra da escala (Bom), veredito e critérios com a palavra da carinha e a observação; a formatação mora numa função pura testada; checagens limpas, verificação no navegador e commit local em pt-BR.",
       "files": [],
       "assertions": [
         "Fez pelo menos um commit local",
@@ -45,7 +45,7 @@
         "Acrescentou teste para a mudança (mais que os 122 da base)",
         "Verificou no navegador e guardou screenshot",
         "Há um botão \"Copiar avaliação\" com o item aberto",
-        "O texto copiado tem nome, nota geral pt-BR (4,9), veredito e todos os critérios",
+        "O texto copiado tem nome, nota geral como palavra da escala (Bom), veredito e todos os critérios",
         "Sem erros de página no fluxo de copiar",
         "A formatação do texto mora numa função pura com teste em src/lib/library (revisão do diff)",
         "Smoke de regressão continua passando",

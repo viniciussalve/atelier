@@ -1,6 +1,7 @@
 import { useId, useMemo } from "react";
 import { ChevronDown, ListFilter, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { FaceIcon } from "@/components/ui/face-icon";
 import { STATUS_LABEL, VERDICT_LABEL } from "@/lib/library/criteria";
 import {
   FACETS_BY_KIND,
@@ -25,10 +26,10 @@ const FACET_LABEL: Record<ListFacet, string> = {
 
 const MIN_SCORES: { value: Score | null; label: string }[] = [
   { value: null, label: "Qualquer nota" },
-  { value: 2, label: "2 ou mais" },
-  { value: 3, label: "3 ou mais" },
-  { value: 4, label: "4 ou mais" },
-  { value: 5, label: "Só 5" },
+  { value: 2, label: "Ruim ou melhor" },
+  { value: 3, label: "Ok ou melhor" },
+  { value: 4, label: "Bom ou melhor" },
+  { value: 5, label: "Só Ótimo" },
 ];
 
 function optionLabel(facet: ListFacet, value: string) {
@@ -223,6 +224,7 @@ function MinScoreOptions({
               onChange={() => onChange(entry.value)}
               className="size-3.5 accent-proof"
             />
+            {entry.value ? <FaceIcon level={entry.value} className="text-proof" /> : null}
             {entry.label}
           </label>
         </li>

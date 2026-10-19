@@ -1,4 +1,4 @@
-import { evaluationStatus, overallScore } from "./criteria.ts";
+import { evaluationStatus, overallScore, roundedScore } from "./criteria.ts";
 import { folderScope, normalizeText } from "./folders.ts";
 import type {
   Asset,
@@ -114,7 +114,8 @@ export function applyFilters(list: Asset[], filters: Filters, except?: ListFacet
       }
     }
     if (filters.minScore !== null) {
-      const score = overallScore(item);
+      // Compare the face the item shows, so "Bom ou melhor" keeps every Bom.
+      const score = roundedScore(overallScore(item));
       if (score === null || score < filters.minScore) return false;
     }
     return true;

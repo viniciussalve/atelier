@@ -77,7 +77,7 @@ async function desktop() {
   const overall = page.locator("[aria-label='Nota geral'] p").first();
   await panes(page).first().locator("h2").first().click();
   const was = await textOf(overall);
-  await panes(page).first().getByRole("radio", { name: "Leitura: 3, Bom" }).click();
+  await panes(page).first().getByRole("radio", { name: "Leitura: Ok" }).click();
   await page.waitForTimeout(300);
   await check(
     `nota na prova muda a nota geral (${was} → outra)`,
@@ -181,8 +181,8 @@ async function migration() {
     .click();
   await page.waitForTimeout(300);
   await check(
-    "migração v3: nota 4 em estrelas vira 4,0",
-    async () => (await textOf(page.locator("[aria-label='Nota geral'] p").first())) === "4,0",
+    "migração v3: nota 4 em estrelas vira a carinha Bom",
+    async () => (await textOf(page.locator("[aria-label='Nota geral'] p").first())) === "Bom",
   );
   await browser.close();
   return realErrors(errors);

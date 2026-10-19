@@ -19,10 +19,10 @@ O `smoke.cjs` cobre os fluxos que não podem quebrar, cada um num contexto limpo
 1. A coleção abre e a Inter aparece uma vez só no ramo Sans serif › Interface.
 2. O filtro Veredito = Usar mostra "2 de 9 fontes".
 3. Comparar 3 itens, arrastar uma divisória e recarregar mantém as larguras (±4 px).
-4. Uma nota dada na prova muda a nota geral.
+4. Uma carinha dada na prova muda a carinha da nota geral.
 5. Ctrl+\, Ctrl+Shift+\, Alt+W, Alt+1 e → funcionam, e Ctrl+\ não divide um painel sem espaço para duas metades de 220 px.
 6. Ctrl+K com "playfair" e Enter abre o item e deixa o foco na aba dele.
-7. Um localStorage no formato v3, com nota 4 em estrelas, mostra "4,0".
+7. Um localStorage no formato v3, com nota 4 em estrelas, mostra a carinha "Bom".
 8. Em 390×844 não há botão de dividir, e o inspetor e a barra abrem como gaveta. A barra aberta recebe o foco e deixa o `<main>` inerte.
 
 Ele termina com código 0 e "no page errors" em cada bloco. Os 404 do Iconify simulado são esperados e filtrados.
@@ -64,7 +64,7 @@ const { open, goto, shot, check, realErrors } = require(process.env.ATELIER_E2E 
   - Painéis: `section[aria-label=Painel]`.
   - Divisórias: `[data-separator]`.
   - Painéis do layout: `[data-panel]`. Um split aninhado também conta como painel.
-  - Nota: role `radio` com nome "Leitura: 3, Bom".
+  - Nota: role `radio` com nome "Leitura: Ok" (a palavra da carinha).
   - Nota geral: `[aria-label='Nota geral'] p`.
 - **Abas do painel e abas da prova são `tab` as duas.** Dentro de um painel, `getByRole("tab")` acha também Prova, Pesos, Glifos e Info. Para as abas do painel, use `getByRole("tablist", { name: "Abas do painel" }).getByRole("tab")`.
 - **Setas num `RadioGroup` ou `ToggleGroup` do Radix** (seletor de fundo, nota): o Radix move o foco num `setTimeout` e só marca a opção se a tecla ainda estiver descida.

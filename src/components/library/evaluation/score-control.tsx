@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { Info, PenLine } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { FaceIcon } from "@/components/ui/face-icon";
 import { Tooltip } from "@/components/ui/tooltip";
 import { SCALE } from "@/lib/library/criteria";
 import type { CriterionDef, CriterionScore, Score } from "@/lib/library/types";
@@ -18,8 +19,9 @@ type Props = {
 };
 
 /**
- * A 1–5 score for one criterion. Clicking the current value clears it; arrow
- * keys move between values. Segments up to the value fill in, like a meter.
+ * A 1–5 score for one criterion, as five faces from Muito ruim to Ótimo. Clicking
+ * the current face clears it; arrow keys move between faces. Only the chosen
+ * face lights up, with a ring, so the state never rests on color alone.
  *
  * `inline` sits in a specimen section header, drawn like a proof mark in the
  * margin, so the criterion is judged while looking at what it is about.
@@ -58,27 +60,25 @@ function Segments({
       className="flex gap-0.5"
     >
       {VALUES.map((option) => {
-        const filled = value !== null && option <= value;
+        const chosen = option === value;
         return (
-          <Tooltip key={option} content={`${option}, ${SCALE[option]}`} side="top">
+          <Tooltip key={option} content={SCALE[option]} side="top">
             <ToggleGroup.Item
               value={String(option)}
-              aria-label={`${criterion.label}: ${option}, ${SCALE[option]}`}
+              aria-label={`${criterion.label}: ${SCALE[option]}`}
               className={cn(
-                "grid place-items-center rounded-[5px] text-xs font-medium tabular-nums transition-colors",
-                size === "md" ? "h-7 flex-1" : "size-6",
+                "grid place-items-center rounded-[5px] transition-colors",
+                size === "md" ? "h-8 flex-1" : "size-6",
                 onPaper
-                  ? filled
-                    ? "bg-proof-ink text-paper"
-                    : "border border-current/20 text-current/50 hover:border-proof-ink hover:text-proof-ink"
-                  : filled
-                    ? "bg-proof text-proof-fg"
-                    : "bg-elevated text-subtle hover:text-fg",
-                option === value && "ring-1 ring-offset-1 ring-offset-transparent",
-                option === value && (onPaper ? "ring-proof-ink" : "ring-proof"),
+                  ? chosen
+                    ? "bg-proof-ink/10 text-proof-ink ring-1 ring-proof-ink/70"
+                    : "text-current/30 hover:text-current/60"
+                  : chosen
+                    ? "bg-proof/15 text-proof ring-1 ring-proof/70"
+                    : "text-subtle hover:bg-elevated hover:text-muted",
               )}
             >
-              {option}
+              <FaceIcon level={option} size={size === "md" ? 20 : 18} />
             </ToggleGroup.Item>
           </Tooltip>
         );

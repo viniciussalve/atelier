@@ -4,8 +4,8 @@ import {
   criteriaFor,
   criteriaForSection,
   evaluationStatus,
-  formatScore,
   overallScore,
+  roundedScore,
   scaleLabel,
   scoredCount,
 } from "./criteria.ts";
@@ -101,22 +101,27 @@ describe("evaluationStatus", () => {
   });
 });
 
-describe("formatScore", () => {
-  it("uses one decimal with a comma", () => {
-    assert.equal(formatScore(44 / 9), "4,9");
-    assert.equal(formatScore(4), "4,0");
+describe("roundedScore", () => {
+  it("rounds half up to the nearest face", () => {
+    assert.equal(roundedScore(3.4), 3);
+    assert.equal(roundedScore(3.5), 4);
+    assert.equal(roundedScore(44 / 9), 5);
   });
 
-  it("shows a dash for no score", () => {
-    assert.equal(formatScore(null), "—");
+  it("stays inside the scale and keeps no score as null", () => {
+    assert.equal(roundedScore(0.2), 1);
+    assert.equal(roundedScore(7), 5);
+    assert.equal(roundedScore(null), null);
   });
 });
 
 describe("scaleLabel", () => {
-  it("names the rounded value", () => {
-    assert.equal(scaleLabel(1), "Fraco");
-    assert.equal(scaleLabel(4.4), "Muito bom");
-    assert.equal(scaleLabel(4.6), "Excelente");
+  it("names the rounded value with the face labels", () => {
+    assert.equal(scaleLabel(1), "Muito ruim");
+    assert.equal(scaleLabel(2), "Ruim");
+    assert.equal(scaleLabel(3), "Ok");
+    assert.equal(scaleLabel(4.4), "Bom");
+    assert.equal(scaleLabel(4.6), "Ótimo");
     assert.equal(scaleLabel(null), "Sem nota");
   });
 });

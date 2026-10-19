@@ -2,11 +2,12 @@ import {
   STATUS_LABEL,
   VERDICT_LABEL,
   evaluationStatus,
-  formatScore,
   overallScore,
+  roundedScore,
   scaleLabel,
   scoredCount,
 } from "@/lib/library/criteria";
+import { FaceIcon } from "@/components/ui/face-icon";
 import type { Asset, Verdict } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
 import { STATUS_TEXT, VERDICT_CHIP, VERDICT_DOT } from "./tones";
@@ -37,34 +38,47 @@ export function VerdictBadge({ verdict, className }: { verdict: Verdict; classNa
   );
 }
 
-/** Five ticks filled up to the rounded score. */
-export function ScoreMeter({ value, className }: { value: number | null; className?: string }) {
-  const filled = value === null ? 0 : Math.round(value);
-  return (
-    <span aria-hidden className={cn("inline-flex items-end gap-px", className)}>
-      {[1, 2, 3, 4, 5].map((tick) => (
-        <span
-          key={tick}
-          className={cn("w-1 rounded-[1px]", tick <= filled ? "bg-proof" : "bg-border")}
-          style={{ height: 4 + tick * 1.5 }}
-        />
-      ))}
-    </span>
-  );
+/** The face of a rounded mean or score, in the proof blue. */
+export function ScoreFace({
+  value,
+  size = 16,
+  className,
+}: {
+  value: number | null;
+  size?: number;
+  className?: string;
+}) {
+  const level = roundedScore(value);
+  if (level === null) return null;
+  return <FaceIcon level={level} size={size} className={cn("shrink-0 text-proof", className)} />;
 }
 
-/** Weighted score as "4,9" with its meter, or a quiet "Sem nota". */
-export function ScoreBadge({ asset, className }: { asset: Asset; className?: string }) {
+/**
+ * The face of the weighted score with its word ("Bom"), or a quiet "Sem nota".
+ * `compact` drops the word where room is short; the name stays for assistive tech.
+ */
+export function ScoreBadge({
+  asset,
+  compact = false,
+  className,
+}: {
+  asset: Asset;
+  compact?: boolean;
+  className?: string;
+}) {
   const score = overallScore(asset);
   const { scored, total } = scoredCount(asset);
   if (score === null) return <span className={cn("text-xs text-subtle", className)}>Sem nota</span>;
+  const label = scaleLabel(score);
+  const detail = `${label}, média ponderada de ${scored} de ${total} critérios`;
   return (
     <span
       className={cn("inline-flex items-center gap-1.5", className)}
-      title={`${scaleLabel(score)}, média ponderada de ${scored} de ${total} critérios`}
+      title={detail}
+      {...(compact ? { role: "img", "aria-label": detail } : {})}
     >
-      <span className="text-xs font-medium tabular-nums">{formatScore(score)}</span>
-      <ScoreMeter value={score} />
+      <ScoreFace value={score} />
+      {compact ? null : <span className="text-xs font-medium whitespace-nowrap">{label}</span>}
     </span>
   );
 }
