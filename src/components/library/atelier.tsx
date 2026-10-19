@@ -81,6 +81,8 @@ export function Atelier() {
       if (!command) return;
       if (command.type === "quickOpen") {
         event.preventDefault();
+        // Like the bar's own ⌘K button: what the palette opens must not land under the drawer.
+        setNavOpen(false);
         setPaletteOpen((open) => !open);
         return;
       }
