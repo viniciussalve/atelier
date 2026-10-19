@@ -13,9 +13,16 @@ import {
 } from "./additions.ts";
 import { libraryBrief, scaleAndCriteria } from "./brief.ts";
 import { searchFonts, searchIconSets } from "./catalog.ts";
-import { fontJson, fontLine, iconSetJson, iconSetLine, listMarkdown } from "./format.ts";
+import {
+  fontJson,
+  fontLine,
+  iconSetJson,
+  iconSetLine,
+  iconsMarkdown,
+  listMarkdown,
+} from "./format.ts";
 import type { ServerInfo, Tool, ToolResult } from "./mcp.ts";
-import { flag, fontCategoryFrom } from "./params.ts";
+import { flag, fontCategoryFrom, listParam } from "./params.ts";
 import { decodeSnapshot, snapshotFromLink } from "./snapshot.ts";
 import {
   recommendFor,
@@ -45,12 +52,6 @@ const num = (value: unknown) => {
 };
 const bool = (value: unknown) =>
   typeof value === "boolean" ? value : typeof value === "string" ? flag(value) : undefined;
-const names = (value: unknown) =>
-  (Array.isArray(value) ? value : typeof value === "string" ? value.split(",") : [])
-    .filter((entry): entry is string => typeof entry === "string")
-    .map((entry) => entry.trim().toLowerCase())
-    .filter(Boolean);
-
 const READ_ONLY = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
 const limit = (max: number) => ({ type: "integer", minimum: 1, maximum: max });
 const LINK = {
@@ -169,15 +170,11 @@ export function atelierTools(deps: ToolDeps): Tool[] {
         const query = str(args.nome);
         if (!query) return { text: "Diga o nome do ícone.", isError: true };
         const { icons, ok } = await deps.searchIcons(query, {
-          prefixes: names(args.conjuntos),
+          prefixes: listParam(args.conjuntos),
           limit: num(args.limite),
         });
         if (!ok) return { text: "O Iconify não respondeu. Tente de novo.", isError: true };
-        const lines = icons.map((icon) => `- \`${icon}\``);
-        return {
-          text: `# Ícones para “${query}”\n\n${lines.join("\n") || "Nada encontrado."}\n`,
-          structured: { icones: icons },
-        };
+        return { text: iconsMarkdown(query, icons), structured: { icones: icons } };
       },
     },
     {
@@ -202,7 +199,7 @@ export function atelierTools(deps: ToolDeps): Tool[] {
             {
               fonte: str(args.fonte),
               conjunto: str(args.conjunto),
-              amostras: names(args.amostras),
+              amostras: listParam(args.amostras),
               limite: num(args.limite),
             },
             deps,

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FONTS, coverageOf, iconSets } from "@/lib/ai/catalog.server";
-import { int } from "@/lib/ai/params";
+import { int, listParam } from "@/lib/ai/params";
 import { json, markdown, wantsMarkdown } from "@/lib/ai/respond";
 import { decodeSnapshot } from "@/lib/ai/snapshot";
 import {
@@ -24,11 +24,8 @@ export const Route = createFileRoute("/api/parecidas")({
         const limite = int(params.get("limite"));
         let result: Suggestion;
         const encoded = params.get("b");
+        const amostras = listParam(params.getAll("amostras"));
         if (params.get("fonte") || params.get("conjunto")) {
-          const amostras = (params.get("amostras") ?? "")
-            .split(",")
-            .map((name) => name.trim().toLowerCase())
-            .filter(Boolean);
           result = await similarTo(
             {
               fonte: params.get("fonte") ?? undefined,
@@ -47,9 +44,12 @@ export const Route = createFileRoute("/api/parecidas")({
           return json({ erro: USAGE }, 400);
         }
         if (!result.ok) return json({ erro: result.error }, result.status);
+        // Recommendations from someone's library, or with a live coverage check, are
+        // kept by the client only; plain catalog similarity may be shared.
+        const caching = encoded || amostras.length ? "private" : "public";
         return wantsMarkdown(request)
-          ? markdown(suggestionMarkdown(result))
-          : json(suggestionJson(result));
+          ? markdown(suggestionMarkdown(result), 200, caching)
+          : json(suggestionJson(result), 200, caching);
       },
     },
   },
