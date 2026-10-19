@@ -22,7 +22,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         aria-label={label}
         aria-pressed={active}
         className={cn(
-          "grid shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-elevated hover:text-fg disabled:pointer-events-none disabled:opacity-30",
+          "grid shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-elevated hover:text-fg disabled:pointer-events-none disabled:opacity-30 aria-disabled:cursor-default aria-disabled:opacity-30 aria-disabled:hover:bg-transparent aria-disabled:hover:text-muted",
           size === "md" ? "size-8" : "size-7",
           active && "bg-elevated text-fg",
           className,

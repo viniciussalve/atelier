@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  canHalve,
   dropZoneAt,
   equalize,
   insertBeside,
@@ -8,6 +9,7 @@ import {
   leaves,
   neighbor,
   normalize,
+  paneBoxes,
   removeLeaf,
   setSizes,
   validateLayout,
@@ -227,5 +229,41 @@ describe("insertIndex", () => {
     assert.equal(insertIndex([10, 30, 50], 5), 0);
     assert.equal(insertIndex([10, 30, 50], 35), 2);
     assert.equal(insertIndex([10, 30, 50], 60), 3);
+  });
+});
+
+describe("paneBoxes", () => {
+  it("gives each pane its share of the area in pixels", () => {
+    const root = split(
+      "s",
+      "horizontal",
+      [leaf("a"), split("t", "vertical", [leaf("b"), leaf("c")])],
+      [25, 75],
+    );
+    const boxes = paneBoxes(root, { width: 800, height: 600 });
+    assert.deepEqual(boxes.a, { width: 200, height: 600 });
+    assert.deepEqual(boxes.b, { width: 600, height: 300 });
+    assert.deepEqual(boxes.c, { width: 600, height: 300 });
+  });
+});
+
+describe("canHalve", () => {
+  const min = { width: 220, height: 160 };
+  const area = { width: 864, height: 800 };
+
+  it("allows a split while both halves stay at the minimum", () => {
+    assert.equal(canHalve(leaf("a"), "a", "right", area, min), true);
+    const two = insertBeside(leaf("a"), "a", leaf("b"), "right", counter());
+    assert.equal(canHalve(two, "a", "right", area, min), false, "432 px halves to 216");
+    assert.equal(canHalve(two, "a", "bottom", area, min), true, "800 px tall halves to 400");
+  });
+
+  it("measures the axis of the split", () => {
+    assert.equal(canHalve(leaf("a"), "a", "bottom", { width: 900, height: 300 }, min), false);
+    assert.equal(canHalve(leaf("a"), "a", "left", { width: 300, height: 900 }, min), false);
+  });
+
+  it("refuses a pane that is not in the layout", () => {
+    assert.equal(canHalve(leaf("a"), "z", "right", area, min), false);
   });
 });

@@ -15,6 +15,20 @@ async function desktop() {
   await goto(page);
   await shot(page, "smoke-01-colecao");
 
+  // Com a coleção na largura toda há espaço para duas metades de 220 px.
+  await page.keyboard.press("Control+Backslash");
+  await page.waitForTimeout(300);
+  await check(
+    "Ctrl+\\ divide à direita quando há espaço",
+    async () => (await panes(page).count()) === 2,
+  );
+  await page.keyboard.press("Alt+KeyW");
+  await page.waitForTimeout(300);
+  await check(
+    "Alt+W fecha a aba e o painel que ficou vazio",
+    async () => (await panes(page).count()) === 1,
+  );
+
   await page.getByRole("button", { name: "Expandir Sans serif" }).click();
   await page.getByRole("button", { name: "Expandir Interface" }).click();
   await check(
@@ -72,17 +86,21 @@ async function desktop() {
   await shot(page, "smoke-04-nota-na-prova");
 
   await panes(page).first().locator("h2").first().click();
-  await page.keyboard.press("Control+Backslash");
-  await page.waitForTimeout(300);
-  await check("Ctrl+\\ divide à direita", async () => (await panes(page).count()) === 4);
   await page.keyboard.press("Control+Shift+Backslash");
   await page.waitForTimeout(300);
-  await check("Ctrl+Shift+\\ divide abaixo", async () => (await panes(page).count()) === 5);
+  await check("Ctrl+Shift+\\ divide abaixo", async () => (await panes(page).count()) === 4);
+  // Um terço da largura não comporta duas metades de 220 px: nenhum painel fica estreito demais.
+  await page.keyboard.press("Control+Backslash");
+  await page.waitForTimeout(300);
+  await check(
+    "Ctrl+\\ não divide um painel sem espaço para duas metades",
+    async () => (await panes(page).count()) === 4,
+  );
   await page.keyboard.press("Alt+KeyW");
   await page.waitForTimeout(300);
   await check(
     "Alt+W fecha a aba (e o painel vazio)",
-    async () => (await panes(page).count()) === 4,
+    async () => (await panes(page).count()) === 3,
   );
   await page.keyboard.press("Alt+Digit1");
   await page.waitForTimeout(200);

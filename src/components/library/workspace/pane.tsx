@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IconButton } from "@/components/ui/icon-button";
 import { closeWholePane, equalizeAll, focus, split } from "@/lib/library/commands";
-import { usePane } from "@/lib/library/hooks";
+import { usePane, useRoomToSplit } from "@/lib/library/hooks";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useWorkspace } from "@/lib/library/workspace";
 import { MAX_PANES, assetIdOf, orderedPanes, type SyncKey } from "@/lib/library/workspace-model";
@@ -40,6 +40,8 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
   const focused = useWorkspace((state) => state.activePaneId === paneId);
   const canSplit = useWorkspace((state) => state.canSplit);
   const paneCount = useWorkspace((state) => Object.keys(state.panes).length);
+  const roomRight = useRoomToSplit(paneId, "right");
+  const roomDown = useRoomToSplit(paneId, "bottom");
   if (!pane) return null;
   const assetId = assetIdOf(pane.active);
   const mac = isMacPlatform();
@@ -63,21 +65,22 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
         <div className="flex items-center gap-0.5 border-l border-border px-1">
           {canSplit ? (
             <>
+              {/* Unavailable stays focusable (aria-disabled), so its tooltip says why. */}
               <IconButton
-                label={full ? `Até ${MAX_PANES} painéis` : "Dividir à direita"}
-                shortcut={full ? undefined : shortcutLabel("splitRight", mac)}
+                label={splitLabel("Dividir à direita", full, roomRight)}
+                shortcut={roomRight ? shortcutLabel("splitRight", mac) : undefined}
                 size="sm"
-                disabled={full}
-                onClick={() => split(paneId, "right")}
+                aria-disabled={!roomRight || undefined}
+                onClick={() => roomRight && split(paneId, "right")}
               >
                 <Columns2 className="size-4" />
               </IconButton>
               <IconButton
-                label={full ? `Até ${MAX_PANES} painéis` : "Dividir abaixo"}
-                shortcut={full ? undefined : shortcutLabel("splitDown", mac)}
+                label={splitLabel("Dividir abaixo", full, roomDown)}
+                shortcut={roomDown ? shortcutLabel("splitDown", mac) : undefined}
                 size="sm"
-                disabled={full}
-                onClick={() => split(paneId, "bottom")}
+                aria-disabled={!roomDown || undefined}
+                onClick={() => roomDown && split(paneId, "bottom")}
               >
                 <Rows2 className="size-4" />
               </IconButton>
@@ -92,6 +95,12 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
       </div>
     </section>
   );
+}
+
+/** The action, or why it is unavailable, so the tooltip and screen readers say the same. */
+function splitLabel(action: string, full: boolean, room: boolean): string {
+  if (full) return `${action}: até ${MAX_PANES} painéis`;
+  return room ? action : `${action}: sem espaço para mais um painel`;
 }
 
 function PaneMenu({ paneId, paneCount }: { paneId: string; paneCount: number }) {

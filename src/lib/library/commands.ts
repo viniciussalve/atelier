@@ -25,6 +25,7 @@ import {
   orderedPanes,
   pinTab,
   replaceTab,
+  roomForItems,
   splitPane,
   type TabKey,
 } from "./workspace-model.ts";
@@ -35,12 +36,22 @@ const lib = () => useLibrary.getState();
 const ws = () => useWorkspace.getState();
 
 /** Opens an item in a pane (the active one by default). */
+/**
+ * The space new panes can count on, so they keep PANE_MIN; unknown before the
+ * first measure. Opening an item brings the inspector column out if it is open.
+ */
+export function roomFor(opensItem: boolean) {
+  const { area, inspectorOpen } = ws();
+  if (!area) return undefined;
+  return opensItem ? roomForItems(area, inspectorOpen, activeAssetId() !== null) : area;
+}
+
 export function openItem(assetId: string, mode: OpenMode, paneId?: string) {
   lib().markUsed(assetId);
   const key = assetKey(assetId);
   ws().update((state) => {
     const target = paneId && state.panes[paneId] ? paneId : state.activePaneId;
-    if (mode === "side" && ws().canSplit) return openToSide(state, target, key);
+    if (mode === "side" && ws().canSplit) return openToSide(state, target, key, roomFor(true));
     return openTab(state, target, key, { preview: mode === "preview" });
   });
 }
@@ -58,7 +69,7 @@ export function showLibrary(kind: Kind) {
 
 export function compareItems(assetIds: string[]) {
   assetIds.forEach((id) => lib().markUsed(id));
-  ws().update((state) => compare(state, assetIds.map(assetKey)));
+  ws().update((state) => compare(state, assetIds.map(assetKey), roomFor(true)));
 }
 
 export function activate(paneId: string, key: TabKey) {
@@ -83,7 +94,7 @@ export function closeWholePane(paneId: string) {
 
 export function split(paneId: string, edge: Edge) {
   if (!ws().canSplit) return;
-  ws().update((state) => splitPane(state, paneId, edge));
+  ws().update((state) => splitPane(state, paneId, edge, undefined, roomFor(false)));
 }
 
 /** The item before or after, in the collection order of its library. */
@@ -138,9 +149,11 @@ export function dropOnPane(paneId: string, zone: DropZone) {
   if (!drag) return;
   if (drag.type === "asset") {
     lib().markUsed(drag.assetId);
-    ws().update((state) => dropAsset(state, drag.assetId, paneId, zone));
+    ws().update((state) => dropAsset(state, drag.assetId, paneId, zone, roomFor(true)));
   } else {
-    ws().update((state) => dropTab(state, drag.fromPaneId, drag.key, paneId, zone));
+    ws().update((state) =>
+      dropTab(state, drag.fromPaneId, drag.key, paneId, zone, roomFor(drag.key !== "collection")),
+    );
   }
 }
 

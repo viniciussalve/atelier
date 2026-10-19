@@ -4,6 +4,8 @@ import { leaves, type LayoutNode } from "./layout.ts";
 import {
   DEFAULT_SYNC,
   MAX_PANES,
+  INSPECTOR_WIDTH,
+  PANE_MIN,
   alignSettings,
   applySettings,
   assetKey,
@@ -21,6 +23,7 @@ import {
   pinTab,
   reconcile,
   replaceTab,
+  roomForItems,
   sanitizeWorkspace,
   splitPane,
   type Workspace,
@@ -382,5 +385,84 @@ describe("sanitizeWorkspace", () => {
     assert.equal(ws.panes["pane-1"].active, "collection");
     assert.equal(ws.panes["pane-1"].preview, null);
     assert.equal(ws.panes["pane-1"].settings.ground, "paper");
+  });
+});
+
+describe("room for panes", () => {
+  const roomy = { width: 1600, height: 900 };
+  const tight = { width: 864, height: 820 };
+  const short = { width: 500, height: 300 };
+
+  it("keeps the pane minimum in one place for the panels too", () => {
+    assert.deepEqual(PANE_MIN, { width: 220, height: 160 });
+  });
+
+  it("splits only while both halves keep the minimum", () => {
+    let ws = row(2); // 864 px wide: 432 each, halving gives 216
+    const first = leaves(ws.root)[0];
+    assert.equal(splitPane(ws, first, "right", undefined, tight), ws);
+    ws = splitPane(ws, first, "bottom", undefined, tight);
+    assert.equal(leaves(valid(ws).root).length, 3, "820 px tall still halves to 410");
+    assert.equal(leaves(splitPane(row(2), first, "right", undefined, roomy).root).length, 3);
+  });
+
+  it("drops on an edge without room into the pane itself", () => {
+    const ws = row(2);
+    const first = leaves(ws.root)[0];
+    const next = valid(dropAsset(ws, "z", first, "right", tight));
+    assert.equal(leaves(next.root).length, 2);
+    assert.ok(next.panes[first].tabs.includes(assetKey("z")));
+  });
+
+  it("moves a dropped tab to the pane when its edge has no room", () => {
+    let ws = row(2);
+    const [first, second] = leaves(ws.root);
+    ws = openTab(ws, second, b, { preview: false });
+    const next = valid(dropTab(ws, second, b, first, "right", tight));
+    assert.equal(leaves(next.root).length, 2);
+    assert.ok(next.panes[first].tabs.includes(b));
+  });
+
+  it("opens beside in the same pane when there is no room for a new one", () => {
+    let ws = createWorkspace();
+    ws = openToSide(ws, ws.activePaneId, a, { width: 400, height: 900 });
+    assert.equal(leaves(valid(ws).root).length, 1);
+    assert.ok(pane(ws).tabs.includes(a));
+  });
+
+  it("compares in as many panes as fit and puts the rest as tabs in the last one", () => {
+    const keys = ["1", "2", "3", "4", "5", "6"].map(assetKey);
+    assert.equal(
+      leaves(valid(compare(createWorkspace(), keys, tight)).root).length,
+      6,
+      "two rows of three, 288 px each",
+    );
+
+    const narrow = valid(compare(createWorkspace(), keys, { width: 500, height: 900 }));
+    const ids = leaves(narrow.root);
+    assert.equal(ids.length, 4, "two rows of two");
+    const last = narrow.panes[ids[3]];
+    assert.deepEqual(last.tabs, [assetKey("4"), assetKey("5"), assetKey("6")]);
+    assert.equal(last.active, assetKey("4"));
+
+    const flat = valid(compare(createWorkspace(), keys, short));
+    assert.equal(leaves(flat.root).length, 2, "one row of two when two rows do not fit");
+    assert.equal(flat.panes[leaves(flat.root)[1]].tabs.length, 5);
+  });
+});
+
+describe("roomForItems", () => {
+  const area = { width: 1000, height: 800 };
+
+  it("sets aside the inspector column that shows once an item is in front", () => {
+    assert.deepEqual(roomForItems(area, true, false), {
+      width: 1000 - INSPECTOR_WIDTH,
+      height: 800,
+    });
+  });
+
+  it("keeps the area when the inspector is closed or already showing", () => {
+    assert.deepEqual(roomForItems(area, false, false), area);
+    assert.deepEqual(roomForItems(area, true, true), area);
   });
 });

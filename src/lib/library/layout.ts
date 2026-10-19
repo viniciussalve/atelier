@@ -23,6 +23,8 @@ export type SplitNode = {
 };
 export type LayoutNode = PaneLeaf | SplitNode;
 export type IdGen = (prefix: "pane" | "split") => string;
+/** A size in pixels. */
+export type Box = { width: number; height: number };
 
 const isSize = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value) && value > 0;
@@ -83,6 +85,46 @@ export function normalize(node: LayoutNode): LayoutNode {
     children,
     sizes: Object.fromEntries(children.map((child, index) => [child.id, scaled[index]])),
   };
+}
+
+/** Each pane's size in pixels for a workspace of `area`, from the split shares. */
+export function paneBoxes(root: LayoutNode, area: Box): Record<string, Box> {
+  const boxes: Record<string, Box> = {};
+  const visit = (node: LayoutNode, box: Box) => {
+    if (node.type === "pane") {
+      boxes[node.id] = box;
+      return;
+    }
+    for (const child of node.children) {
+      const share = (node.sizes[child.id] ?? 100 / node.children.length) / 100;
+      visit(
+        child,
+        node.orientation === "horizontal"
+          ? { width: box.width * share, height: box.height }
+          : { width: box.width, height: box.height * share },
+      );
+    }
+  };
+  visit(root, area);
+  return boxes;
+}
+
+/**
+ * Whether splitting `paneId` toward `edge` keeps both halves at `min` or more:
+ * a split halves the pane along that axis (see insertBeside).
+ */
+export function canHalve(
+  root: LayoutNode,
+  paneId: string,
+  edge: Edge,
+  area: Box,
+  min: Box,
+): boolean {
+  const box = paneBoxes(root, area)[paneId];
+  if (!box) return false;
+  return edge === "left" || edge === "right"
+    ? box.width / 2 >= min.width
+    : box.height / 2 >= min.height;
 }
 
 /** Puts `leaf` beside `targetId`, halving the target's space. */

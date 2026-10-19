@@ -1,8 +1,8 @@
 import { useState, type DragEvent } from "react";
-import { dropOnPane, endDrag } from "@/lib/library/commands";
-import { dropZoneAt, type DropZone } from "@/lib/library/layout";
+import { dropOnPane, endDrag, roomFor } from "@/lib/library/commands";
+import { canHalve, dropZoneAt, type DropZone } from "@/lib/library/layout";
 import { useWorkspace } from "@/lib/library/workspace";
-import { MAX_PANES } from "@/lib/library/workspace-model";
+import { MAX_PANES, PANE_MIN } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
 
 const ZONE_CLASS: Record<DropZone, string> = {
@@ -44,12 +44,18 @@ export function DropOverlay({ paneId }: { paneId: string }) {
 
   function onDragOver(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
-    const next = dropZoneAt(
+    let next = dropZoneAt(
       event.clientX,
       event.clientY,
       event.currentTarget.getBoundingClientRect(),
       allowEdges,
     );
+    // An edge whose halves would fall under the minimum opens the item here instead.
+    const room = roomFor(
+      drag?.type === "asset" || (drag?.type === "tab" && drag.key !== "collection"),
+    );
+    const { root } = useWorkspace.getState();
+    if (next !== "center" && room && !canHalve(root, paneId, next, room, PANE_MIN)) next = "center";
     event.dataTransfer.dropEffect = next === "center" && fromHere ? "none" : "move";
     setZone(next === "center" && fromHere ? null : next);
   }

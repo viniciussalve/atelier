@@ -2,6 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef } from "react";
 import { Group, Panel, Separator, useGroupRef } from "react-resizable-panels";
 import type { LayoutNode, SplitNode } from "@/lib/library/layout";
 import { useWorkspace } from "@/lib/library/workspace";
+import { PANE_MIN } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
 import { PaneView } from "./pane";
 
@@ -10,8 +11,30 @@ export function Workspace({ onOpenNav }: { onOpenNav: () => void }) {
   const root = useWorkspace((state) => state.root);
   const canSplit = useWorkspace((state) => state.canSplit);
   const activePaneId = useWorkspace((state) => state.activePaneId);
-  if (!canSplit) return <PaneView paneId={activePaneId} onOpenNav={onOpenNav} />;
-  return <NodeView node={root} onOpenNav={onOpenNav} />;
+  const setArea = useWorkspace((state) => state.setArea);
+  const frame = useRef<HTMLDivElement>(null);
+
+  // New panes must keep PANE_MIN, so the commands need the space the panes share.
+  useEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setArea({ width: Math.round(width), height: Math.round(height) });
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [setArea]);
+
+  return (
+    <div ref={frame} className="h-full w-full">
+      {canSplit ? (
+        <NodeView node={root} onOpenNav={onOpenNav} />
+      ) : (
+        <PaneView paneId={activePaneId} onOpenNav={onOpenNav} />
+      )}
+    </div>
+  );
 }
 
 function NodeView({ node, onOpenNav }: { node: LayoutNode; onOpenNav: () => void }) {
@@ -70,7 +93,11 @@ function SplitView({ node, onOpenNav }: { node: SplitNode; onOpenNav: () => void
               />
             </Separator>
           ) : null}
-          <Panel id={child.id} minSize={horizontal ? 220 : 160} className="min-h-0 min-w-0">
+          <Panel
+            id={child.id}
+            minSize={horizontal ? PANE_MIN.width : PANE_MIN.height}
+            className="min-h-0 min-w-0"
+          >
             <NodeView node={child} onOpenNav={onOpenNav} />
           </Panel>
         </Fragment>

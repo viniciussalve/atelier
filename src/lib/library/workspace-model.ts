@@ -7,6 +7,7 @@
  * preview tab, which the next single click reuses; pinning keeps it.
  */
 import {
+  canHalve,
   firstLeaf,
   insertBeside,
   leaves,
@@ -14,6 +15,7 @@ import {
   normalize,
   removeLeaf,
   validateLayout,
+  type Box,
   type DropZone,
   type Edge,
   type IdGen,
@@ -24,6 +26,25 @@ import {
 import type { PreviewGround } from "./types.ts";
 
 export const MAX_PANES = 6;
+/** Below this a pane stops being usable; the panels use it as their minimum too. */
+export const PANE_MIN: Box = { width: 220, height: 160 };
+
+/** Width of the inspector column on wide screens. */
+export const INSPECTOR_WIDTH = 320;
+
+/**
+ * The space panes will share once the item they open is in front: an open
+ * inspector that is not showing yet (the collection is in front) takes its column then.
+ */
+export function roomForItems(area: Box, inspectorOpen: boolean, inspectorShowing: boolean): Box {
+  if (!inspectorOpen || inspectorShowing) return area;
+  return { width: Math.max(0, area.width - INSPECTOR_WIDTH), height: area.height };
+}
+
+/** Whether `paneId` has room to split toward `edge`; with no `area` measured, it always does. */
+function fits(ws: Workspace, paneId: string, edge: Edge, area?: Box): boolean {
+  return !area || canHalve(ws.root, paneId, edge, area, PANE_MIN);
+}
 
 export type TabKey = "collection" | `asset:${string}`;
 export type FontSpecimenTab = "prova" | "pesos" | "glifos" | "info";
@@ -257,9 +278,15 @@ export function closePane(ws: Workspace, paneId: string): Workspace {
  * Splits a pane. Without `tabs`, the new pane shows the source's active tab as
  * a preview, so the next click there picks what to compare against.
  */
-export function splitPane(ws: Workspace, paneId: string, edge: Edge, tabs?: TabKey[]): Workspace {
+export function splitPane(
+  ws: Workspace,
+  paneId: string,
+  edge: Edge,
+  tabs?: TabKey[],
+  area?: Box,
+): Workspace {
   const source = ws.panes[paneId];
-  if (!source || paneCount(ws) >= MAX_PANES) return ws;
+  if (!source || paneCount(ws) >= MAX_PANES || !fits(ws, paneId, edge, area)) return ws;
   const gen = idGenFor(ws);
   const id = gen("pane");
   const newTabs = tabs?.length ? [...new Set(tabs)] : [source.active];
@@ -324,6 +351,7 @@ export function dropTab(
   key: TabKey,
   to: string,
   zone: DropZone,
+  area?: Box,
 ): Workspace {
   const source = ws.panes[from];
   if (!source || !source.tabs.includes(key) || !ws.panes[to]) return ws;
@@ -331,23 +359,34 @@ export function dropTab(
   if (from === to && source.tabs.length === 1) return ws;
   // Take the tab out first, so emptying its pane frees a slot for the split.
   const removed = closeTab(ws, from, key);
-  if (!removed.panes[to] || paneCount(removed) >= MAX_PANES) return moveTab(ws, from, key, to);
+  if (!removed.panes[to] || paneCount(removed) >= MAX_PANES || !fits(removed, to, zone, area))
+    return moveTab(ws, from, key, to);
   return splitPane(removed, to, zone, [key]);
 }
 
 /** Drops an item dragged from the sidebar or the collection. */
-export function dropAsset(ws: Workspace, assetId: string, to: string, zone: DropZone): Workspace {
+export function dropAsset(
+  ws: Workspace,
+  assetId: string,
+  to: string,
+  zone: DropZone,
+  area?: Box,
+): Workspace {
   const key = assetKey(assetId);
-  if (zone === "center" || paneCount(ws) >= MAX_PANES)
+  if (zone === "center" || paneCount(ws) >= MAX_PANES || !fits(ws, to, zone, area))
     return openTab(ws, to, key, { preview: false });
   return splitPane(ws, to, zone, [key]);
 }
 
-/** "Abrir ao lado": the pane on the right, a new split, or the next pane when full. */
-export function openToSide(ws: Workspace, from: string, key: TabKey): Workspace {
+/**
+ * "Abrir ao lado": the pane on the right, a new split, or, when full or out of
+ * room, the next pane (the same one when it is alone).
+ */
+export function openToSide(ws: Workspace, from: string, key: TabKey, area?: Box): Workspace {
   const right = neighbor(ws.root, from, "right");
   if (right) return openTab(ws, right, key, { preview: false });
-  if (paneCount(ws) < MAX_PANES) return splitPane(ws, from, "right", [key]);
+  if (paneCount(ws) < MAX_PANES && fits(ws, from, "right", area))
+    return splitPane(ws, from, "right", [key]);
   const ids = leaves(ws.root);
   const next = ids[(ids.indexOf(from) + 1) % ids.length];
   return openTab(ws, next, key, { preview: false });
@@ -362,18 +401,44 @@ export function openCollection(ws: Workspace): Workspace {
   return openTab(ws, ws.activePaneId, "collection", { preview: false });
 }
 
-/** One pane per item: a row for up to three, two rows for four to six. */
-export function compare(ws: Workspace, keys: TabKey[]): Workspace {
+/**
+ * How many of `n` compared items get a pane of their own in `area`, keeping
+ * every pane at PANE_MIN: a row of up to three, two rows for four to six.
+ */
+function comparePanes(n: number, area?: Box): number {
+  if (!area) return n;
+  const columns = Math.floor(area.width / PANE_MIN.width);
+  const twoRows = Math.floor(area.height / PANE_MIN.height) >= 2;
+  for (let count = n; count > 1; count--) {
+    if (count <= 3 ? count <= columns : twoRows && Math.ceil(count / 2) <= columns) return count;
+  }
+  return 1;
+}
+
+/**
+ * One pane per item: a row for up to three, two rows for four to six. When
+ * `area` holds fewer panes, the items left over become tabs of the last pane.
+ */
+export function compare(ws: Workspace, keys: TabKey[], area?: Box): Workspace {
   const list = [...new Set(keys)].filter((key) => key !== "collection").slice(0, MAX_PANES);
   if (list.length === 0) return ws;
-  if (list.length === 1) return openTab(ws, ws.activePaneId, list[0], { preview: false });
+  const count = comparePanes(list.length, area);
+  if (count === 1) {
+    const opened = list.reduceRight(
+      (next, key) => openTab(next, next.activePaneId, key, { preview: false }),
+      ws,
+    );
+    return activateTab(opened, opened.activePaneId, list[0]);
+  }
+  const rest = list.slice(count);
   const settings = ws.panes[ws.activePaneId]?.settings ?? DEFAULT_PANE_SETTINGS;
   const panes: Record<string, Pane> = {};
-  const ids = list.map((key, index) => {
+  const ids = list.slice(0, count).map((key, index) => {
     const id = `pane-${index + 1}`;
+    const extra = index === count - 1 ? rest : [];
     panes[id] = {
       id,
-      tabs: index === 0 ? ["collection", key] : [key],
+      tabs: index === 0 ? ["collection", key, ...extra] : [key, ...extra],
       active: key,
       preview: null,
       settings: { ...settings },
@@ -389,7 +454,7 @@ export function compare(ws: Workspace, keys: TabKey[]): Workspace {
       : { type: "split", id, orientation: "horizontal", children, sizes: even(children) };
   };
   let root: LayoutNode;
-  if (list.length <= 3) {
+  if (count <= 3) {
     root = row(ids, "split-1");
   } else {
     const cut = Math.ceil(ids.length / 2);

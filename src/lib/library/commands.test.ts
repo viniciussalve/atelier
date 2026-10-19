@@ -81,3 +81,35 @@ describe("scoreInActivePane", () => {
     assert.equal(roboto?.criteria.leitura?.value, 4);
   });
 });
+
+describe("split", () => {
+  it("does not split a pane that has no room for two halves", () => {
+    const { useWorkspace } = m.workspace;
+    useWorkspace.setState({ canSplit: true, area: { width: 400, height: 900 } });
+    m.commands.split(useWorkspace.getState().activePaneId, "right");
+    assert.equal(Object.keys(useWorkspace.getState().panes).length, 1);
+
+    useWorkspace.setState({ area: { width: 1200, height: 900 } });
+    m.commands.split(useWorkspace.getState().activePaneId, "right");
+    assert.equal(Object.keys(useWorkspace.getState().panes).length, 2);
+  });
+});
+
+describe("compareItems", () => {
+  it("leaves room for the inspector that shows once the compared items are in front", () => {
+    const { useWorkspace } = m.workspace;
+    // 900 px window: 644 px beside the sidebar, 324 px once the 320 px inspector shows.
+    useWorkspace.setState({
+      canSplit: true,
+      inspectorOpen: true,
+      area: { width: 644, height: 800 },
+    });
+    m.commands.compareItems(["inter", "roboto", "noto", "jetbrains"]);
+    const state = useWorkspace.getState();
+    assert.equal(Object.keys(state.panes).length, 1, "one 324 px pane, the rest as tabs");
+    const tabs = state.panes[state.activePaneId].tabs;
+    for (const id of ["inter", "roboto", "noto", "jetbrains"]) {
+      assert.ok(tabs.includes(m.model.assetKey(id)), id);
+    }
+  });
+});

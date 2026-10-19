@@ -25,6 +25,7 @@ import {
   split,
 } from "@/lib/library/commands";
 import { folderPath, ignoringAccents } from "@/lib/library/folders";
+import { useRoomToSplit } from "@/lib/library/hooks";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset, Kind } from "@/lib/library/types";
@@ -50,6 +51,9 @@ export function CommandPalette({
   const folders = useLibrary((state) => state.folders);
   const canSplit = useWorkspace((state) => state.canSplit);
   const paneCount = useWorkspace((state) => Object.keys(state.panes).length);
+  const activePaneId = useWorkspace((state) => state.activePaneId);
+  const roomRight = useRoomToSplit(activePaneId, "right");
+  const roomDown = useRoomToSplit(activePaneId, "bottom");
   const toSide = useRef(false);
   const mac = isMacPlatform();
 
@@ -152,21 +156,21 @@ export function CommandPalette({
             label="Mostrar o que falta avaliar"
             onSelect={() => run(() => showView(useLibrary.getState().kind, { type: "pending" }))}
           />
-          {canSplit ? (
-            <>
-              <Action
-                icon={<Columns2 />}
-                label="Dividir à direita"
-                shortcut={shortcutLabel("splitRight", mac)}
-                onSelect={() => run(() => split(useWorkspace.getState().activePaneId, "right"))}
-              />
-              <Action
-                icon={<Rows2 />}
-                label="Dividir abaixo"
-                shortcut={shortcutLabel("splitDown", mac)}
-                onSelect={() => run(() => split(useWorkspace.getState().activePaneId, "bottom"))}
-              />
-            </>
+          {canSplit && roomRight ? (
+            <Action
+              icon={<Columns2 />}
+              label="Dividir à direita"
+              shortcut={shortcutLabel("splitRight", mac)}
+              onSelect={() => run(() => split(activePaneId, "right"))}
+            />
+          ) : null}
+          {canSplit && roomDown ? (
+            <Action
+              icon={<Rows2 />}
+              label="Dividir abaixo"
+              shortcut={shortcutLabel("splitDown", mac)}
+              onSelect={() => run(() => split(activePaneId, "bottom"))}
+            />
           ) : null}
           {paneCount > 1 ? (
             <Action

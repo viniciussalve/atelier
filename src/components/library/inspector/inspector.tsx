@@ -8,6 +8,7 @@ import { useSteadyWhilePressed } from "@/components/library/shared/use-steady-wh
 import { useActiveAsset, useAsset } from "@/lib/library/hooks";
 import { useWorkspace, type InspectorTab } from "@/lib/library/workspace";
 import type { Asset } from "@/lib/library/types";
+import { INSPECTOR_WIDTH } from "@/lib/library/workspace-model";
 import { Details } from "./details";
 
 /**
@@ -33,7 +34,8 @@ export function Inspector() {
     return (
       <aside
         aria-label={label}
-        className="flex w-80 min-h-0 shrink-0 flex-col border-l border-border bg-surface"
+        style={{ width: INSPECTOR_WIDTH }}
+        className="flex min-h-0 shrink-0 flex-col border-l border-border bg-surface"
       >
         <InspectorBody asset={asset} onClose={() => setOpen(false)} />
       </aside>

@@ -20,7 +20,7 @@ O `smoke.cjs` cobre os fluxos que não podem quebrar, cada um num contexto limpo
 2. O filtro Veredito = Usar mostra "2 de 9 fontes".
 3. Comparar 3 itens, arrastar uma divisória e recarregar mantém as larguras (±4 px).
 4. Uma nota dada na prova muda a nota geral.
-5. Ctrl+\, Ctrl+Shift+\, Alt+W, Alt+1 e → funcionam.
+5. Ctrl+\, Ctrl+Shift+\, Alt+W, Alt+1 e → funcionam, e Ctrl+\ não divide um painel sem espaço para duas metades de 220 px.
 6. Ctrl+K com "playfair" e Enter abre o item.
 7. Um localStorage no formato v3, com nota 4 em estrelas, mostra "4,0".
 8. Em 390×844 não há botão de dividir, e o inspetor e a barra abrem como gaveta.
