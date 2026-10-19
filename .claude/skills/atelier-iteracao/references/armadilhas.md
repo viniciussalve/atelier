@@ -90,6 +90,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **Uma fonte adicionada some junto com as outras.**
   - Causa: o `css2` do Google Fonts responde 400 para a requisição inteira se uma família ou um peso não existe.
   - O que fazer: um `<link>` por família (`fontAssetHref`), com os pesos do catálogo; família desconhecida vai sem eixo.
+- **Na paleta, Enter abre um item em vez do comando digitado.**
+  - Causa: o cmdk ordena dentro de cada grupo, mas não reordena os grupos. Um item que casa por letras espalhadas, no grupo de cima, ganha de um comando que casa exato.
+  - O que fazer: o filtro da paleta zera pontuações abaixo de 0,01. Nome de comando novo deve começar pelo verbo que a pessoa digitaria.
 
 ## Teclado
 

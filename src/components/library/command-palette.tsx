@@ -37,8 +37,14 @@ const item =
 const heading =
   "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-subtle";
 
-// cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar.
-const filter = ignoringAccents(defaultFilter);
+// cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar. Scores
+// under 0.01 are letters scattered across a name and its tags ("adicionar" in
+// "Material Design Icons"); cmdk does not reorder groups, so such an item listed
+// first would take Enter from a command that matches exactly.
+const filter = ignoringAccents((value, search, keywords) => {
+  const score = defaultFilter(value, search, keywords);
+  return score < 0.01 ? 0 : score;
+});
 
 /** ⌘K: jump to any item, folder or command. ⌘Enter opens an item beside the current pane. */
 export function CommandPalette({
