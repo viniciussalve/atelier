@@ -346,7 +346,7 @@ export function atelierTools(deps: ToolDeps): Tool[] {
 }
 
 export const INSTRUCTIONS =
-  "O Atelier avalia fontes do Google Fonts e conjuntos de ícones do Iconify com carinhas (de Muito ruim a Ótimo) por critério e um veredito (Usar, Revisar, Evitar). A biblioteca da pessoa fica no navegador dela: peça o “Link para IA” (fica no topo da barra lateral) e use ler_biblioteca e recomendar. Para sugerir itens, explique o motivo de cada um e termine com o link de link_para_adicionar; a pessoa confirma antes de entrar qualquer coisa. Não invente avaliações.";
+  "O Atelier avalia fontes do Google Fonts e conjuntos de ícones do Iconify com carinhas (de Muito ruim a Ótimo) por critério e um veredito (Usar, Revisar, Evitar). A biblioteca da pessoa fica no navegador dela: peça o “Link para IA” (fica no menu “…” de cada painel e no ⌘K) e use ler_biblioteca e recomendar. Para sugerir itens, explique o motivo de cada um e termine com o link de link_para_adicionar; a pessoa confirma antes de entrar qualquer coisa. Não invente avaliações.";
 
 export function atelierServer(deps: ToolDeps): ServerInfo {
   return {

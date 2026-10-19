@@ -23,7 +23,6 @@ import { useWorkspace } from "@/lib/library/workspace";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import type { Kind, View } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
-import { AiLinkRow } from "./ai-link-row";
 import { Explorer, type Draft } from "./explorer";
 
 type QuickView = Exclude<View["type"], "folder">;
@@ -176,7 +175,6 @@ export function Sidebar({
       </div>
 
       <nav aria-label="Vistas e pastas" className="flex-1 overflow-y-auto px-2 pb-4">
-        <AiLinkRow />
         {searching ? null : (
           <section aria-label="Vistas" className="mb-4">
             <p className="px-2 pb-1 text-xs font-medium text-muted">Vistas</p>

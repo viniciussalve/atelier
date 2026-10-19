@@ -87,7 +87,7 @@ export function guide(base: string): string {
     "",
     "> Ferramenta para avaliar fontes do Google Fonts e conjuntos de ícones do Iconify antes de usá-los num produto. Cada critério recebe uma carinha (de Muito ruim a Ótimo), com pesos, e cada item recebe um veredito.",
     "",
-    "A biblioteca de cada pessoa fica só no navegador dela. Para ver o que ela avaliou, peça o “Link para IA”, que fica no topo da barra lateral do Atelier: ele abre um resumo da biblioteca, no mesmo formato deste texto.",
+    "A biblioteca de cada pessoa fica só no navegador dela. Para ver o que ela avaliou, peça o “Link para IA”, que fica no menu “…” de cada painel do Atelier e no ⌘K: ele abre um resumo da biblioteca, no mesmo formato deste texto.",
     "",
     answerSection(base),
     "",
