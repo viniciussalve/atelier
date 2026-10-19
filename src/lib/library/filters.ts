@@ -1,5 +1,6 @@
 import { evaluationStatus, overallScore, roundedScore } from "./criteria.ts";
 import { folderScope, normalizeText } from "./folders.ts";
+import { DEFAULT_PREVIEW } from "./preview.ts";
 import type {
   Asset,
   EvaluationStatus,
@@ -31,14 +32,15 @@ export const FACETS_BY_KIND: Record<Kind, ListFacet[]> = {
 };
 
 export function defaultNav(): Record<Kind, KindNav> {
-  const nav = (): KindNav => ({
+  const nav = (kind: Kind): KindNav => ({
     view: { type: "all" },
     query: "",
     filters: EMPTY_FILTERS,
     sort: { key: "name", dir: "asc" },
     display: "grid",
+    preview: { ...DEFAULT_PREVIEW[kind] },
   });
-  return { font: nav(), icon: nav() };
+  return { font: nav("font"), icon: nav("icon") };
 }
 
 export function defaultSortDir(key: SortKey): SortSpec["dir"] {

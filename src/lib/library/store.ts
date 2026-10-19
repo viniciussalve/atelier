@@ -4,9 +4,11 @@ import { mergeNewAssets } from "../ai/additions.ts";
 import { EMPTY_FILTERS, defaultSortDir } from "./filters.ts";
 import { descendantIds } from "./folders.ts";
 import { migrateLibrary } from "./migrate.ts";
+import { sanitizePreview } from "./preview.ts";
 import { defaultLibrary } from "./seed.ts";
 import type {
   Asset,
+  CollectionPreview,
   CriterionId,
   Display,
   Kind,
@@ -30,6 +32,7 @@ type LibraryActions = {
   clearFilters: (kind: Kind) => void;
   setSort: (kind: Kind, key: SortKey) => void;
   setDisplay: (kind: Kind, display: Display) => void;
+  setPreview: (kind: Kind, patch: Partial<CollectionPreview>) => void;
   setExpanded: (folderId: string, open: boolean) => void;
   collapseAll: () => void;
   createFolder: (name: string, kind: Kind, parentId: string | null) => string | null;
@@ -113,6 +116,10 @@ export const useLibrary = create<LibraryState>()(
                 : { key, dir: defaultSortDir(key) },
           })),
         setDisplay: (kind, display) => patchNav(kind, () => ({ display })),
+        setPreview: (kind, patch) =>
+          patchNav(kind, (nav) => ({
+            preview: sanitizePreview(kind, { ...nav.preview, ...patch }),
+          })),
         setExpanded: (folderId, open) =>
           set((state) => {
             if (state.expanded.includes(folderId) === open) return state;
@@ -233,7 +240,7 @@ export const useLibrary = create<LibraryState>()(
     },
     {
       name: "atelier-library",
-      version: 4,
+      version: 5,
       skipHydration: true,
       migrate: (persisted, version) => migrateLibrary(persisted, version) as LibraryState,
       partialize: (state): LibraryData => ({

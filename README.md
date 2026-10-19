@@ -6,7 +6,7 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Barra lateral.** Escolha a biblioteca (Fontes ou Ícones). Vistas rápidas: Tudo, Recentes, Para avaliar, Sem pasta e Sem tag. Abaixo fica o explorador de pastas: um item aparece só na pasta mais funda de cada ramo, as pastas começam recolhidas e o filtro do topo procura em pastas e itens. Arraste um item para uma pasta para incluí-lo nela.
 
-**Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação.
+**Coleção.** É a grade ou lista da vista atual, com busca, filtros e ordenação. Como no Google Fonts, cada item aparece desenhado na própria fonte: escreva em "Escreva para testar" e ajuste o corpo para mudar todos os cards e linhas de uma vez. Nos ícones, o controle muda o tamanho das amostras. Texto e corpo ficam salvos por biblioteca.
 
 - Filtros: veredito, status, nota mínima, tags, licença, estilo e formato. Cada opção mostra quantos itens tem com os outros filtros aplicados.
 - Ordenação: nome, nota, veredito, modificado e uso recente.

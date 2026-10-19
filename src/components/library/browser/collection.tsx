@@ -1,5 +1,15 @@
 import { useMemo, type DragEvent, type MouseEvent, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, Grid2x2, List, Search, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Columns3,
+  Grid2x2,
+  List,
+  Search,
+  Type,
+  X,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,17 +20,18 @@ import {
 import { Segmented } from "@/components/ui/segmented";
 import { Tooltip } from "@/components/ui/tooltip";
 import { itemCount, viewTitle } from "@/components/library/shared/labels";
+import { SizeSlider } from "@/components/library/specimen/controls";
 import { beginDrag, compareItems, endDrag, openItem } from "@/lib/library/commands";
 import { activeFilterCount } from "@/lib/library/filters";
 import { useCollection } from "@/lib/library/hooks";
+import { PREVIEW_RANGE, PREVIEW_SAMPLE } from "@/lib/library/preview";
 import { selectionIn, selectionScope, toggleSelection } from "@/lib/library/selection";
 import { useLibrary } from "@/lib/library/store";
-import type { Asset, Display, Kind, SortKey, View } from "@/lib/library/types";
+import type { Asset, CollectionPreview, Display, Kind, SortKey, View } from "@/lib/library/types";
 import { useWorkspace } from "@/lib/library/workspace";
 import { MAX_PANES } from "@/lib/library/workspace-model";
 import { cn } from "@/lib/utils";
-import { AssetCard, type CardHandlers } from "./asset-card";
-import { AssetTable } from "./asset-table";
+import { AssetCard, AssetRow, type CardHandlers } from "./asset-card";
 import { FilterBar } from "./filter-bar";
 
 const SORTS: { key: SortKey; label: string }[] = [
@@ -47,6 +58,7 @@ export function Collection({ paneId }: { paneId: string }) {
   const setQuery = useLibrary((state) => state.setQuery);
   const setSort = useLibrary((state) => state.setSort);
   const setDisplay = useLibrary((state) => state.setDisplay);
+  const setPreview = useLibrary((state) => state.setPreview);
   const clearFilters = useLibrary((state) => state.clearFilters);
   const canSplit = useWorkspace((state) => state.canSplit);
   const { list, total } = useCollection(kind);
@@ -91,7 +103,12 @@ export function Collection({ paneId }: { paneId: string }) {
               : `${list.length} de ${itemCount(total, kind)}`}
           </p>
         </div>
-        <label className="flex h-8 w-full items-center gap-2 rounded-md border border-border bg-surface px-2 focus-within:border-proof/60 @lg:w-64">
+        <PreviewControls
+          kind={kind}
+          preview={nav.preview}
+          onChange={(patch) => setPreview(kind, patch)}
+        />
+        <label className="flex h-8 w-full items-center gap-2 rounded-md border border-border bg-surface px-2 focus-within:border-proof/60 @lg:w-56">
           <Search className="size-3.5 shrink-0 text-subtle" />
           <input
             value={nav.query}
@@ -159,11 +176,12 @@ export function Collection({ paneId }: { paneId: string }) {
             }
           />
         ) : nav.display === "grid" ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-3 p-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(18rem,100%),1fr))] gap-4 p-4">
             {list.map((item) => (
               <AssetCard
                 key={item.id}
                 asset={item}
+                preview={nav.preview}
                 selected={selected.has(item.id)}
                 selecting={selected.size > 0}
                 onSelect={() => toggle(item.id)}
@@ -172,15 +190,19 @@ export function Collection({ paneId }: { paneId: string }) {
             ))}
           </div>
         ) : (
-          <AssetTable
-            list={list}
-            sort={nav.sort}
-            sortLocked={sortLocked}
-            onSort={(key) => setSort(kind, key)}
-            selected={selected}
-            onSelect={toggle}
-            handlersFor={handlersFor}
-          />
+          <div className="border-t border-border">
+            {list.map((item) => (
+              <AssetRow
+                key={item.id}
+                asset={item}
+                preview={nav.preview}
+                selected={selected.has(item.id)}
+                selecting={selected.size > 0}
+                onSelect={() => toggle(item.id)}
+                handlers={handlersFor(item)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
@@ -217,6 +239,47 @@ export function Collection({ paneId }: { paneId: string }) {
           </button>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/** The text and size every card and row draws with, like the type tester of a font catalog. */
+function PreviewControls({
+  kind,
+  preview,
+  onChange,
+}: {
+  kind: Kind;
+  preview: CollectionPreview;
+  onChange: (patch: Partial<CollectionPreview>) => void;
+}) {
+  const range = PREVIEW_RANGE[kind];
+  return (
+    <div className="flex w-full items-center gap-3 @3xl:w-auto">
+      {kind === "font" ? (
+        <label className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-surface px-2 focus-within:border-proof/60 @3xl:w-60 @3xl:flex-none">
+          <Type className="size-3.5 shrink-0 text-subtle" />
+          <input
+            value={preview.text}
+            onChange={(event) => onChange({ text: event.target.value })}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") onChange({ text: "" });
+            }}
+            placeholder="Escreva para testar"
+            title={`Sem texto, as fontes mostram: ${PREVIEW_SAMPLE}`}
+            aria-label="Texto da prévia"
+            className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-subtle"
+          />
+        </label>
+      ) : null}
+      <SizeSlider
+        label={kind === "font" ? "Corpo" : "Tamanho"}
+        value={preview.size}
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        onChange={(size) => onChange({ size })}
+      />
     </div>
   );
 }
