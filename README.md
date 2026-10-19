@@ -24,6 +24,8 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 - Fontes: Prova, Pesos, Glifos e Info.
 - Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos, Componentes e Info.
 
+**Adicionar.** No ⌘K, "Adicionar fonte ou conjunto…" busca no Google Fonts e no Iconify. Um link `/?adicionar=fonte:Inter Tight,icones:lucide&motivo=…`, o formato que uma IA escreve, abre o mesmo diálogo com as sugestões já marcadas. Nada entra sem confirmar. Sugestões de IA levam a tag `ia` e o motivo nas notas, e aparecem em Para avaliar.
+
 **Avaliação.** Cada biblioteca tem critérios com peso e uma orientação do que observar. Cada critério recebe uma carinha, de Muito ruim a Ótimo, e, se quiser, uma nota escrita. A nota geral é a carinha da média ponderada dos critérios avaliados. O veredito (usar, revisar, evitar) é a decisão final. Cada seção da prova traz a carinha do critério que ela mede, para avaliar olhando o espécime.
 
 | Atalho (Mac / outros) | Ação                              |
@@ -55,3 +57,5 @@ A lógica fica em módulos puros com testes em `src/lib/library/`:
 - `migrate`: estado salvo antigo.
 
 A interface fica em `src/components/library/`.
+
+Catálogos e endpoints para IA ficam em `src/lib/ai/` e `src/routes/api/` (`/api/fontes`, `/api/conjuntos`, `/api/icones`, `/api/adicionar`; JSON, ou Markdown com `?formato=md`). O catálogo do Google Fonts é gerado por `node scripts/catalog-google-fonts.mjs`, sem chave de API; o do Iconify vem do pacote `@iconify/collections`.

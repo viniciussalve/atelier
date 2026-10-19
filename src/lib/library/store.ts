@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { mergeNewAssets } from "../ai/additions.ts";
 import { EMPTY_FILTERS, defaultSortDir } from "./filters.ts";
 import { descendantIds } from "./folders.ts";
 import { migrateLibrary } from "./migrate.ts";
@@ -47,6 +48,8 @@ type LibraryActions = {
   addSample: (id: string, name: string) => void;
   removeSample: (id: string, name: string) => void;
   markUsed: (id: string) => void;
+  /** Adds the items the library does not have yet; returns the ids added. */
+  addAssets: (incoming: Asset[], origin?: { tags?: string[]; notes?: string }) => string[];
 };
 
 export type LibraryState = LibraryData & LibraryActions;
@@ -218,6 +221,14 @@ export const useLibrary = create<LibraryState>()(
           ),
         markUsed: (id) =>
           patchAsset(id, (item) => ({ ...item, lastUsedAt: new Date().toISOString() })),
+        addAssets: (incoming, origin = {}) => {
+          const { assets, added } = mergeNewAssets(get().assets, incoming, {
+            now: new Date().toISOString(),
+            ...origin,
+          });
+          if (added.length) set({ assets });
+          return added;
+        },
       };
     },
     {

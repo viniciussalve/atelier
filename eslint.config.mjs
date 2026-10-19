@@ -45,7 +45,7 @@ export default tseslint.config(
   {
     // These modules run under `node --experimental-strip-types` in tests, which
     // keeps a value import of a type-only export and fails at runtime.
-    files: ["src/lib/library/**/*.ts"],
+    files: ["src/lib/library/**/*.ts", "src/lib/ai/**/*.ts"],
     rules: {
       "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
     },

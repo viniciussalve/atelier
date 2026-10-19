@@ -6,6 +6,7 @@ import {
   Folder,
   LayoutGrid,
   PanelRight,
+  Plus,
   Rows2,
   Search,
   Type,
@@ -13,8 +14,10 @@ import {
   X,
 } from "lucide-react";
 import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
+import { activeTab } from "@/components/library/shared/active-tab";
 import { KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
+import { returnFocus } from "@/components/ui/return-focus";
 import {
   activeAssetId,
   close,
@@ -36,24 +39,25 @@ const item =
 const heading =
   "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-subtle";
 
-// cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar.
-const filter = ignoringAccents(defaultFilter);
-
-/** The tab in front in the active pane: the one in the Tab order there. */
-function activeTab() {
-  const id = CSS.escape(useWorkspace.getState().activePaneId);
-  return document.querySelector<HTMLElement>(
-    `[data-pane-id="${id}"] [role=tab][aria-selected=true]`,
-  );
-}
+// cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar. Scores
+// under 0.01 are letters scattered across a name and its tags ("adicionar" in
+// "Material Design Icons"); cmdk does not reorder groups, so such an item listed
+// first would take Enter from a command that matches exactly.
+const filter = ignoringAccents((value, search, keywords) => {
+  const score = defaultFilter(value, search, keywords);
+  return score < 0.01 ? 0 : score;
+});
 
 /** ⌘K: jump to any item, folder or command. ⌘Enter opens an item beside the current pane. */
 export function CommandPalette({
   open,
   onOpenChange,
+  onAddItems,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Opens the add dialog; called a frame after the palette closes. */
+  onAddItems: () => void;
 }) {
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
@@ -73,12 +77,8 @@ export function CommandPalette({
   useEffect(() => {
     toSide.current = false;
     if (!open) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    return () => {
-      const back =
-        opener && opener !== document.body && opener.isConnected && !opener.closest("[inert]");
-      (back ? opener : activeTab())?.focus();
-    };
+    const opener = document.activeElement;
+    return () => returnFocus(opener, activeTab);
   }, [open]);
 
   const run = (action: () => void) => {
@@ -168,6 +168,12 @@ export function CommandPalette({
             icon={<Shapes />}
             label="Ir para Ícones"
             onSelect={() => run(() => showLibrary("icon"))}
+          />
+          <Action
+            icon={<Plus />}
+            label="Adicionar fonte ou conjunto…"
+            // The palette gives focus back as it closes; the dialog opens after that.
+            onSelect={() => run(() => requestAnimationFrame(onAddItems))}
           />
           <Action
             icon={<LayoutGrid />}

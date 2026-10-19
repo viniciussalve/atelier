@@ -67,3 +67,19 @@ export function googleFontsHref(assets: Asset[]): string {
     });
   return `https://fonts.googleapis.com/css2?${params.join("&")}&display=swap`;
 }
+
+/**
+ * One family's stylesheet. Items added from the catalogs each get their own, so a
+ * family or weight Google does not serve (a 400 for the whole request) breaks only
+ * that family. No weights asks for the family's default cut.
+ */
+export function googleFontHref(family: string, weights: number[]): string {
+  const name = encodeURIComponent(family).replace(/%20/g, "+");
+  const axis = weights.length ? `:wght@${[...weights].sort((a, b) => a - b).join(";")}` : "";
+  return `https://fonts.googleapis.com/css2?family=${name}${axis}&display=swap`;
+}
+
+export function fontAssetHref(asset: Pick<Asset, "family" | "weights">): string {
+  const weights = asset.weights.trim() ? parseWeights(asset.weights) : [];
+  return googleFontHref(primaryFamily(asset.family), weights);
+}

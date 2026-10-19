@@ -62,3 +62,6 @@ export function groundOf(id: PreviewGround): Ground {
 }
 
 export const PAPER_INK = DARK_INK;
+
+/** Glyph color on the app chrome (dark surfaces). */
+export const CHROME_INK = LIGHT_INK;

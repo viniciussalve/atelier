@@ -27,7 +27,9 @@
         "./src/*"
       ]
     },
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    // The server reads bundled catalogs (src/lib/ai/data, @iconify/collections).
+    "resolveJsonModule": true
   },
   "include": [
     "src",

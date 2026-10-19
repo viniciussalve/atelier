@@ -6,7 +6,8 @@
 import { collectionList } from "./filters.ts";
 import type { DropZone, Edge } from "./layout.ts";
 import { useLibrary } from "./store.ts";
-import type { CriterionId, Kind, Score, View } from "./types.ts";
+import { AI_TAG } from "../ai/additions.ts";
+import type { Asset, CriterionId, Kind, Score, View } from "./types.ts";
 import { useWorkspace, type DragPayload } from "./workspace.ts";
 import {
   activateTab,
@@ -65,6 +66,23 @@ export function showView(kind: Kind, view: View) {
 export function showLibrary(kind: Kind) {
   lib().setKind(kind);
   ws().update(openCollection);
+}
+
+/**
+ * Adds catalog items and opens the first new one, with "Para avaliar" behind it.
+ * AI suggestions carry the `ia` tag and the reason as a note. Returns the ids added.
+ */
+export function addItems(assets: Asset[], origin: { fromAi?: boolean; reason?: string } = {}) {
+  const added = lib().addAssets(
+    assets,
+    origin.fromAi ? { tags: [AI_TAG], notes: origin.reason } : {},
+  );
+  const first = lib().assets.find((item) => item.id === added[0]);
+  if (first) {
+    showView(first.kind, { type: "pending" });
+    openItem(first.id, "preview");
+  }
+  return added;
 }
 
 export function compareItems(assetIds: string[]) {
