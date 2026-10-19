@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { iconSetsFrom } from "./catalog.ts";
-import { fontJson, fontLine, iconSetLine, listMarkdown } from "./format.ts";
+import { fontJson, fontLine, iconSetLine, iconsMarkdown, listMarkdown } from "./format.ts";
 import { FONTS, ICON_INFO } from "./test-fixtures.ts";
 
 describe("catalog Markdown", () => {
@@ -23,5 +23,18 @@ describe("catalog Markdown", () => {
 
   it("says when nothing matched", () => {
     assert.equal(listMarkdown("Fontes", []), "# Fontes\n\nNada encontrado.\n");
+  });
+});
+
+describe("iconsMarkdown", () => {
+  it("lists the icon names found, ready to paste", () => {
+    assert.equal(
+      iconsMarkdown("casa", ["lucide:house", "mdi:home"]),
+      "# Ícones para “casa”\n\n- `lucide:house`\n- `mdi:home`\n",
+    );
+  });
+
+  it("says when nothing matched", () => {
+    assert.equal(iconsMarkdown("xyz", []), "# Ícones para “xyz”\n\nNada encontrado.\n");
   });
 });

@@ -47,6 +47,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **JSON de pacote no servidor quebra com `ERR_IMPORT_ATTRIBUTE_MISSING`.**
   - Causa: o SSR do Vite deixa o pacote para o Node, que exige `with { type: "json" }`. O índice do `@iconify/collections` importa o JSON sem isso.
   - O que fazer: importe o `.json` direto, com o atributo: `import collections from "@iconify/collections/collections.json" with { type: "json" }`.
+- **O Iconify devolve mais ícones do que o pedido.**
+  - Causa: a busca dele tem limite mínimo de 32.
+  - O que fazer: peça ao menos 32 e corte no limite pedido (`searchIcons` já faz).
 - **Rota de servidor nova não existe para o `tsc`.**
   - Causa: o `src/routeTree.gen.ts` só se refaz quando o dev ou o build rodam.
   - O que fazer: suba o dev antes do typecheck e commite o arquivo gerado (ele está no `.prettierignore`).

@@ -37,11 +37,11 @@ Módulos puros, testados com `node --experimental-strip-types` como os de `src/l
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
 | `catalog.ts`             | Tipos `CatalogFont` e `CatalogIconSet`, `iconSetsFrom` (Iconify), `searchFonts`, `searchIconSets`, `findFont`, `findIconSet`, `iconSetStyle`             | sim   |
 | `additions.ts`           | A lista `adicionar` (`parseAddList`, `formatAddList`, `addLink`), `fontAsset`/`iconSetAsset`, `resolveSpecs`, `assetKeyOf`, `mergeNewAssets`, `AI_TAG`   | sim   |
-| `params.ts`              | Lê a query dos endpoints em português (`categoria=monoespaçada`, `traco=sim`)                                                                            | sim   |
-| `format.ts`              | Itens do catálogo em JSON e Markdown, com o trecho `fonte:…`/`icones:…` para o link                                                                      | sim   |
+| `params.ts`              | Lê a query em português (`categoria=monoespaçada`, `traco=sim`); `int` (nunca NaN) e `listParam` (lista com vírgulas ou repetida)                        | sim   |
+| `format.ts`              | Itens do catálogo em JSON e Markdown, com o trecho `fonte:…`/`icones:…` para o link; `iconsMarkdown` (busca de ícones)                                   | sim   |
 | `links.ts`               | `appBase`/`appUrl`: a origem pública, com o prefixo dos previews por caminho. Use em todo `fetch` e link montado no navegador                            | sim   |
 | `respond.ts`             | Respostas JSON ou Markdown (`?formato=md`), com CORS aberto: são dados públicos                                                                          | —     |
-| `catalog.server.ts`      | Só no servidor: os catálogos embutidos, `resolveAdditions` (confere no Google Fonts a família que o catálogo não tem) e `searchIcons` (busca do Iconify) | —     |
+| `catalog.server.ts`      | Só no servidor: catálogos embutidos, `resolveAdditions` (confere em paralelo no Google Fonts a família que o catálogo não tem) e `searchIcons` (Iconify) | sim   |
 | `data/google-fonts.json` | Catálogo do Google Fonts, gerado por `scripts/catalog-google-fonts.mjs`. O do Iconify vem do pacote `@iconify/collections`                               | —     |
 
 Rotas de servidor em `src/routes/api/`: `fontes`, `conjuntos`, `icones` e `adicionar`.
@@ -137,6 +137,6 @@ Em `command-palette.tsx`, acrescente um `<Action icon label shortcut onSelect>` 
 ### Novo endpoint para IA
 
 1. A lógica vai num módulo puro em `src/lib/ai/`, com teste. Se precisar de rede ou dos catálogos, a parte que busca fica em `catalog.server.ts` (ou outro `*.server.ts`), com o `fetch` injetável.
-2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`.
+2. A rota é um arquivo em `src/routes/api/` com `createFileRoute("/api/…")({ server: { handlers: { GET } } })`. Responda com `json`/`markdown` de `respond.ts`. Listas na query passam por `listParam`, números por `int`.
 3. Suba o dev (`server.sh start`) antes do `tsc`: ele regenera `src/routeTree.gen.ts`, que vai no commit.
 4. Confira com `curl` em JSON e em `?formato=md`.

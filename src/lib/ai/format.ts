@@ -51,3 +51,11 @@ export function iconSetLine(set: CatalogIconSet): string {
 export function listMarkdown(title: string, lines: string[]): string {
   return `# ${title}\n\n${lines.length ? lines.join("\n") : "Nada encontrado."}\n`;
 }
+
+/** Icon names found by a search ("lucide:house"), ready to paste. */
+export function iconsMarkdown(query: string, icons: string[]): string {
+  return listMarkdown(
+    `Ícones para “${query}”`,
+    icons.map((icon) => `- \`${icon}\``),
+  );
+}
