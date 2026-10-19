@@ -2,7 +2,8 @@ import { PanelRightClose } from "lucide-react";
 import { Scorecard } from "@/components/library/evaluation/scorecard";
 import { IconButton } from "@/components/ui/icon-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useActiveAsset } from "@/lib/library/hooks";
+import { useSteadyWhilePressed } from "@/components/library/shared/use-steady-while-pressed";
+import { useActiveAsset, useAsset } from "@/lib/library/hooks";
 import { useWorkspace, type InspectorTab } from "@/lib/library/workspace";
 import { cn } from "@/lib/utils";
 import { Details } from "./details";
@@ -12,8 +13,10 @@ import { Details } from "./details";
  * screens, a drawer on narrow ones; hidden while the collection is in front.
  */
 export function Inspector() {
-  const asset = useActiveAsset();
   const wide = useWorkspace((state) => state.canSplit);
+  // As a column the inspector resizes the panes. A press that makes another pane
+  // active would show or hide it under the pointer, and the click would miss.
+  const asset = useAsset(useSteadyWhilePressed(useActiveAsset()?.id ?? null, wide));
   const open = useWorkspace((state) =>
     state.canSplit ? state.inspectorOpen : state.inspectorDrawer,
   );
