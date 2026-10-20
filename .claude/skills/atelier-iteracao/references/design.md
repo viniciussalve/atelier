@@ -28,7 +28,7 @@ Cores em hex só em `shared/grounds.ts`, que espelha o tema para o Iconify color
 
 ## Layout
 
-- Cada painel é um `@container`. Ajuste o que aparece pela largura **do painel**, não da janela: `@sm:`, `@md:`, `@xl:`, `@2xl:`. A barra de filtros vira um único botão "Filtros" abaixo de `@2xl`.
+- Cada painel é um `@container`. Ajuste o que aparece pela largura **do painel**, não da janela: `@sm:`, `@md:`, `@xl:`, `@2xl:`. Os filtros ficam num único botão "Filtros" no cabeçalho da coleção; os ativos aparecem como chips numa linha que só existe enquanto há filtro.
 - A janela abaixo de 860 px (`canSplit` falso) mostra um painel por vez, e barra e inspetor viram gavetas.
 - Textos longos de prova ficam em até ~62ch.
 - Divisórias têm 1 px de linha e área de clique maior; painéis têm 220 px de largura mínima (160 px na vertical), em `PANE_MIN`. Nada abre um painel que fique abaixo disso: dividir, soltar na borda, abrir ao lado e Comparar consultam o espaço medido (`roomFor` em `commands.ts`).

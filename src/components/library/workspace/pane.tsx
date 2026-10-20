@@ -1,7 +1,9 @@
-import { Columns2, Equal, MoreHorizontal, PanelLeft, Rows2, X } from "lucide-react";
+import { Columns2, Equal, MoreHorizontal, PanelLeft, Rows2, Sparkles, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { Collection } from "@/components/library/browser/collection";
 import { AssetTab } from "@/components/library/specimen/asset-tab";
+import { buildAiLink } from "@/components/library/shared/ai-link";
+import { copyText } from "@/components/library/shared/copy";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import { useTabLabel } from "@/components/library/shared/use-tab-label";
 import {
@@ -116,6 +118,15 @@ function PaneMenu({ paneId, paneCount }: { paneId: string; paneCount: number }) 
         <MoreHorizontal className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          // Built from the library as it is now; the copy starts inside the selection.
+          onSelect={() =>
+            void copyText(buildAiLink(), { notice: "Link para IA copiado", title: "Link para IA" })
+          }
+        >
+          <Sparkles /> Copiar link para IA
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Sincronizar painéis</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>

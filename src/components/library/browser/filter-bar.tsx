@@ -1,5 +1,5 @@
 import { useId, useMemo } from "react";
-import { ChevronDown, ListFilter, X } from "lucide-react";
+import { ListFilter, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FaceIcon } from "@/components/ui/face-icon";
 import { STATUS_LABEL, VERDICT_LABEL } from "@/lib/library/criteria";
@@ -38,8 +38,8 @@ function optionLabel(facet: ListFacet, value: string) {
   return value;
 }
 
-/** Facet popovers, the active filters as chips, and a way to clear them. */
-export function FilterBar({ kind }: { kind: Kind }) {
+/** The facets of the current view with their counts and the filters applied, from a library's nav. */
+function useFilters(kind: Kind) {
   const nav = useLibrary((state) => state.nav[kind]);
   const assets = useLibrary((state) => state.assets);
   const folders = useLibrary((state) => state.folders);
@@ -56,68 +56,61 @@ export function FilterBar({ kind }: { kind: Kind }) {
     return facetCounts(base, filters, facets);
   }, [assets, folders, kind, nav.view, nav.query, filters, facets]);
 
-  const active = activeFilterCount(filters);
-  const toggle = (facet: ListFacet, value: string) => toggleFilter(kind, facet, value);
+  return {
+    facets,
+    filters,
+    options,
+    active: activeFilterCount(filters),
+    toggle: (facet: ListFacet, value: string) => toggleFilter(kind, facet, value),
+    setMinScore: (value: Score | null) => setMinScore(kind, value),
+    clear: () => clearFilters(kind),
+  };
+}
 
+/** One button for every facet, so filtering takes no room until it is used. */
+export function FilterButton({ kind }: { kind: Kind }) {
+  const { facets, filters, options, active, toggle, setMinScore } = useFilters(kind);
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-4 py-2">
-      <div className="hidden flex-wrap items-center gap-1.5 @2xl:flex">
-        {facets.map((facet) => (
-          <Popover key={facet}>
-            <FacetTrigger label={FACET_LABEL[facet]} count={filters[facet].length} />
-            <PopoverContent className="w-60 p-1">
+    <Popover>
+      <PopoverTrigger
+        className={cn(
+          "flex h-8 items-center gap-1.5 rounded-md border px-2 text-sm transition-colors data-[state=open]:border-proof/60 data-[state=open]:text-fg",
+          active ? "border-proof/40 text-fg" : "border-border text-muted hover:text-fg",
+        )}
+      >
+        <ListFilter className="size-3.5" />
+        Filtros
+        {active ? <span className="text-xs text-proof tabular-nums">{active}</span> : null}
+      </PopoverTrigger>
+      <PopoverContent align="end" className="max-h-[70vh] w-64 overflow-y-auto p-1">
+        {facets.map((facet) =>
+          options[facet].length ? (
+            <section key={facet} aria-label={FACET_LABEL[facet]} className="pb-1">
+              <p className="px-2 pt-2 pb-1 text-xs font-medium text-muted">{FACET_LABEL[facet]}</p>
               <FacetOptions
                 facet={facet}
                 options={options[facet]}
                 selected={filters[facet]}
                 onToggle={toggle}
               />
-            </PopoverContent>
-          </Popover>
-        ))}
-        <Popover>
-          <FacetTrigger label="Nota mínima" count={filters.minScore === null ? 0 : 1} />
-          <PopoverContent className="w-48 p-1">
-            <MinScoreOptions
-              value={filters.minScore}
-              onChange={(value) => setMinScore(kind, value)}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+            </section>
+          ) : null,
+        )}
+        <section aria-label="Nota mínima">
+          <p className="px-2 pt-2 pb-1 text-xs font-medium text-muted">Nota mínima</p>
+          <MinScoreOptions value={filters.minScore} onChange={setMinScore} />
+        </section>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
-      <Popover>
-        <PopoverTrigger className="flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-sm text-muted hover:text-fg data-[state=open]:border-proof/60 data-[state=open]:text-fg @2xl:hidden">
-          <ListFilter className="size-3.5" />
-          Filtros
-          {active ? <span className="text-xs text-proof tabular-nums">{active}</span> : null}
-        </PopoverTrigger>
-        <PopoverContent className="max-h-[70vh] w-64 overflow-y-auto p-1">
-          {facets.map((facet) =>
-            options[facet].length ? (
-              <section key={facet} className="pb-1">
-                <p className="px-2 pt-2 pb-1 text-xs font-medium text-muted">
-                  {FACET_LABEL[facet]}
-                </p>
-                <FacetOptions
-                  facet={facet}
-                  options={options[facet]}
-                  selected={filters[facet]}
-                  onToggle={toggle}
-                />
-              </section>
-            ) : null,
-          )}
-          <section>
-            <p className="px-2 pt-2 pb-1 text-xs font-medium text-muted">Nota mínima</p>
-            <MinScoreOptions
-              value={filters.minScore}
-              onChange={(value) => setMinScore(kind, value)}
-            />
-          </section>
-        </PopoverContent>
-      </Popover>
-
+/** The filters applied, as chips, and a way to clear them; nothing when none is. */
+export function ActiveFilters({ kind }: { kind: Kind }) {
+  const { facets, filters, active, toggle, setMinScore, clear } = useFilters(kind);
+  if (!active) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-4 py-2">
       {facets.flatMap((facet) =>
         filters[facet].map((value) => (
           <Chip
@@ -132,34 +125,17 @@ export function FilterBar({ kind }: { kind: Kind }) {
         <Chip
           facet="Nota"
           label={MIN_SCORES.find((entry) => entry.value === filters.minScore)?.label ?? ""}
-          onRemove={() => setMinScore(kind, null)}
+          onRemove={() => setMinScore(null)}
         />
       ) : null}
-      {active ? (
-        <button
-          type="button"
-          onClick={() => clearFilters(kind)}
-          className="h-7 rounded-md px-2 text-sm text-muted hover:text-fg"
-        >
-          Limpar filtros
-        </button>
-      ) : null}
+      <button
+        type="button"
+        onClick={clear}
+        className="h-7 rounded-md px-2 text-sm text-muted hover:text-fg"
+      >
+        Limpar filtros
+      </button>
     </div>
-  );
-}
-
-function FacetTrigger({ label, count }: { label: string; count: number }) {
-  return (
-    <PopoverTrigger
-      className={cn(
-        "flex h-7 items-center gap-1 rounded-md border px-2 text-sm transition-colors data-[state=open]:border-proof/60 data-[state=open]:text-fg",
-        count ? "border-proof/40 text-fg" : "border-border text-muted hover:text-fg",
-      )}
-    >
-      {label}
-      {count ? <span className="text-xs text-proof tabular-nums">{count}</span> : null}
-      <ChevronDown className="size-3.5 opacity-60" />
-    </PopoverTrigger>
   );
 }
 
