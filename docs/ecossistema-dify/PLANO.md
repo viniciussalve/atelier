@@ -62,16 +62,16 @@ O material aqui não é tela: é texto lido por um recuperador e JSON lido por u
 
 ## Fora do repositório (depende do Dify ou da sala)
 
-| Ordem | Passo                                                                              | Quem              | Depende de       |
-| ----- | ---------------------------------------------------------------------------------- | ----------------- | ---------------- |
-| A     | Rodar `conhecimento/roteiro-all-96-plugin-github.md` e decidir plugin ou API       | Vinicius          | Instância local  |
-| B     | Criar as bases conforme `conhecimento/configuracao-bases.md`                       | Dify Conhecimento | A + etapas 1 a 3 |
-| C     | Ingerir `docs/ds/` (plugin, ou script pela API de conhecimento se o plugin falhar) | Dify Conhecimento | A, B             |
-| D     | Rodar `conhecimento/teste-recuperacao.csv` e calibrar o threshold                  | Dify Qualidade    | C                |
-| E     | ~~Aprovar o contrato v0~~ Feito em 20/10/2026                                      | Sala + Vinicius   | Etapa 4          |
-| F     | ~~Importar o `validar-spec`~~ Feito em 20/10/2026; falta publicar API e MCP        | Dify Workflows    | E, etapa 5       |
-| G     | Importar o fluxo piloto (DSL pronto na etapa 10) e preencher os ids das bases      | Dify Workflows    | E, F, D          |
-| H     | Plugin do Cursor carregado local (ALL-103)                                         | tinkabot          | G                |
-| I     | Segunda camada: spec vira draft PR (ALL-92, ALL-101)                               | Proto Bot         | G                |
+| Ordem | Passo                                                                                                                    | Quem              | Depende de       |
+| ----- | ------------------------------------------------------------------------------------------------------------------------ | ----------------- | ---------------- |
+| A     | Rodar `conhecimento/roteiro-all-96-plugin-github.md` e decidir plugin ou API                                             | Vinicius          | Instância local  |
+| B     | Criar as bases conforme `conhecimento/configuracao-bases.md`                                                             | Dify Conhecimento | A + etapas 1 a 3 |
+| C     | Ingerir `docs/ds/` (plugin, ou script pela API de conhecimento se o plugin falhar)                                       | Dify Conhecimento | A, B             |
+| D     | Rodar `conhecimento/teste-recuperacao.csv` e calibrar o threshold                                                        | Dify Qualidade    | C                |
+| E     | ~~Aprovar o contrato v0~~ Feito em 20/10/2026                                                                            | Sala + Vinicius   | Etapa 4          |
+| F     | ~~Importar o `validar-spec`~~ Feito em 20/10/2026; falta publicar API e MCP                                              | Dify Workflows    | E, etapa 5       |
+| G     | ~~Importar o fluxo piloto~~ Feito em 20/10/2026 (tela de login válida na 1ª tentativa); falta preencher os ids das bases | Dify Workflows    | E, F, D          |
+| H     | Plugin do Cursor carregado local (ALL-103)                                                                               | tinkabot          | G                |
+| I     | Segunda camada: spec vira draft PR (ALL-92, ALL-101)                                                                     | Proto Bot         | G                |
 
 O script de sincronização pela API (plano B do passo C) fica pra depois da decisão do passo A: escrever antes seria código que pode não ser usado.

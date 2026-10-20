@@ -15,7 +15,7 @@ workflow:
   environment_variables:
   - id: "7d0b3c1e-9a52-4c0e-8f61-5a1b2c3d4e01"
     name: "flow_version"
-    value: "1"
+    value: "2"
     value_type: "string"
     description: "Sobe a cada mudança do fluxo."
     selector:
@@ -149,8 +149,9 @@ workflow:
         code_language: "javascript"
         code: |-
           function main({ componentes, regras }) {
+            const lista = (itens) => (Array.isArray(itens) ? itens : []);
             const bloco = (itens, prefixo) =>
-              (Array.isArray(itens) ? itens : [])
+              lista(itens)
                 .map((i) => `### ${prefixo}${i?.metadata?.document_name ?? "?"}\n\n${i?.content ?? ""}`)
                 .join("\n\n");
             return {
@@ -160,6 +161,10 @@ workflow:
                 "## Regras do DS",
                 bloco(regras, "") || "(nenhuma regra recuperada)",
               ].join("\n\n"),
+              // Counted per base: zero components tells the evaluator that component
+              // cases and the screen trap measured nothing, whatever the rules gave.
+              componentes_recuperados: lista(componentes).length,
+              regras_recuperadas: lista(regras).length,
             };
           }
 
@@ -175,6 +180,12 @@ workflow:
         outputs:
           contexto:
             type: "string"
+            children: null
+          componentes_recuperados:
+            type: "number"
+            children: null
+          regras_recuperadas:
+            type: "number"
             children: null
     - id: "1760918500010"
       type: "custom"
@@ -885,6 +896,16 @@ workflow:
           value_selector:
           - "1760918500010"
           - "tentativas"
+          value_type: "number"
+        - variable: "componentes_recuperados"
+          value_selector:
+          - "1760918500004"
+          - "componentes_recuperados"
+          value_type: "number"
+        - variable: "regras_recuperadas"
+          value_selector:
+          - "1760918500004"
+          - "regras_recuperadas"
           value_type: "number"
     edges:
     - id: "1760918500001-source-1760918500002-target"

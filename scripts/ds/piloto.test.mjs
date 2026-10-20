@@ -96,7 +96,7 @@ test("the graph: Início -> two searches -> contexto -> loop [LLM -> validar -> 
   const fim = nodes.find((n) => n.data.type === "end");
   assert.deepEqual(
     fim.data.outputs.map((o) => o.variable),
-    ["spec", "valida", "erros", "tentativas"],
+    ["spec", "valida", "erros", "tentativas", "componentes_recuperados", "regras_recuperadas"],
   );
 });
 
@@ -158,7 +158,7 @@ test("validar fills meta, passes a good spec and piles up rejected tokens across
 
 test("contexto labels each chunk with the path the spec cites as fonte", () => {
   const main = rodar(CODIGO_CONTEXTO);
-  const { contexto } = main({
+  const { contexto, componentes_recuperados, regras_recuperadas } = main({
     componentes: [{ content: "Para alternar.", metadata: { document_name: "segmented.md" } }],
     regras: [],
   });
@@ -167,6 +167,10 @@ test("contexto labels each chunk with the path the spec cites as fonte", () => {
     /## Componentes\n\n### docs\/ds\/componentes\/segmented\.md\n\nPara alternar\./,
   );
   assert.match(contexto, /## Regras do DS\n\n\(nenhuma regra recuperada\)/);
+  assert.deepEqual([componentes_recuperados, regras_recuperadas], [1, 0]);
+  const sohRegras = main({ componentes: [], regras: [{}, {}] });
+  assert.deepEqual([sohRegras.componentes_recuperados, sohRegras.regras_recuperadas], [0, 2]);
+  assert.equal(main({ componentes: null, regras: undefined }).componentes_recuperados, 0);
 });
 
 test("validar takes pedido from the Start input, not from the LLM", () => {

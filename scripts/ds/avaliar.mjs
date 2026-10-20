@@ -263,6 +263,13 @@ export function relatorioMd({ data, fluxo, versoes = [], resultados, metricas: m
         `| ${rotulo} | ${mostrar(nome, m[nome].valor)} | ${m[nome].criterio} | ${simNao(m[nome].passou)} | ${m[nome].bloqueia ? "sim" : "não"} |`,
     ),
   ];
+  const semBusca = resultados.filter((r) => r.componentes_recuperados === 0).map((r) => r.id);
+  if (semBusca.length) {
+    linhas.push(
+      "",
+      `**Atenção:** a busca de componentes voltou vazia em ${semBusca.length} de ${resultados.length} casos (${semBusca.join(", ")}). Neles, componentes e a armadilha de tela (T21) não medem nada: sem contexto, o modelo não conhece os componentes e quase toda spec traz alguma lacuna.`,
+    );
+  }
   if (comparacao.length) {
     linhas.push("", "## Comparado com a rodada anterior", "");
     for (const c of comparacao) {
@@ -338,9 +345,12 @@ export async function rodarFluxo(
     if (outputs?.spec === undefined || outputs.spec === null) {
       return { erro: "o fluxo terminou sem `spec` nas saídas" };
     }
-    if (typeof outputs.spec !== "string") return { spec: outputs.spec };
+    // The pilot says how many component chunks it found; older flows don't.
+    const componentes_recuperados =
+      typeof outputs.componentes_recuperados === "number" ? outputs.componentes_recuperados : null;
+    if (typeof outputs.spec !== "string") return { spec: outputs.spec, componentes_recuperados };
     try {
-      return { spec: JSON.parse(outputs.spec) };
+      return { spec: JSON.parse(outputs.spec), componentes_recuperados };
     } catch {
       return { erro: "a `spec` devolvida não é JSON" };
     }
@@ -389,9 +399,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const fonte = fonteDoAtelier();
   const resultados = [];
   for (const caso of casos) {
-    const { spec, erro } = await rodarFluxo(caso.pedido, { url, chave });
-    resultados.push(avaliarCaso(caso, spec, fonte, erro));
-    console.error(`${caso.id} ${spec ? "ok" : `sem spec: ${erro}`}`);
+    const r = await rodarFluxo(caso.pedido, { url, chave });
+    resultados.push({
+      ...avaliarCaso(caso, r.spec, fonte, r.erro),
+      componentes_recuperados: r.componentes_recuperados ?? null,
+    });
+    console.error(`${caso.id} ${r.spec ? "ok" : `sem spec: ${r.erro}`}`);
   }
   const data = new Date().toISOString();
   const atual = {
