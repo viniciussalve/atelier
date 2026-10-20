@@ -322,3 +322,42 @@ test("--casos with no value stops instead of running every case", async () => {
     },
   );
 });
+
+test("reads how many chunks the bases gave, and warns when they gave none", async () => {
+  const fetch = async () =>
+    sse({
+      event: "workflow_finished",
+      data: { status: "succeeded", outputs: { spec: t19, recuperados: 0 } },
+    });
+  const r = await rodarFluxo("p", { url: "http://dify/v1", chave: "k", fetch });
+  assert.equal(r.recuperados, 0);
+  const antigo = await rodarFluxo("p", {
+    url: "http://dify/v1",
+    chave: "k",
+    fetch: async () =>
+      sse({ event: "workflow_finished", data: { status: "succeeded", outputs: { spec: t19 } } }),
+  });
+  assert.equal(antigo.recuperados, null, "a flow without the output says nothing");
+
+  const caso = { id: "T21", camada: "spec", tipo: "armadilha", esperado: "" };
+  const resultados = [
+    { ...avaliarCaso(caso, t19, fonte), recuperados: 0 },
+    { ...avaliarCaso({ ...caso, id: "T19" }, t19, fonte), recuperados: 5 },
+  ];
+  const md = relatorioMd({
+    data: "d",
+    fluxo: "f",
+    resultados,
+    metricas: metricas(resultados),
+    comparacao: [],
+  });
+  assert.match(md, /\*\*Atenção:\*\* a busca nas bases voltou vazia em 1 de 2 casos \(T21\)/);
+  const cheio = relatorioMd({
+    data: "d",
+    fluxo: "f",
+    resultados: [resultados[1]],
+    metricas: metricas([resultados[1]]),
+    comparacao: [],
+  });
+  assert.doesNotMatch(cheio, /Atenção/);
+});

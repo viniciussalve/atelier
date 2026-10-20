@@ -97,8 +97,9 @@ const MAIN_VALIDAR = [
 
 /** Retrieved chunks as text, each under the path the spec cites as `fonte`. */
 export const CODIGO_CONTEXTO = `function main({ componentes, regras }) {
+  const lista = (itens) => (Array.isArray(itens) ? itens : []);
   const bloco = (itens, prefixo) =>
-    (Array.isArray(itens) ? itens : [])
+    lista(itens)
       .map((i) => \`### \${prefixo}\${i?.metadata?.document_name ?? "?"}\\n\\n\${i?.content ?? ""}\`)
       .join("\\n\\n");
   return {
@@ -108,6 +109,9 @@ export const CODIGO_CONTEXTO = `function main({ componentes, regras }) {
       "## Regras do DS",
       bloco(regras, "") || "(nenhuma regra recuperada)",
     ].join("\\n\\n"),
+    // Zero tells the evaluator the bases gave nothing, so component cases
+    // and the screen trap measured nothing.
+    recuperados: lista(componentes).length + lista(regras).length,
   };
 }
 `;
@@ -198,7 +202,10 @@ export function pilotoApp({ validador, fonte, schema, tokensMd, config }) {
         { variable: "componentes", value_selector: [ID.componentes, "result"] },
         { variable: "regras", value_selector: [ID.regras, "result"] },
       ],
-      outputs: { contexto: { type: "string", children: null } },
+      outputs: {
+        contexto: { type: "string", children: null },
+        recuperados: { type: "number", children: null },
+      },
     }),
     {
       ...no(ID.laco, "loop", 1280, {
@@ -309,11 +316,17 @@ export function pilotoApp({ validador, fonte, schema, tokensMd, config }) {
         ["valida", "number"],
         ["erros", "array[string]"],
         ["tentativas", "number"],
-      ].map(([nome, tipo]) => ({
-        variable: nome,
-        value_selector: [ID.laco, nome],
-        value_type: tipo,
-      })),
+      ]
+        .map(([nome, tipo]) => ({
+          variable: nome,
+          value_selector: [ID.laco, nome],
+          value_type: tipo,
+        }))
+        .concat({
+          variable: "recuperados",
+          value_selector: [ID.contexto, "recuperados"],
+          value_type: "number",
+        }),
     }),
   ];
   const edges = [

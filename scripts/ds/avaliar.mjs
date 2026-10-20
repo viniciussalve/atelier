@@ -263,6 +263,13 @@ export function relatorioMd({ data, fluxo, versoes = [], resultados, metricas: m
         `| ${rotulo} | ${mostrar(nome, m[nome].valor)} | ${m[nome].criterio} | ${simNao(m[nome].passou)} | ${m[nome].bloqueia ? "sim" : "não"} |`,
     ),
   ];
+  const semBusca = resultados.filter((r) => r.recuperados === 0).map((r) => r.id);
+  if (semBusca.length) {
+    linhas.push(
+      "",
+      `**Atenção:** a busca nas bases voltou vazia em ${semBusca.length} de ${resultados.length} casos (${semBusca.join(", ")}). Neles, componentes e a armadilha de tela (T21) não medem nada: sem contexto, o modelo não conhece os componentes e quase toda spec traz alguma lacuna.`,
+    );
+  }
   if (comparacao.length) {
     linhas.push("", "## Comparado com a rodada anterior", "");
     for (const c of comparacao) {
@@ -338,9 +345,11 @@ export async function rodarFluxo(
     if (outputs?.spec === undefined || outputs.spec === null) {
       return { erro: "o fluxo terminou sem `spec` nas saídas" };
     }
-    if (typeof outputs.spec !== "string") return { spec: outputs.spec };
+    // The pilot says how many chunks the bases gave; older flows don't.
+    const recuperados = typeof outputs.recuperados === "number" ? outputs.recuperados : null;
+    if (typeof outputs.spec !== "string") return { spec: outputs.spec, recuperados };
     try {
-      return { spec: JSON.parse(outputs.spec) };
+      return { spec: JSON.parse(outputs.spec), recuperados };
     } catch {
       return { erro: "a `spec` devolvida não é JSON" };
     }
@@ -389,8 +398,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const fonte = fonteDoAtelier();
   const resultados = [];
   for (const caso of casos) {
-    const { spec, erro } = await rodarFluxo(caso.pedido, { url, chave });
-    resultados.push(avaliarCaso(caso, spec, fonte, erro));
+    const { spec, erro, recuperados = null } = await rodarFluxo(caso.pedido, { url, chave });
+    resultados.push({ ...avaliarCaso(caso, spec, fonte, erro), recuperados });
     console.error(`${caso.id} ${spec ? "ok" : `sem spec: ${erro}`}`);
   }
   const data = new Date().toISOString();

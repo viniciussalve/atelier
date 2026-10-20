@@ -96,7 +96,7 @@ test("the graph: Início -> two searches -> contexto -> loop [LLM -> validar -> 
   const fim = nodes.find((n) => n.data.type === "end");
   assert.deepEqual(
     fim.data.outputs.map((o) => o.variable),
-    ["spec", "valida", "erros", "tentativas"],
+    ["spec", "valida", "erros", "tentativas", "recuperados"],
   );
 });
 
@@ -158,7 +158,7 @@ test("validar fills meta, passes a good spec and piles up rejected tokens across
 
 test("contexto labels each chunk with the path the spec cites as fonte", () => {
   const main = rodar(CODIGO_CONTEXTO);
-  const { contexto } = main({
+  const { contexto, recuperados } = main({
     componentes: [{ content: "Para alternar.", metadata: { document_name: "segmented.md" } }],
     regras: [],
   });
@@ -167,6 +167,12 @@ test("contexto labels each chunk with the path the spec cites as fonte", () => {
     /## Componentes\n\n### docs\/ds\/componentes\/segmented\.md\n\nPara alternar\./,
   );
   assert.match(contexto, /## Regras do DS\n\n\(nenhuma regra recuperada\)/);
+  assert.equal(recuperados, 1);
+  assert.equal(
+    main({ componentes: [{ content: "x", metadata: {} }], regras: [{}, {}] }).recuperados,
+    3,
+  );
+  assert.equal(main({ componentes: null, regras: undefined }).recuperados, 0);
 });
 
 test("validar takes pedido from the Start input, not from the LLM", () => {

@@ -25,7 +25,9 @@ Importado e rodado numa instância 1.17.1 pelo Vinicius em 20/10/2026: funcionou
 
 ## `interface-spec.yml` (ALL-93, fluxo piloto)
 
-Workflow: Início (`pedido`) → busca em "Componentes" (Top K 3) → busca em "Regras do DS" (Top K 4) → Montar contexto → Laço, até 3 tentativas: LLM escreve a spec → Validar e preencher meta → Guardar a tentativa → Fim (`spec`, `valida`, `erros`, `tentativas`).
+Workflow: Início (`pedido`) → busca em "Componentes" (Top K 3) → busca em "Regras do DS" (Top K 4) → Montar contexto → Laço, até 3 tentativas: LLM escreve a spec → Validar e preencher meta → Guardar a tentativa → Fim (`spec`, `valida`, `erros`, `tentativas`, `recuperados`).
+
+`recuperados` é quantos trechos as duas buscas trouxeram. Com zero, o avaliador avisa que a rodada não mediu componentes nem a armadilha de tela.
 
 - **Tokens:** a lista inteira de `docs/ds/tokens.md` vai no prompt, sem busca por Top K.
 - **Saída estruturada:** o LLM devolve a spec no schema v0 sem `meta`.
@@ -53,4 +55,4 @@ Mudou a configuração: `npm run ds:gerar` e reimporte.
 - As variáveis do laço convertidas pelo próprio código do Dify, com os valores iniciais certos.
 - O nó de validação e o de contexto rodados com o invólucro do executor de JavaScript do Dify.
 
-Ninguém importou nem rodou este fluxo numa instância ainda.
+Importado e rodado numa instância 1.17.1 pelo Vinicius em 20/10/2026, ainda sem as bases: "tela de login" saiu válida na 1ª tentativa, com 11 tokens reais, nenhum inventado e a falta de rota de login em `lacunas`.
