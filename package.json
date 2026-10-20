@@ -18,7 +18,9 @@
     "check:auth": "node scripts/check-auth-invariant.mjs",
     "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --test src/lib/app-data/readiness-schedule.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/preview-path-prefix.test.ts 'src/lib/library/*.test.ts' 'src/lib/ai/*.test.ts'",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "ds:gerar": "node scripts/ds/gerar.mjs",
+    "ds:check": "node scripts/ds/gerar.mjs --check"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
