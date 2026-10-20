@@ -431,6 +431,24 @@ describe("sanitizeWorkspace", () => {
     assert.equal(ws.panes["pane-2"].settings.sampleText, "Meu texto");
   });
 
+  it("opens a pane saved on the removed Pesos tab on Interface", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["collection"],
+          active: "collection",
+          preview: null,
+          settings: { ...DEFAULT_PANE_SETTINGS, fontTab: "pesos" },
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.equal(ws.panes["pane-1"].settings.fontTab, "interface");
+  });
+
   it("sends a pane saved on the removed Info tab back to the first specimen tab", () => {
     const ws = sanitizeWorkspace({
       root: { type: "pane", id: "pane-1" },

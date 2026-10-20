@@ -2,7 +2,7 @@
 componente: font-specimen
 camada: library
 arquivo: src/components/library/specimen/font-specimen.tsx
-export: fontproof, fontweights, fontglyphs
+export: fontproof, fontglyphs
 ---
 
 # FontSpecimen
@@ -17,7 +17,7 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 ## Export
 
-`FontProof`, `FontWeights`, `FontGlyphs`
+`FontProof`, `FontGlyphs`
 
 ## Props
 
@@ -31,15 +31,6 @@ The proof sheet for a font. Sizes are in em of the pane's "Corpo", except the fi
 | `paneId` | `string` | sim |  |
 | `settings` | `PaneSettings` | sim |  |
 | `onSettings` | `(patch: Partial<PaneSettings>) => void` | sim |  |
-
-### `FontWeights`
-
-Every declared weight: its name, the headline and two lines of the reading text.
-
-| Prop | Tipo | Obrigatória | Descrição |
-| --- | --- | --- | --- |
-| `asset` | `Asset` | sim |  |
-| `settings` | `PaneSettings` | sim |  |
 
 ### `FontGlyphs`
 

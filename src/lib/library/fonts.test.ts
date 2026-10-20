@@ -7,6 +7,7 @@ import {
   parseWeights,
   primaryFamily,
   weightName,
+  weightRoles,
 } from "./fonts.ts";
 import { seedAssets } from "./seed.ts";
 
@@ -78,5 +79,22 @@ describe("fontAssetHref", () => {
       fontAssetHref({ family: '"Brand New", sans-serif', weights: "" }),
       "https://fonts.googleapis.com/css2?family=Brand+New&display=swap",
     );
+  });
+});
+
+describe("weightRoles", () => {
+  it("gives text, labels and titles the declared weights closest to 400, 500 and 600", () => {
+    assert.deepEqual(weightRoles([100, 200, 300, 400, 500, 600, 700, 800, 900]), {
+      texto: 400,
+      rotulo: 500,
+      titulo: 600,
+    });
+    assert.deepEqual(weightRoles([400, 700]), { texto: 400, rotulo: 400, titulo: 700 });
+    assert.deepEqual(weightRoles([300, 500]), { texto: 300, rotulo: 500, titulo: 500 });
+  });
+
+  it("falls back to the one weight a font has", () => {
+    assert.deepEqual(weightRoles([400]), { texto: 400, rotulo: 400, titulo: 400 });
+    assert.deepEqual(weightRoles([]), { texto: 400, rotulo: 400, titulo: 400 });
   });
 });

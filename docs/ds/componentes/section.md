@@ -2,7 +2,7 @@
 componente: section
 camada: library
 arquivo: src/components/library/specimen/section.tsx
-export: specimensection
+export: specimensection, specimenscreen
 ---
 
 # Section
@@ -17,7 +17,7 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 ## Export
 
-`SpecimenSection`
+`SpecimenSection`, `SpecimenScreen`
 
 ## Props
 
@@ -34,8 +34,18 @@ One part of a specimen. When a criterion is judged on this part, its score opens
 | `onPaper` | `boolean` | sim |  |
 | `children` | `ReactNode` | sim |  |
 
+### `SpecimenScreen`
+
+One small screen of a specimen: its name in the app's own type, then the screen in a frame.
+
+| Prop | Tipo | Obrigatória | Descrição |
+| --- | --- | --- | --- |
+| `title` | `string` | sim |  |
+| `children` | `ReactNode` | sim |  |
+
 ## Telas onde aparece
 
+- Provas: `src/components/library/specimen/font-interface.tsx`
 - Provas: `src/components/library/specimen/font-specimen.tsx`
 - Provas: `src/components/library/specimen/icon-specimen.tsx`
 

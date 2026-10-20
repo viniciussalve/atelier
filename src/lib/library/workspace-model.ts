@@ -47,7 +47,7 @@ function fits(ws: Workspace, paneId: string, edge: Edge, area?: Box): boolean {
 }
 
 export type TabKey = "collection" | `asset:${string}`;
-export type FontSpecimenTab = "prova" | "pesos" | "glifos";
+export type FontSpecimenTab = "prova" | "interface" | "glifos";
 export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes";
 
 export type PaneSettings = {
@@ -74,7 +74,7 @@ export type Workspace = { root: LayoutNode; panes: Record<string, Pane>; activeP
 export type SyncKey = "text" | "size" | "ground" | "tab" | "scroll";
 export type SyncFlags = Record<SyncKey, boolean>;
 
-export const FONT_TABS: FontSpecimenTab[] = ["prova", "pesos", "glifos"];
+export const FONT_TABS: FontSpecimenTab[] = ["prova", "interface", "glifos"];
 export const ICON_TABS: IconSpecimenTab[] = ["amostras", "tamanhos", "componentes"];
 const GROUND_IDS: PreviewGround[] = ["paper", "mist", "ink", "navy", "sand"];
 
@@ -625,9 +625,13 @@ function sanitizeSettings(raw: unknown): PaneSettings {
     ground: GROUND_IDS.includes(value.ground as PreviewGround)
       ? (value.ground as PreviewGround)
       : defaults.ground,
-    fontTab: FONT_TABS.includes(value.fontTab as FontSpecimenTab)
-      ? (value.fontTab as FontSpecimenTab)
-      : defaults.fontTab,
+    // The Pesos tab became Interface, which now shows the weights at work.
+    fontTab:
+      value.fontTab === "pesos"
+        ? "interface"
+        : FONT_TABS.includes(value.fontTab as FontSpecimenTab)
+          ? (value.fontTab as FontSpecimenTab)
+          : defaults.fontTab,
     iconTab: ICON_TABS.includes(value.iconTab as IconSpecimenTab)
       ? (value.iconTab as IconSpecimenTab)
       : defaults.iconTab,

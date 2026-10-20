@@ -22,12 +22,13 @@ import {
 import type { Asset } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
 import { GroundPicker, SizeSlider } from "./controls";
-import { FontGlyphs, FontProof, FontWeights } from "./font-specimen";
+import { FontInterface } from "./font-interface";
+import { FontGlyphs, FontProof } from "./font-specimen";
 import { IconSpecimen } from "./icon-specimen";
 
 const FONT_TABS: { id: FontSpecimenTab; label: string }[] = [
   { id: "prova", label: "Prova" },
-  { id: "pesos", label: "Pesos" },
+  { id: "interface", label: "Interface" },
   { id: "glifos", label: "Glifos" },
 ];
 
@@ -176,7 +177,8 @@ function Body({
       />
     );
   }
-  if (tab === "pesos") return <FontWeights asset={asset} settings={settings} />;
+  if (tab === "interface")
+    return <FontInterface asset={asset} paneId={paneId} settings={settings} />;
   if (tab === "glifos") return <FontGlyphs asset={asset} settings={settings} />;
   return <FontProof asset={asset} paneId={paneId} settings={settings} onSettings={onSettings} />;
 }

@@ -53,3 +53,13 @@ export function SpecimenSection({
     </section>
   );
 }
+
+/** One small screen of a specimen: its name in the app's own type, then the screen in a frame. */
+export function SpecimenScreen({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <figure className="min-w-0">
+      <figcaption className="mb-2 font-sans text-xs font-normal opacity-60">{title}</figcaption>
+      <div className="overflow-hidden rounded-lg border border-current/15">{children}</div>
+    </figure>
+  );
+}
