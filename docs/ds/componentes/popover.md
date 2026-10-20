@@ -57,23 +57,16 @@ Para uma lista de ações, use o `DropdownMenu`. Para uma tarefa que interrompe 
 
 ## Trecho de código
 
-De `src/components/library/evaluation/score-control.tsx`:
+De `src/components/library/inspector/details.tsx`:
 
 ```tsx
 <Popover>
-  <PopoverTrigger
-    aria-label={note ? `Nota sobre ${criterion.label}: ${note}` : `Anotar ${criterion.label}`}
-    className="relative grid size-6 place-items-center rounded-[5px] hover:bg-current/10"
-  >
-    <PenLine className="size-3.5" />
-    {note ? (
-      <span
-        aria-hidden
-        className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-current"
-      />
-    ) : null}
+  <PopoverTrigger className="inline-flex h-7 items-center gap-1 rounded-md border border-dashed border-border px-2 text-xs text-muted hover:text-fg">
+    {/* … */}
   </PopoverTrigger>
-  {/* … */}
+  <PopoverContent className="w-60 p-1">
+    {/* … */}
+  </PopoverContent>
 </Popover>
 ```
 

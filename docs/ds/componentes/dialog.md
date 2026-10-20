@@ -70,8 +70,6 @@ De `src/components/library/shared/copy-layer.tsx`:
     </DialogClose>
   }
 >
-  <textarea
-    readOnly
   {/* … */}
 </Modal>
 ```

@@ -54,6 +54,33 @@ export function Card() {
   );
 }
 `,
+  "src/components/library/browser/card.test.tsx": `import { Chip } from "@/components/ui/chip";
+
+export const Teste = () => <Chip tone="bad">só no teste</Chip>;
+`,
+  "src/components/library/browser/long.tsx": `import { Card } from "./card";
+
+export function Long() {
+  return (
+    <Card>
+      <p>1</p>
+      <p>2</p>
+      <p>3</p>
+      <p>4</p>
+      <p>5</p>
+      <p>6</p>
+      <p>7</p>
+      <p>8</p>
+      <p>9</p>
+      <p>10</p>
+      <p>11</p>
+      <p>12</p>
+      <p>13</p>
+      <p>14</p>
+    </Card>
+  );
+}
+`,
   "src/components/library/orphan.tsx": `export function Orphan() {
   return null;
 }
@@ -85,7 +112,10 @@ test("reads exports and props from the types, and skips constants", () => {
 });
 
 test("finds where a component appears and a real use of it", () => {
-  const [chip, card, orphan] = extrairComponentes(projeto(FIXTURE));
+  const componentes = extrairComponentes(projeto(FIXTURE));
+  const [chip, card, orphan] = ["chip", "card", "orphan"].map((nome) =>
+    componentes.find((c) => c.nome === nome),
+  );
   assert.deepEqual(chip.ondeAparece, [
     { area: "Coleção", arquivo: "src/components/library/browser/card.tsx" },
   ]);
@@ -93,7 +123,10 @@ test("finds where a component appears and a real use of it", () => {
     de: "src/components/library/browser/card.tsx",
     codigo: '<Chip tone="good">Ok</Chip>',
   });
-  assert.deepEqual(card.ondeAparece, [{ area: "Rota /", arquivo: "src/routes/index.tsx" }]);
+  assert.deepEqual(card.ondeAparece, [
+    { area: "Coleção", arquivo: "src/components/library/browser/long.tsx" },
+    { area: "Rota /", arquivo: "src/routes/index.tsx" },
+  ]);
   assert.equal(card.trecho.codigo, "<Card />");
   assert.equal(orphan.nome, "orphan");
   assert.deepEqual(orphan.ondeAparece, []);
@@ -141,4 +174,18 @@ test("keeps the AI-written text when regenerating, and nothing else", () => {
   assert.equal(quandoUsarDe(md), texto);
   assert.equal(componenteMd(chip, quandoUsarDe(md)), md);
   assert.equal(quandoUsarDe(undefined), undefined);
+});
+
+test("tests are not screens, and a long use keeps valid JSX", () => {
+  const componentes = extrairComponentes(projeto(FIXTURE));
+  const chip = componentes.find((c) => c.nome === "chip");
+  assert.deepEqual(
+    chip.ondeAparece.map((o) => o.arquivo),
+    ["src/components/library/browser/card.tsx"],
+  );
+  // Card's only JSX use besides the route is long: its children are cut, the
+  // tags stay whole.
+  const raiz = projeto({ ...FIXTURE, "src/routes/index.tsx": "export const Page = () => null;\n" });
+  const card = extrairComponentes(raiz).find((c) => c.nome === "card");
+  assert.equal(card.trecho.codigo, "<Card>\n  {/* … */}\n</Card>");
 });

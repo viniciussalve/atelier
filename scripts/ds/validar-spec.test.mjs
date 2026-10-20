@@ -105,6 +105,7 @@ test("tokens cited in free text count too, but not in lacunas or meta", () => {
   const r = validarSpec(
     spec({
       tela: { nome: "Coleção", resumo: "Fundo em var(--color-surface-2)." },
+      tokens: [{ nome: "--color-bg", uso: "junto de --color-made-up", fonte: "docs/ds/tokens.md" }],
       lacunas: [{ falta: "--color-primary", motivo: "o atelier não tem cor primária" }],
       meta: {
         flow_version: "1",
@@ -115,8 +116,9 @@ test("tokens cited in free text count too, but not in lacunas or meta", () => {
     }),
     BASE,
   );
-  assert.deepEqual(r.tokens_rejeitados, ["--color-surface-2"]);
+  assert.deepEqual(r.tokens_rejeitados, ["--color-surface-2", "--color-made-up"]);
   assert.match(r.erros[0], /^tela\.resumo: `--color-surface-2` não existe\./);
+  assert.match(r.erros[1], /^tokens\[0\]\.uso: `--color-made-up` não existe\./);
 });
 
 test("components: unknown page, export from another page, and unknown source", () => {

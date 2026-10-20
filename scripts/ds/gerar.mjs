@@ -4,7 +4,7 @@
 //   node scripts/ds/gerar.mjs [--check]
 
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   MAX_TOKENS,
@@ -48,7 +48,7 @@ function existentes(raiz) {
   } catch {
     // No folder yet.
   }
-  return [`${PASTA}/tokens.md`, ...nomes.map((nome) => relative(raiz, join(pasta, nome)))];
+  return [`${PASTA}/tokens.md`, ...nomes.map((nome) => `${PASTA}/componentes/${nome}`)];
 }
 
 function ler(caminho) {

@@ -49,6 +49,15 @@ export function lerTokensCss(css) {
   return tokens;
 }
 
+/** A DTCG `$value` as CSS: dimensions and colors may be objects, families lists. */
+function valorDtcg(valor) {
+  if (typeof valor !== "object" || valor === null) return String(valor);
+  if (Array.isArray(valor)) return valor.map((v) => (/\s/.test(v) ? `"${v}"` : v)).join(", ");
+  if ("value" in valor && "unit" in valor) return `${valor.value}${valor.unit}`;
+  if (typeof valor.hex === "string") return valor.hex;
+  return JSON.stringify(valor);
+}
+
 /**
  * DTCG JSON: the key path becomes the name, `--group-name`.
  * @param {string} texto
@@ -59,7 +68,7 @@ export function lerTokensDtcg(texto) {
   const visitar = (no, caminho) => {
     if (!no || typeof no !== "object") return;
     if ("$value" in no) {
-      tokens.push(token(`--${caminho.join("-")}`, String(no.$value), no.$description ?? ""));
+      tokens.push(token(`--${caminho.join("-")}`, valorDtcg(no.$value), no.$description ?? ""));
     }
     for (const [chave, filho] of Object.entries(no)) {
       if (!chave.startsWith("$")) visitar(filho, [...caminho, chave]);

@@ -67,9 +67,8 @@ De `src/components/library/specimen/asset-tab.tsx`:
   }
 >
   <TabsList aria-label="Partes da prova">
-    {tabs.map((entry) => (
-      <TabsTrigger key={entry.id} value={entry.id}>
-  {/* … */}
+    {/* … */}
+  </TabsList>
 </Tabs>
 ```
 

@@ -67,7 +67,7 @@ function arquivosFonte(raiz) {
     for (const item of readdirSync(join(raiz, relativo), { withFileTypes: true })) {
       const caminho = `${relativo}/${item.name}`;
       if (item.isDirectory()) visitar(caminho);
-      else if (/\.tsx?$/.test(item.name) && !/\.(test|gen)\.ts$/.test(item.name))
+      else if (/\.tsx?$/.test(item.name) && !/\.(test\.tsx?|gen\.ts)$/.test(item.name))
         saida.push(caminho);
     }
   };
@@ -136,19 +136,52 @@ function propsDe(checker, tipo, local) {
 
 const CORTE = 14;
 
-/** Every use in JSX of one of `nomes` in `arquivo`, as trimmed lines. */
-function usosEm(fonte, nomes) {
+const tagDe = (fonte, no) =>
+  ts.isJsxElement(no)
+    ? no.openingElement.tagName.getText(fonte)
+    : ts.isJsxSelfClosingElement(no)
+      ? no.tagName.getText(fonte)
+      : undefined;
+
+/** The source from `de` to `ate`, as lines dedented to the column of `no`. */
+function linhasDe(fonte, no, de, ate) {
+  const recuo = fonte.getLineAndCharacterOfPosition(no.getStart(fonte)).character;
+  const [primeira, ...resto] = fonte.text.slice(de, ate).split("\n");
+  return [primeira, ...resto.map((l) => l.slice(recuo))];
+}
+
+/**
+ * The element cut down without breaking the JSX: its tags stay whole, the
+ * children that are pieces of the same component stay (cut the same way),
+ * everything else becomes one comment.
+ */
+function cortar(fonte, no, nomes) {
+  if (!ts.isJsxElement(no)) return linhasDe(fonte, no, no.getStart(fonte), no.end);
+  const dentro = [];
+  for (const filho of no.children) {
+    if (ts.isJsxText(filho) && !filho.text.trim()) continue;
+    if (nomes.includes(tagDe(fonte, filho))) {
+      dentro.push(...cortar(fonte, filho, nomes).map((l) => `  ${l}`));
+    } else if (dentro.at(-1) !== "  {/* … */}") {
+      dentro.push("  {/* … */}");
+    }
+  }
+  return [
+    ...linhasDe(fonte, no, no.getStart(fonte), no.openingElement.end),
+    ...dentro,
+    ...linhasDe(fonte, no, no.closingElement.getStart(fonte), no.end),
+  ];
+}
+
+/** Every use in JSX of one of `buscar`: whole, and cut down to the `pecas`. */
+function usosEm(fonte, buscar, pecas) {
   const usos = [];
   const visitar = (no) => {
-    const abertura = ts.isJsxElement(no)
-      ? no.openingElement
-      : ts.isJsxSelfClosingElement(no)
-        ? no
-        : undefined;
-    if (abertura && nomes.includes(abertura.tagName.getText(fonte))) {
-      const inicio = fonte.getLineAndCharacterOfPosition(no.getStart(fonte));
-      const [primeira, ...resto] = fonte.text.slice(no.getStart(fonte), no.end).split("\n");
-      usos.push([primeira, ...resto.map((l) => l.slice(inicio.character))]);
+    if (buscar.includes(tagDe(fonte, no))) {
+      usos.push({
+        linhas: linhasDe(fonte, no, no.getStart(fonte), no.end),
+        curto: cortar(fonte, no, pecas),
+      });
       return;
     }
     ts.forEachChild(no, visitar);
@@ -159,24 +192,22 @@ function usosEm(fonte, nomes) {
 
 /**
  * A real use from a file that imports the component: the first short use of
- * the main export, else of any export, else the shortest one, cut down.
+ * the main export, else of any export, else the shortest one with its
+ * children cut.
  */
 function trechoDe(programa, importadores, principal, nomes, arquivoDe) {
   const candidatos = [];
   for (const grupo of [[principal], nomes]) {
     for (const de of importadores) {
       const fonte = programa.getSourceFile(arquivoDe(de));
-      if (fonte) candidatos.push(...usosEm(fonte, grupo).map((linhas) => ({ de, linhas })));
+      if (fonte) candidatos.push(...usosEm(fonte, grupo, nomes).map((uso) => ({ de, ...uso })));
     }
   }
   if (!candidatos.length) return undefined;
-  const escolhido =
-    candidatos.find((c) => c.linhas.length <= CORTE) ??
-    candidatos.reduce((menor, c) => (c.linhas.length < menor.linhas.length ? c : menor));
-  const { linhas } = escolhido;
-  const trecho =
-    linhas.length > CORTE ? [...linhas.slice(0, CORTE - 1), "  {/* … */}", linhas.at(-1)] : linhas;
-  return { de: escolhido.de, codigo: trecho.join("\n") };
+  const inteiro = candidatos.find((c) => c.linhas.length <= CORTE);
+  if (inteiro) return { de: inteiro.de, codigo: inteiro.linhas.join("\n") };
+  const menor = candidatos.reduce((a, c) => (c.curto.length < a.curto.length ? c : a));
+  return { de: menor.de, codigo: menor.curto.join("\n") };
 }
 
 /**

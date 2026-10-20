@@ -152,8 +152,10 @@ export function validarSpec(entrada, { schema, tokens, componentes, rotas, fonte
     lista("tokens").forEach((t, i) => {
       if (typeof t?.nome === "string") rejeitar(`tokens[${i}].nome`, t.nome);
     });
-    // Tokens named in free text count too; `lacunas` may name what is missing.
-    const { meta: _meta, lacunas: _lacunas, tokens: _tokens, ...corpo } = spec;
+    // Tokens named in free text count too, `tokens[].uso` included (the names
+    // were checked above); `lacunas` may name what is missing.
+    const { meta: _meta, lacunas: _lacunas, ...corpo } = spec;
+    corpo.tokens = lista("tokens").map((t) => ({ ...t, nome: null }));
     for (const [onde, texto] of textos(corpo, "")) {
       for (const nome of texto.match(TOKEN) ?? []) {
         if (!rejeitados.includes(nome)) rejeitar(onde, nome);

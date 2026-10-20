@@ -77,6 +77,20 @@ test("reads DTCG JSON into the same names", () => {
   );
 });
 
+test("DTCG structured values become CSS", () => {
+  const dtcg = {
+    color: {
+      proof: { $value: { colorSpace: "srgb", components: [0.6, 0.8, 0.9], hex: "#93cfe4" } },
+    },
+    radius: { md: { $value: { value: 10, unit: "px" } } },
+    font: { sans: { $value: ["IBM Plex Sans", "sans-serif"] } },
+  };
+  assert.deepEqual(
+    lerTokensDtcg(JSON.stringify(dtcg)).map((t) => t.valor),
+    ["#93cfe4", "10px", '"IBM Plex Sans", sans-serif'],
+  );
+});
+
 test("picks the reader by extension", () => {
   assert.equal(lerTokens("src/styles.css", CSS).length, 6);
   assert.equal(
