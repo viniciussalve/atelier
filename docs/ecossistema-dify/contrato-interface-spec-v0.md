@@ -36,3 +36,15 @@ O schema único é `docs/ds/interface-spec.v0.schema.json`. Nenhum outro lugar c
 - **`lacunas`.** O caso T21 (gráfico de pizza) pede que a spec diga o que falta em vez de inventar um componente. Sem um campo pra isso, o LLM tende a preencher `componentes` com algo que não existe.
 - **`acao` como lista fechada:** `abrir`, `clicar`, `digitar`, `arrastar`, `pressionar`, `ver`. Fechada, o Proto Bot sabe reproduzir cada passo; aberta, cada spec inventaria um verbo.
 - **`componentes[].nome` e `export` separados.** Uma página de `docs/ds/componentes` pode ter vários exports (`dropdown-menu` tem 12). O `nome` acha a página; o `export` diz qual peça usar.
+
+## Exemplos
+
+Em `docs/ds/exemplos/`, validados pelo `npm test`:
+
+- `t19-comparar-fontes.json`: pedido do caso T19, spec válida.
+- `t20-buscar-icones.json`: pedido do caso T20, spec válida.
+- `t21-grafico-de-pizza.json`: caso T21, sem componente de gráfico; a falta vai em `lacunas`.
+
+## Validação
+
+`npm run ds:validar -- <spec.json>` confere o schema, os tokens, os componentes, as fontes e as rotas. A mesma função vai no nó Code do app `validar-spec` (ALL-104); veja `scripts/ds/validar-spec.mjs`.
