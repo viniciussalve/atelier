@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -13,6 +13,7 @@ test("flags a changed page and a page left over from a removed component", () =>
   const raiz = mkdtempSync(join(tmpdir(), "ds-"));
   cpSync(join(RAIZ, "docs/ds"), join(raiz, "docs/ds"), { recursive: true });
   cpSync(join(RAIZ, "src"), join(raiz, "src"), { recursive: true });
+  symlinkSync(join(RAIZ, "node_modules"), join(raiz, "node_modules"));
   const arquivos = gerarDocs(raiz);
   assert.deepEqual(diferencas(raiz, arquivos), []);
 

@@ -6,6 +6,13 @@
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  MAX_TOKENS,
+  componenteMd,
+  estimarTokens,
+  extrairComponentes,
+  quandoUsarDe,
+} from "./componentes.mjs";
 import { lerTokens, tokensMd } from "./tokens.mjs";
 
 export const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -17,6 +24,16 @@ export function gerarDocs(raiz = RAIZ) {
   const arquivos = new Map();
   const tokens = lerTokens(FONTE_TOKENS, readFileSync(join(raiz, FONTE_TOKENS), "utf8"));
   arquivos.set(`${PASTA}/tokens.md`, tokensMd(tokens, FONTE_TOKENS));
+  for (const componente of extrairComponentes(raiz)) {
+    const caminho = `${PASTA}/componentes/${componente.nome}.md`;
+    const md = componenteMd(componente, quandoUsarDe(ler(join(raiz, caminho))));
+    if (estimarTokens(md) > MAX_TOKENS) {
+      throw new Error(
+        `${caminho} passa de ${MAX_TOKENS} tokens (≈${estimarTokens(md)}): o Dify cortaria o componente ao meio.`,
+      );
+    }
+    arquivos.set(caminho, md);
+  }
   return arquivos;
 }
 
@@ -25,7 +42,9 @@ function existentes(raiz) {
   const pasta = join(raiz, PASTA, "componentes");
   let nomes = [];
   try {
-    nomes = readdirSync(pasta).filter((nome) => nome.endsWith(".md"));
+    nomes = readdirSync(pasta)
+      .filter((nome) => nome.endsWith(".md"))
+      .sort();
   } catch {
     // No folder yet.
   }
