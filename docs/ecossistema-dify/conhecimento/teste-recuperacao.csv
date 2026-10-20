@@ -1,0 +1,9 @@
+id,base,pergunta,arquivo_esperado,posicao_max,filtro_metadado,tipo,observacoes
+RC-001,Componentes,Qual componente uso pra alternar entre poucas opções exclusivas numa barra?,docs/ds/componentes/segmented.md,1,camada=ui,intencao,EXEMPLO provisório - confirmar quando docs/ds existir (ALL-90)
+RC-002,Componentes,Como abro um modal de confirmação?,docs/ds/componentes/dialog.md,1,camada=ui,intencao,EXEMPLO provisório
+RC-003,Componentes,IconButton,docs/ds/componentes/icon-button.md,1,,nome_exato,EXEMPLO provisório - testa o lado full-text da híbrida
+RC-004,Componentes,Como mostro uma dica curta ao passar o mouse num ícone?,docs/ds/componentes/tooltip.md,2,camada=ui,intencao,EXEMPLO provisório
+RC-005,Componentes,Navegação entre seções do mesmo painel,docs/ds/componentes/tabs.md,2,camada=ui,intencao,EXEMPLO provisório - pode competir com segmented; anotar qual vem
+RC-006,Componentes,Qual a previsão do tempo?,,0,,fora_do_escopo,EXEMPLO - nenhum chunk deve passar do threshold
+RC-007,Regras do DS,Posso usar um hex direto no className?,.claude/skills/atelier-iteracao/references/armadilhas.md,2,tema=armadilhas,regra,EXEMPLO provisório - confirmar a seção exata
+RC-008,Regras do DS,O que verificar antes de considerar uma tela pronta?,.claude/skills/atelier-iteracao/references/verificacao.md,2,tema=verificacao,regra,EXEMPLO provisório

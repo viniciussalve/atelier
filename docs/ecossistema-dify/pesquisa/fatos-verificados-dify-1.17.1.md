@@ -1,0 +1,23 @@
+# Fatos verificados: Dify 1.17.1 para o kickstart do ecossistema
+
+Checados em 19/10/2026 contra a doc oficial e o código da tag 1.17.1. Use como base do kickstart; nada aqui é suposição.
+
+| #   | Fato                                                                                                                                               | Impacto no desenho                                                                                                                    | Fonte                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 1.17.1 lançada em 10/09/2026 (bug fixes + melhorias).                                                                                              | Versão-alvo de todo DSL e plugin.                                                                                                     | https://github.com/langgenius/dify/releases/tag/1.17.1                                                                                 |
+| 2   | Chaves de API de base de conhecimento podem ser presas a bases específicas; outras bases devolvem 403.                                             | Script de sync e plugin usam chave só das bases do atelier.                                                                           | https://github.com/langgenius/dify/releases/tag/1.17.1                                                                                 |
+| 3   | MCP Server embutido por app, ligado na aba de pontos de acesso; a URL carrega a credencial.                                                        | Plugin do Cursor = `mcp.json` com uma URL por app, guardada como segredo. Sem servidor próprio.                                       | https://docs.dify.ai/en/self-host/use-dify/publish/publish-mcp                                                                         |
+| 4   | Workflow com nó de gatilho deixa Web App, API e MCP indisponíveis; Workflow sem nó Start comum também perde o MCP.                                 | App que gera a `InterfaceSpec` = Workflow com Start comum e sem gatilho. Sync fica na CI ou num Workflow separado.                    | https://github.com/langgenius/dify/blob/1.17.1/web/app/components/app/access-point/built-in-access-points/index.tsx e .../mcp-card.tsx |
+| 5   | Gatilhos (Webhook, Schedule, Integração) existem desde 1.10.0 e só em Workflow.                                                                    | Chatflow não pode reagir a push.                                                                                                      | https://github.com/langgenius/dify/releases/tag/1.10.0                                                                                 |
+| 6   | Plugin oficial de fonte de dados GitHub para o Knowledge Pipeline (Dify >= 1.9.0): arquivos de repo privado, issues e PRs; token pessoal ou OAuth. | Ingestão de `docs/ds/` sem script de upload. Ainda não confirmado: filtro por pasta, metadados e reindex automático no push (ALL-96). | https://marketplace.dify.ai/plugin/langgenius/github_datasource                                                                        |
+| 7   | Webhook Trigger usa `TRIGGER_URL` (padrão `http://localhost`) como prefixo da URL.                                                                 | Numa instância local, o GitHub não alcança o webhook sem túnel; mais um motivo pra sync na CI.                                        | https://docs.dify.ai/en/self-host/use-dify/nodes/trigger/webhook-trigger                                                               |
+
+## Em aberto
+
+- Plugin GitHub: filtro por pasta, metadados por documento e reindex no push (ALL-96).
+- Instância em `localhost:8080`: os bots não alcançam; decidir entre o Vinicius executar os passos ou expor a instância por túnel com acesso restrito.
+
+## Para conferir os DSLs
+
+- Versão de DSL que a 1.17.1 gera e espera: `version: 0.7.0` (`api/constants/dsl_version.py` na tag 1.17.1): https://github.com/langgenius/dify/blob/1.17.1/api/constants/dsl_version.py
+- Referência para checar campos de nó: modelos em `api/services/app_dsl_service.py` e `graphon.nodes.*.entities` na mesma tag.

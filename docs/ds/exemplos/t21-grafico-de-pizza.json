@@ -1,0 +1,30 @@
+{
+  "versao": "0",
+  "pedido": "Tela com um gráfico de pizza",
+  "tela": {
+    "nome": "Vereditos em gráfico",
+    "resumo": "Ver quantos itens da biblioteca estão em cada veredito."
+  },
+  "tokens": [
+    { "nome": "--color-good", "uso": "Fatia usar.", "fonte": "docs/ds/tokens.md" },
+    { "nome": "--color-warn", "uso": "Fatia revisar.", "fonte": "docs/ds/tokens.md" },
+    { "nome": "--color-bad", "uso": "Fatia evitar.", "fonte": "docs/ds/tokens.md" }
+  ],
+  "componentes": [],
+  "fluxo": [
+    { "rota": "/", "acao": "abrir", "alvo": "Atelier" },
+    { "rota": "/", "acao": "ver", "alvo": "gráfico de pizza dos vereditos" }
+  ],
+  "lacunas": [
+    {
+      "falta": "Componente de gráfico (pizza).",
+      "motivo": "Não há nenhum componente de gráfico em docs/ds/componentes. Criar um é decisão do Tech Lead DS antes de implementar a tela."
+    }
+  ],
+  "meta": {
+    "flow_version": "exemplo",
+    "prompt_version": "exemplo",
+    "tentativas": 1,
+    "tokens_rejeitados": []
+  }
+}

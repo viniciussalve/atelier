@@ -1,0 +1,22 @@
+id,camada,categoria,entrada,resposta_esperada,criterio_aprovacao,fonte_esperada,tipo,prioridade,observacoes
+T01,token,mapear_cor,"Troque o valor fixo #93cfe4 usado num anel de foco",--color-proof,"Sugere exatamente --color-proof; não cria token novo",src/styles.css,positivo,alta,"Comentário do @theme: proof = foco, painel ativo, seleção"
+T02,token,mapear_cor,"Troque o valor fixo #0c0d10 no fundo da página",--color-bg,Sugere exatamente --color-bg,src/styles.css,positivo,alta,
+T03,token,mapear_cor,"Troque o valor fixo #2a2e38 numa borda de card",--color-border,Sugere exatamente --color-border,src/styles.css,positivo,alta,
+T04,token,mapear_cor,"Troque o valor fixo #ef8f86 num selo de veredito 'evitar'",--color-bad,Sugere exatamente --color-bad,src/styles.css,positivo,alta,"Vereditos: usar=good, revisar=warn, evitar=bad"
+T05,token,mapear_cor,"Troque o valor fixo #e8c46e num selo 'revisar'",--color-warn,Sugere exatamente --color-warn,src/styles.css,positivo,media,
+T06,token,mapear_cor,"Texto escuro sobre fundo --color-proof, hoje com #0b2430",--color-proof-fg,Sugere --color-proof-fg (par de contraste),src/styles.css,positivo,media,
+T07,token,mapear_cor,"Marca de revisão sobre fundo claro (paper), hoje #2b7894",--color-proof-ink,"Sugere --color-proof-ink, não --color-proof",src/styles.css,positivo,media,"Testa se distingue proof de proof-ink"
+T08,token,mapear_raio,"Troque border-radius: 10px num botão",--radius-md,Sugere --radius-md,src/styles.css,positivo,alta,
+T09,token,mapear_raio,"Troque border-radius: 16px num modal",--radius-lg,Sugere --radius-lg,src/styles.css,positivo,media,
+T10,token,mapear_fonte,"Troque font-family: 'IBM Plex Mono' num bloco de código",--font-mono,Sugere --font-mono,src/styles.css,positivo,media,
+T11,token,armadilha_inventar,"Qual o token da cor primária do atelier?","Não existe --color-primary; a mais próxima é --color-accent (com --color-accent-fg)","Não cita --color-primary nem outro nome fora do @theme; diz que não existe",src/styles.css,armadilha,alta,"Mede token inventado"
+T12,token,armadilha_inventar,"Qual token de espaçamento usar pra padding médio?","Não há token de espaçamento no @theme hoje; a escala é a padrão do Tailwind","Não inventa --spacing-md ou similar; diz que não existe no @theme",src/styles.css,armadilha,alta,"Se o DTCG criar escala de espaço, atualizar a resposta"
+T13,token,armadilha_inventar,"Troque o valor fixo #ff0000 numa mensagem de erro",Nenhum token tem esse valor; candidato semântico é --color-bad,"Não afirma que #ff0000 é um token; propõe --color-bad como substituição e sinaliza a diferença de cor",src/styles.css,armadilha,media,
+T14,token,excecao,"border: 1px solid var(--color-border)",Nenhuma violação,Não aponta o 1px como hard-coded,lista de exceções do Tech Lead DS,negativo,alta,"Mede falso positivo"
+T15,token,excecao,"width: 100% num campo",Nenhuma violação,Não aponta 100%,lista de exceções do Tech Lead DS,negativo,alta,
+T16,token,excecao,"fill: currentColor num ícone SVG",Nenhuma violação,Não aponta currentColor,lista de exceções do Tech Lead DS,negativo,media,
+T17,token,excecao,"margin: 0",Nenhuma violação,Não aponta 0,lista de exceções do Tech Lead DS,negativo,media,
+T18,token,ambiguo,"animation-duration: 0.01ms !important no bloco prefers-reduced-motion",Fora de escopo de token (regra de acessibilidade),"Não sugere token; se comentar, explica que é a regra de movimento reduzido",src/styles.css,negativo,baixa,"Caso a decidir com o Tech Lead DS"
+T19,spec,validacao,"Pedido: tela que compara duas fontes lado a lado com veredito",InterfaceSpec válida,"JSON válido no schema da ALL-91; todo token citado existe; vereditos usam good/warn/bad",ALL-91 + docs/ds,positivo,alta,"Componentes: segmented, asset-card, collection, workspace, scorecard, badges. Rota: /. Exemplo válido em docs/ds/exemplos/t19-comparar-fontes.json"
+T20,spec,validacao,"Pedido: painel de busca de ícones com filtro",InterfaceSpec válida,"JSON válido; todo token e componente citado existe; passos do fluxo usam rotas reais",ALL-91 + docs/ds,positivo,alta,"Componentes: segmented, collection, filter-bar (FilterButton, ActiveFilters), icons. Rota: /. Exemplo válido em docs/ds/exemplos/t20-buscar-icones.json"
+T21,spec,armadilha_inventar,"Pedido: tela com um gráfico de pizza",Spec que não inventa componente,"Se não houver componente de gráfico, a spec diz que falta em vez de citar um inexistente",docs/ds,armadilha,media,"Não há componente de gráfico em docs/ds/componentes: a falta vai em lacunas. Exemplo em docs/ds/exemplos/t21-grafico-de-pizza.json"

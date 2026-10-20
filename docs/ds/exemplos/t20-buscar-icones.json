@@ -1,0 +1,73 @@
+{
+  "versao": "0",
+  "pedido": "Painel de busca de ícones com filtro",
+  "tela": {
+    "nome": "Buscar ícones",
+    "resumo": "Na biblioteca de ícones, buscar conjuntos pelo nome e filtrar por licença, vendo os filtros aplicados como chips."
+  },
+  "tokens": [
+    {
+      "nome": "--color-surface",
+      "uso": "Fundo da caixa de filtros.",
+      "fonte": "docs/ds/tokens.md"
+    },
+    {
+      "nome": "--color-border",
+      "uso": "Borda do campo de busca e dos chips.",
+      "fonte": "docs/ds/tokens.md"
+    },
+    {
+      "nome": "--color-muted",
+      "uso": "Contagem de cada opção de filtro.",
+      "fonte": "docs/ds/tokens.md"
+    },
+    { "nome": "--radius-md", "uso": "Raio do campo de busca.", "fonte": "docs/ds/tokens.md" }
+  ],
+  "componentes": [
+    {
+      "nome": "segmented",
+      "export": "Segmented",
+      "uso": "Escolher a biblioteca Ícones.",
+      "fonte": "docs/ds/componentes/segmented.md"
+    },
+    {
+      "nome": "collection",
+      "export": "Collection",
+      "uso": "Campo Buscar na coleção e a grade de resultados.",
+      "fonte": "docs/ds/componentes/collection.md"
+    },
+    {
+      "nome": "filter-bar",
+      "export": "FilterButton",
+      "uso": "Botão Filtros com as facetas.",
+      "fonte": "docs/ds/componentes/filter-bar.md"
+    },
+    {
+      "nome": "filter-bar",
+      "export": "ActiveFilters",
+      "uso": "Chips dos filtros aplicados.",
+      "fonte": "docs/ds/componentes/filter-bar.md"
+    },
+    {
+      "nome": "icons",
+      "export": "SetGlyphs",
+      "uso": "Amostra de ícones em cada card.",
+      "fonte": "docs/ds/componentes/icons.md"
+    }
+  ],
+  "fluxo": [
+    { "rota": "/", "acao": "abrir", "alvo": "Atelier" },
+    { "rota": "/", "acao": "clicar", "alvo": "Ícones, em Biblioteca" },
+    { "rota": "/", "acao": "digitar", "alvo": "campo Buscar na coleção", "valor": "lucide" },
+    { "rota": "/", "acao": "clicar", "alvo": "botão Filtros" },
+    { "rota": "/", "acao": "clicar", "alvo": "uma opção de Licença" },
+    { "rota": "/", "acao": "ver", "alvo": "chip do filtro de licença" }
+  ],
+  "lacunas": [],
+  "meta": {
+    "flow_version": "exemplo",
+    "prompt_version": "exemplo",
+    "tentativas": 1,
+    "tokens_rejeitados": []
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "versao": "0",
+  "pedido": "Tela que compara duas fontes lado a lado com veredito",
+  "tela": {
+    "nome": "Comparar fontes",
+    "resumo": "Marcar duas fontes na coleção, abri-las em painéis lado a lado e dar o veredito de cada uma no inspetor."
+  },
+  "tokens": [
+    {
+      "nome": "--color-proof",
+      "uso": "Painel ativo e itens marcados para comparar.",
+      "fonte": "docs/ds/tokens.md"
+    },
+    {
+      "nome": "--color-border",
+      "uso": "Divisória entre os painéis.",
+      "fonte": "docs/ds/tokens.md"
+    },
+    { "nome": "--color-good", "uso": "Veredito usar.", "fonte": "docs/ds/tokens.md" },
+    { "nome": "--color-warn", "uso": "Veredito revisar.", "fonte": "docs/ds/tokens.md" },
+    { "nome": "--color-bad", "uso": "Veredito evitar.", "fonte": "docs/ds/tokens.md" }
+  ],
+  "componentes": [
+    {
+      "nome": "segmented",
+      "export": "Segmented",
+      "uso": "Escolher a biblioteca Fontes.",
+      "fonte": "docs/ds/componentes/segmented.md"
+    },
+    {
+      "nome": "asset-card",
+      "export": "AssetCard",
+      "uso": "Card com a caixa de seleção para comparar.",
+      "fonte": "docs/ds/componentes/asset-card.md"
+    },
+    {
+      "nome": "collection",
+      "export": "Collection",
+      "uso": "Grade com o botão Comparar lado a lado.",
+      "fonte": "docs/ds/componentes/collection.md"
+    },
+    {
+      "nome": "workspace",
+      "export": "Workspace",
+      "uso": "Os dois painéis lado a lado.",
+      "fonte": "docs/ds/componentes/workspace.md"
+    },
+    {
+      "nome": "scorecard",
+      "export": "Scorecard",
+      "uso": "Nota geral e veredito no inspetor.",
+      "fonte": "docs/ds/componentes/scorecard.md"
+    },
+    {
+      "nome": "badges",
+      "export": "VerdictBadge",
+      "uso": "Veredito no card.",
+      "fonte": "docs/ds/componentes/badges.md"
+    }
+  ],
+  "fluxo": [
+    { "rota": "/", "acao": "abrir", "alvo": "Atelier" },
+    { "rota": "/", "acao": "clicar", "alvo": "Fontes, em Biblioteca" },
+    { "rota": "/", "acao": "clicar", "alvo": "Selecionar Inter para comparar" },
+    { "rota": "/", "acao": "clicar", "alvo": "Selecionar IBM Plex Sans para comparar" },
+    { "rota": "/", "acao": "clicar", "alvo": "botão Comparar lado a lado" },
+    { "rota": "/", "acao": "clicar", "alvo": "botão Avaliar" },
+    { "rota": "/", "acao": "ver", "alvo": "Veredito no inspetor" }
+  ],
+  "lacunas": [],
+  "meta": {
+    "flow_version": "exemplo",
+    "prompt_version": "exemplo",
+    "tentativas": 1,
+    "tokens_rejeitados": []
+  }
+}
