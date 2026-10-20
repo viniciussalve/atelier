@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { promisify } from "node:util";
 import {
   CONJUNTO,
   RODADAS,
@@ -14,10 +16,12 @@ import {
   relatorioMd,
   rodarFluxo,
   ultimaRodada,
+  versoesDe,
 } from "./avaliar.mjs";
 import { RAIZ } from "./gerar.mjs";
 import { fonteDoAtelier } from "./validar.mjs";
 
+const execFileAsync = promisify(execFile);
 const fonte = fonteDoAtelier();
 const t19 = JSON.parse(
   readFileSync(join(RAIZ, "docs/ds/exemplos/t19-comparar-fontes.json"), "utf8"),
@@ -205,4 +209,94 @@ test("the last round compared is the last one over the same cases", () => {
   assert.equal(ultimaRodada(raiz, ["T01"]).data, "2026-10-20T020000-000Z");
   assert.equal(ultimaRodada(raiz, ["T19"]), undefined);
   assert.equal(ultimaRodada(mkdtempSync(join(tmpdir(), "vazio-")), ["T01"]), undefined);
+});
+
+test("T21 passes only when the spec names the missing chart in lacunas, with no invented component", () => {
+  const t21 = JSON.parse(
+    readFileSync(join(RAIZ, "docs/ds/exemplos/t21-grafico-de-pizza.json"), "utf8"),
+  );
+  const caso = { id: "T21", camada: "spec", tipo: "armadilha", esperado: "" };
+  assert.equal(avaliarCaso(caso, t21, fonte).armadilha_ok, true);
+  const calado = avaliarCaso(caso, { ...t21, lacunas: [] }, fonte);
+  assert.equal(calado.armadilha_ok, false);
+  assert.match(calado.erros.at(-1), /armadilha sem `lacunas`/);
+  const inventou = avaliarCaso(
+    caso,
+    {
+      ...t21,
+      componentes: [
+        { nome: "pie-chart", export: "PieChart", uso: "x", fonte: "docs/ds/tokens.md" },
+      ],
+    },
+    fonte,
+  );
+  assert.equal(inventou.armadilha_ok, false);
+  assert.match(inventou.componentes_inventados[0], /^componentes\[0\]\.nome: `pie-chart`/);
+});
+
+test("runs that returned no spec stay out of the invention rates, and fail spec válida", () => {
+  const casos = Array.from({ length: 4 }, (_, i) => ({
+    id: `T0${i}`,
+    camada: "spec",
+    tipo: "positivo",
+    esperado: "",
+  }));
+  const resultados = [
+    avaliarCaso(casos[0], comTokens(["--color-bg"], { tokens_rejeitados: ["--color-x"] }), fonte),
+    ...casos.slice(1).map((c) => avaliarCaso(c, undefined, fonte, "timeout")),
+  ];
+  const m = metricas(resultados);
+  assert.equal(m.token_inventado_primeira.valor, 1);
+  assert.equal(m.token_inventado_final.valor, 0);
+  assert.equal(m.spec_valida.valor, 0.25);
+});
+
+test("a round records the flow and prompt versions its specs came from", () => {
+  const caso = { id: "T19", camada: "spec", tipo: "positivo", esperado: "" };
+  const r = avaliarCaso(caso, comTokens([], { flow_version: "3", prompt_version: "7" }), fonte);
+  assert.deepEqual(r.versoes, { flow: "3", prompt: "7" });
+  assert.deepEqual(versoesDe([r, r, avaliarCaso(caso, undefined, fonte)]), [
+    { flow: "3", prompt: "7" },
+  ]);
+  const md = relatorioMd({
+    data: "d",
+    fluxo: "f",
+    versoes: versoesDe([r]),
+    resultados: [r],
+    metricas: metricas([r]),
+    comparacao: [],
+  });
+  assert.match(md, /versões: flow 3, prompt 7/);
+});
+
+test("a stream that breaks after the headers is a case error, not a crash", async () => {
+  const quebrado = new Response(
+    new ReadableStream({
+      start(c) {
+        c.enqueue(new TextEncoder().encode("data: {"));
+        c.error(new Error("connection reset"));
+      },
+    }),
+    { status: 200 },
+  );
+  const r = await rodarFluxo("p", {
+    url: "http://dify/v1",
+    chave: "k",
+    fetch: async () => quebrado,
+  });
+  assert.match(r.erro, /o stream caiu no meio \(connection reset\)/);
+});
+
+test("--casos with an unknown id stops before calling the flow", async () => {
+  const script = join(RAIZ, "scripts/ds/avaliar.mjs");
+  await assert.rejects(
+    execFileAsync(process.execPath, [script, "--casos", "T01,T99"], {
+      env: { ...process.env, DIFY_API_URL: "http://127.0.0.1:9/v1", DIFY_SPEC_API_KEY: "k" },
+    }),
+    (erro) => {
+      assert.equal(erro.code, 2);
+      assert.match(erro.stderr, /Casos que não existem no conjunto: T99/);
+      return true;
+    },
+  );
 });

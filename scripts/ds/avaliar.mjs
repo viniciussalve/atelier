@@ -79,9 +79,12 @@ export function avaliarCaso(caso, spec, fonte, erroFluxo = "sem resposta") {
       ...base,
       valida: false,
       erros: [`O fluxo não devolveu spec: ${erroFluxo}`],
+      respondeu: false,
       tokens_inventados: [],
+      componentes_inventados: [],
       inventou_na_primeira: false,
       tentativas: null,
+      versoes: null,
       ...(caso.tipo === "armadilha" ? { armadilha_ok: false } : {}),
       ...(caso.camada === "token" && caso.tipo === "positivo" ? { token_certo: false } : {}),
     };
@@ -92,13 +95,26 @@ export function avaliarCaso(caso, spec, fonte, erroFluxo = "sem resposta") {
     ...base,
     valida: v.valida,
     erros: v.erros,
+    respondeu: true,
     tokens_inventados: v.tokens_rejeitados,
+    componentes_inventados: v.erros.filter((e) => /^componentes\[\d+\]\.(nome|export):/.test(e)),
     inventou_na_primeira: (spec?.meta?.tokens_rejeitados?.length ?? 0) > 0,
     tentativas: typeof spec?.meta?.tentativas === "number" ? spec.meta.tentativas : null,
+    // The flow fills these from its environment, so a round says which
+    // flow and prompt produced it even when the API URL stays the same.
+    versoes: { flow: spec?.meta?.flow_version ?? null, prompt: spec?.meta?.prompt_version ?? null },
   };
   if (caso.camada === "token" && caso.tipo === "positivo")
     r.token_certo = nomes.includes(caso.esperado);
-  if (caso.tipo === "armadilha") r.armadilha_ok = v.tokens_rejeitados.length === 0;
+  if (caso.tipo === "armadilha") {
+    // A screen request that asks for something the atelier lacks (T21) is
+    // only passed when the spec says so in `lacunas`, not when it just omits it.
+    const disseQueFalta = caso.camada !== "spec" || (spec?.lacunas?.length ?? 0) > 0;
+    r.armadilha_ok =
+      v.tokens_rejeitados.length === 0 && r.componentes_inventados.length === 0 && disseQueFalta;
+    if (!disseQueFalta)
+      r.erros = [...r.erros, "armadilha sem `lacunas`: a spec não disse o que falta"];
+  }
   return r;
 }
 
@@ -117,6 +133,9 @@ function metrica(valor, criterio, passa, bloqueia) {
 export function metricas(resultados) {
   const positivos = resultados.filter((r) => "token_certo" in r);
   const armadilhas = resultados.filter((r) => "armadilha_ok" in r);
+  // A run that returned no spec fails spec válida, but says nothing about
+  // invention: it stays out of those denominators.
+  const respondidos = resultados.filter((r) => r.respondeu);
   const tentativas = resultados.map((r) => r.tentativas).filter((t) => t !== null);
   const m = {
     spec_valida: metrica(
@@ -132,13 +151,13 @@ export function metricas(resultados) {
       false,
     ),
     token_inventado_primeira: metrica(
-      fracao(resultados, (r) => r.inventou_na_primeira),
+      fracao(respondidos, (r) => r.inventou_na_primeira),
       "≤ 5%",
       (v) => v <= 0.05,
       false,
     ),
     token_inventado_final: metrica(
-      fracao(resultados, (r) => r.tokens_inventados.length > 0),
+      fracao(respondidos, (r) => r.tokens_inventados.length > 0),
       "= 0%",
       (v) => v === 0,
       true,
@@ -181,6 +200,15 @@ export function compararRodadas(anterior, atual) {
     });
 }
 
+/** Every flow/prompt version pair seen in a round; more than one means it changed mid-run. */
+export function versoesDe(resultados) {
+  const vistas = new Map();
+  for (const r of resultados) {
+    if (r.versoes) vistas.set(`${r.versoes.flow}|${r.versoes.prompt}`, r.versoes);
+  }
+  return [...vistas.values()];
+}
+
 const ROTULOS = {
   spec_valida: "Spec válida",
   token_certo: "Token certo",
@@ -203,16 +231,21 @@ function motivos(r) {
   const saida = [];
   if (r.tokens_inventados.length)
     saida.push(`tokens inventados: ${r.tokens_inventados.join(", ")}`);
+  if (r.componentes_inventados.length) saida.push(...r.componentes_inventados);
   if (r.token_certo === false) saida.push(`não veio o token esperado ${r.esperado}`);
-  const outros = r.erros.filter((e) => !r.tokens_inventados.some((t) => e.includes(`\`${t}\``)));
+  const outros = r.erros.filter(
+    (e) =>
+      !r.tokens_inventados.some((t) => e.includes(`\`${t}\``)) &&
+      !r.componentes_inventados.includes(e),
+  );
   return [...saida, ...outros];
 }
 
-export function relatorioMd({ data, fluxo, resultados, metricas: m, comparacao }) {
+export function relatorioMd({ data, fluxo, versoes = [], resultados, metricas: m, comparacao }) {
   const linhas = [
     `# Rodada de avaliação · ${data}`,
     "",
-    `Fluxo: \`${fluxo}\` · ${resultados.length} casos · ${m.aprovada ? "**Aprovada**" : "**Reprovada**"} (bloqueiam: spec válida, token inventado final e armadilha)`,
+    `Fluxo: \`${fluxo}\` · versões: ${versoes.map((v) => `flow ${v.flow}, prompt ${v.prompt}`).join("; ") || "nenhuma spec voltou"} · ${resultados.length} casos · ${m.aprovada ? "**Aprovada**" : "**Reprovada**"} (bloqueiam: spec válida, token inventado final e armadilha)`,
     "",
     "| Métrica | Valor | Critério | Passou | Bloqueia |",
     "| --- | --- | --- | --- | --- |",
@@ -238,7 +271,7 @@ export function relatorioMd({ data, fluxo, resultados, metricas: m, comparacao }
   if (naoMedidos.length) {
     linhas.push(
       "",
-      `Não medidos: ${naoMedidos.join(", ")}. Os casos negativos pedem um campo de violação que a InterfaceSpec v0 não tem.`,
+      `Critério do caso não medido em ${naoMedidos.join(", ")}: os negativos pedem um campo de violação que a InterfaceSpec v0 não tem. A spec deles ainda conta em spec válida.`,
     );
   }
   return linhas.join("\n") + "\n";
@@ -268,7 +301,12 @@ export async function rodarFluxo(
   } catch (e) {
     return { erro: `sem conexão com o Dify (${e.message})` };
   }
-  const texto = await resposta.text();
+  let texto;
+  try {
+    texto = await resposta.text();
+  } catch (e) {
+    return { erro: `o stream caiu no meio (${e.message})` };
+  }
   if (!resposta.ok) return { erro: `HTTP ${resposta.status}: ${texto.slice(0, 200)}` };
   for (const bloco of texto.split(/\r?\n\r?\n/)) {
     const dados = bloco
@@ -328,9 +366,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(2);
   }
   const filtro = process.argv.find((a, i) => process.argv[i - 1] === "--casos")?.split(",");
-  const casos = casosDe(readFileSync(join(RAIZ, CONJUNTO), "utf8")).filter(
-    (c) => !filtro || filtro.includes(c.id),
-  );
+  const todos = casosDe(readFileSync(join(RAIZ, CONJUNTO), "utf8"));
+  const desconhecidos = (filtro ?? []).filter((id) => !todos.some((c) => c.id === id));
+  if (filtro && (!filtro.length || desconhecidos.length)) {
+    console.error(
+      `Casos que não existem no conjunto: ${desconhecidos.join(", ") || "(nenhum pedido)"}`,
+    );
+    process.exit(2);
+  }
+  const casos = todos.filter((c) => !filtro || filtro.includes(c.id));
   const fonte = fonteDoAtelier();
   const resultados = [];
   for (const caso of casos) {
@@ -342,6 +386,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const atual = {
     data,
     fluxo: url,
+    versoes: versoesDe(resultados),
     casos: casos.map((c) => c.id),
     metricas: metricas(resultados),
     resultados,
