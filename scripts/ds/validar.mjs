@@ -9,7 +9,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { RAIZ } from "./gerar.mjs";
+import { RAIZ } from "./raiz.mjs";
 import { validarSpec } from "./validar-spec.mjs";
 
 export const SCHEMA = "docs/ds/interface-spec.v0.schema.json";
@@ -44,13 +44,24 @@ function listar(raiz, pasta) {
   return saida;
 }
 
-/** What a spec may cite, read from the repository. */
-export function fonteDoAtelier(raiz = RAIZ) {
-  const ler = (caminho) => readFileSync(join(raiz, caminho), "utf8");
+/**
+ * What a spec may cite, read from the repository. `gerados` (path -> text)
+ * stands in for docs/ds while it is being generated.
+ * @param {string} [raiz]
+ * @param {Map<string, string>} [gerados]
+ */
+export function fonteDoAtelier(raiz = RAIZ, gerados = undefined) {
+  const ler = (caminho) => gerados?.get(caminho) ?? readFileSync(join(raiz, caminho), "utf8");
   const tokens = [...ler("docs/ds/tokens.md").matchAll(/^\| `(--[a-z][a-z0-9-]*)` \|/gm)].map(
     (m) => m[1],
   );
-  const paginas = listar(raiz, "docs/ds/componentes").filter((nome) => nome.endsWith(".md"));
+  const paginas = (
+    gerados
+      ? [...gerados.keys()]
+          .filter((caminho) => caminho.startsWith("docs/ds/componentes/"))
+          .map((caminho) => caminho.slice("docs/ds/componentes/".length))
+      : listar(raiz, "docs/ds/componentes").filter((nome) => nome.endsWith(".md"))
+  ).sort();
   const componentes = paginas.map((pagina) => {
     const md = ler(`docs/ds/componentes/${pagina}`);
     const exports = /\n## Export\n\n(.+)\n/.exec(md)?.[1] ?? "";
