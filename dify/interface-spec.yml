@@ -1,0 +1,992 @@
+# Gerado por npm run ds:gerar a partir de dify/interface-spec.config.json. Importe no Dify 1.17.1 como arquivo DSL.
+app:
+  name: "interface-spec"
+  mode: "workflow"
+  icon: "🧭"
+  icon_type: "emoji"
+  icon_background: "#E0F2FE"
+  description: "Fluxo piloto (ALL-93): pedido de tela -> InterfaceSpec v0, validada e corrigida em até 3 tentativas. Gerado por npm run ds:gerar; não edite no Dify, reimporte."
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: "app"
+version: "0.7.0"
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - id: "7d0b3c1e-9a52-4c0e-8f61-5a1b2c3d4e01"
+    name: "flow_version"
+    value: "1"
+    value_type: "string"
+    description: "Sobe a cada mudança do fluxo."
+    selector:
+    - "env"
+    - "flow_version"
+  - id: "7d0b3c1e-9a52-4c0e-8f61-5a1b2c3d4e02"
+    name: "prompt_version"
+    value: "f8aabe11f53e"
+    value_type: "string"
+    description: "Hash do prompt, gerado."
+    selector:
+    - "env"
+    - "prompt_version"
+  rag_pipeline_variables: []
+  features: {}
+  graph:
+    nodes:
+    - id: "1760918500001"
+      type: "custom"
+      position:
+        x: 80
+        y: 280
+      positionAbsolute:
+        x: 80
+        y: 280
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "start"
+        desc: ""
+        selected: false
+        title: "Início"
+        variables:
+        - variable: "pedido"
+          label: "Pedido de tela"
+          type: "paragraph"
+          required: true
+          max_length: 4000
+          options: []
+    - id: "1760918500002"
+      type: "custom"
+      position:
+        x: 380
+        y: 280
+      positionAbsolute:
+        x: 380
+        y: 280
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "knowledge-retrieval"
+        desc: ""
+        selected: false
+        title: "Buscar componentes"
+        query_variable_selector:
+        - "1760918500001"
+        - "pedido"
+        dataset_ids: []
+        retrieval_mode: "multiple"
+        multiple_retrieval_config:
+          top_k: 3
+          score_threshold: null
+          reranking_enable: false
+          reranking_mode: "reranking_model"
+        metadata_filtering_mode: "automatic"
+        metadata_model_config:
+          provider: "langgenius/deepseek/deepseek"
+          name: "deepseek-flash"
+          mode: "chat"
+          completion_params:
+            thinking: false
+    - id: "1760918500003"
+      type: "custom"
+      position:
+        x: 680
+        y: 280
+      positionAbsolute:
+        x: 680
+        y: 280
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "knowledge-retrieval"
+        desc: ""
+        selected: false
+        title: "Buscar regras do DS"
+        query_variable_selector:
+        - "1760918500001"
+        - "pedido"
+        dataset_ids: []
+        retrieval_mode: "multiple"
+        multiple_retrieval_config:
+          top_k: 4
+          score_threshold: null
+          reranking_enable: false
+          reranking_mode: "reranking_model"
+        metadata_filtering_mode: "automatic"
+        metadata_model_config:
+          provider: "langgenius/deepseek/deepseek"
+          name: "deepseek-flash"
+          mode: "chat"
+          completion_params:
+            thinking: false
+    - id: "1760918500004"
+      type: "custom"
+      position:
+        x: 980
+        y: 280
+      positionAbsolute:
+        x: 980
+        y: 280
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "code"
+        desc: ""
+        selected: false
+        title: "Montar contexto"
+        code_language: "javascript"
+        code: |-
+          function main({ componentes, regras }) {
+            const bloco = (itens, prefixo) =>
+              (Array.isArray(itens) ? itens : [])
+                .map((i) => `### ${prefixo}${i?.metadata?.document_name ?? "?"}\n\n${i?.content ?? ""}`)
+                .join("\n\n");
+            return {
+              contexto: [
+                "## Componentes",
+                bloco(componentes, "docs/ds/componentes/") || "(nenhum componente recuperado)",
+                "## Regras do DS",
+                bloco(regras, "") || "(nenhuma regra recuperada)",
+              ].join("\n\n"),
+            };
+          }
+
+        variables:
+        - variable: "componentes"
+          value_selector:
+          - "1760918500002"
+          - "result"
+        - variable: "regras"
+          value_selector:
+          - "1760918500003"
+          - "result"
+        outputs:
+          contexto:
+            type: "string"
+            children: null
+    - id: "1760918500010"
+      type: "custom"
+      position:
+        x: 1280
+        y: 280
+      positionAbsolute:
+        x: 1280
+        y: 280
+      width: 1000
+      height: 260
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "loop"
+        desc: ""
+        selected: false
+        title: "Gerar e corrigir"
+        start_node_id: "1760918500010start"
+        loop_count: 3
+        logical_operator: "and"
+        break_conditions:
+        - id: "pronto"
+          varType: "number"
+          variable_selector:
+          - "1760918500010"
+          - "valida"
+          comparison_operator: "="
+          value: "1"
+        loop_variables:
+        - id: "v-spec"
+          label: "spec"
+          var_type: "object"
+          value_type: "constant"
+          value: "{}"
+        - id: "v-valida"
+          label: "valida"
+          var_type: "number"
+          value_type: "constant"
+          value: "0"
+        - id: "v-erros"
+          label: "erros"
+          var_type: "array[string]"
+          value_type: "constant"
+          value: "[]"
+        - id: "v-rejeitados"
+          label: "rejeitados"
+          var_type: "array[string]"
+          value_type: "constant"
+          value: "[]"
+        - id: "v-tentativas"
+          label: "tentativas"
+          var_type: "number"
+          value_type: "constant"
+          value: "0"
+      zIndex: 1
+    - id: "1760918500010start"
+      type: "custom-loop-start"
+      parentId: "1760918500010"
+      zIndex: 1002
+      draggable: false
+      selectable: false
+      position:
+        x: 60
+        y: 80
+      data:
+        type: "loop-start"
+        title: ""
+        desc: ""
+        isInLoop: true
+    - id: "1760918500011"
+      type: "custom"
+      position:
+        x: 180
+        y: 80
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "llm"
+        desc: ""
+        selected: false
+        title: "Escrever a spec"
+        model:
+          provider: "langgenius/deepseek/deepseek"
+          name: "deepseek-flash"
+          mode: "chat"
+          completion_params:
+            thinking: false
+            temperature: 0.2
+            max_tokens: 8192
+        prompt_template:
+        - id: "sistema"
+          role: "system"
+          text: |-
+            Você escreve a InterfaceSpec v0 de uma tela do atelier, a ferramenta de avaliação de fontes e ícones. Responda só com o JSON.
+
+            Regras:
+            1. Tokens: use só os da lista abaixo, com o nome exato. Um nome fora dela não existe; não invente nem aproxime. A `fonte` de todo token é "docs/ds/tokens.md".
+            2. Componentes: use só os que aparecem no contexto recuperado, em "## Componentes". `nome` é o nome da página sem ".md" (ex.: "segmented"), `export` é um dos exports da página com a caixa do código, e `fonte` é o caminho no título da seção (ex.: "docs/ds/componentes/segmented.md").
+            3. Fluxo: os passos que a pessoa faz, em ordem. `rota` é uma das rotas reais abaixo (pode levar query, como "/?adicionar=fonte:Inter"); `acao` é uma de abrir, clicar, digitar, arrastar, pressionar, ver; `alvo` é o nome que a pessoa vê na tela.
+            4. Lacunas: se o pedido precisa de algo que o atelier não tem (um componente, um token), diga em `lacunas` o que falta e por quê, em vez de inventar.
+            5. Siga as regras do design system no contexto ("## Regras do DS").
+            6. `versao` é "0" e `pedido` repete o pedido. Não escreva `meta`.
+
+            Rotas reais: /, /api/adicionar, /api/conjuntos, /api/fontes, /api/icones, /api/parecidas, /ia, /llms.txt, /mcp, /robots.txt
+
+            Tokens (docs/ds/tokens.md):
+
+            # Tokens do atelier
+
+            Fonte: `src/styles.css`. Gerado por `npm run ds:gerar`, sem IA: não edite à mão.
+
+            Use sempre o nome exato. Um nome que não está nesta lista não existe no atelier.
+
+            ## Cores (21)
+
+            | Token | Valor | Classe Tailwind | Nota |
+            | --- | --- | --- | --- |
+            | `--color-bg` | `#0c0d10` | `bg-bg, text-bg, border-bg` |  |
+            | `--color-surface` | `#14161b` | `bg-surface, text-surface, border-surface` |  |
+            | `--color-elevated` | `#1c1f26` | `bg-elevated, text-elevated, border-elevated` |  |
+            | `--color-fg` | `#eceef2` | `bg-fg, text-fg, border-fg` |  |
+            | `--color-muted` | `#8b909c` | `bg-muted, text-muted, border-muted` |  |
+            | `--color-subtle` | `#6b7080` | `bg-subtle, text-subtle, border-subtle` |  |
+            | `--color-border` | `#2a2e38` | `bg-border, text-border, border-border` |  |
+            | `--color-accent` | `#e6e8ee` | `bg-accent, text-accent, border-accent` |  |
+            | `--color-accent-fg` | `#12141a` | `bg-accent-fg, text-accent-fg, border-accent-fg` |  |
+            | `--color-paper` | `#f6f5f2` | `bg-paper, text-paper, border-paper` |  |
+            | `--color-paper-fg` | `#1c1e24` | `bg-paper-fg, text-paper-fg, border-paper-fg` |  |
+            | `--color-mist` | `#e4e2dc` | `bg-mist, text-mist, border-mist` |  |
+            | `--color-ink` | `#12141a` | `bg-ink, text-ink, border-ink` |  |
+            | `--color-navy` | `#243056` | `bg-navy, text-navy, border-navy` |  |
+            | `--color-sand` | `#f3e6c4` | `bg-sand, text-sand, border-sand` |  |
+            | `--color-proof` | `#93cfe4` | `bg-proof, text-proof, border-proof` | Non-photo blue: the pencil designers mark proofs with. Focus, the active pane, selections and scores. `proof-ink` is the same mark on paper. |
+            | `--color-proof-fg` | `#0b2430` | `bg-proof-fg, text-proof-fg, border-proof-fg` | Non-photo blue: the pencil designers mark proofs with. Focus, the active pane, selections and scores. `proof-ink` is the same mark on paper. |
+            | `--color-proof-ink` | `#2b7894` | `bg-proof-ink, text-proof-ink, border-proof-ink` | Non-photo blue: the pencil designers mark proofs with. Focus, the active pane, selections and scores. `proof-ink` is the same mark on paper. |
+            | `--color-good` | `#8fcf9f` | `bg-good, text-good, border-good` | Verdicts: usar, revisar, evitar. |
+            | `--color-warn` | `#e8c46e` | `bg-warn, text-warn, border-warn` | Verdicts: usar, revisar, evitar. |
+            | `--color-bad` | `#ef8f86` | `bg-bad, text-bad, border-bad` | Verdicts: usar, revisar, evitar. |
+
+            ## Fontes (2)
+
+            | Token | Valor | Classe Tailwind | Nota |
+            | --- | --- | --- | --- |
+            | `--font-sans` | `"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif` | `font-sans` |  |
+            | `--font-mono` | `"IBM Plex Mono", ui-monospace, monospace` | `font-mono` |  |
+
+            ## Raios (3)
+
+            | Token | Valor | Classe Tailwind | Nota |
+            | --- | --- | --- | --- |
+            | `--radius-sm` | `6px` | `rounded-sm` |  |
+            | `--radius-md` | `10px` | `rounded-md` |  |
+            | `--radius-lg` | `16px` | `rounded-lg` |  |
+
+            Contexto recuperado:
+
+            {{#1760918500004.contexto#}}
+          edition_type: "basic"
+        - id: "usuario"
+          role: "user"
+          text: |-
+            Pedido: {{#1760918500001.pedido#}}
+
+            Erros da tentativa anterior, se houver (corrija todos): {{#1760918500010.erros#}}
+          edition_type: "basic"
+        context:
+          enabled: false
+          variable_selector: []
+        vision:
+          enabled: false
+        memory: null
+        reasoning_format: "separated"
+        structured_output_enabled: true
+        structured_output:
+          schema:
+            type: "object"
+            additionalProperties: false
+            required:
+            - "versao"
+            - "pedido"
+            - "tela"
+            - "tokens"
+            - "componentes"
+            - "fluxo"
+            - "lacunas"
+            properties:
+              versao:
+                const: "0"
+              pedido:
+                type: "string"
+                minLength: 1
+                description: "O pedido de tela, como chegou no Start."
+              tela:
+                type: "object"
+                additionalProperties: false
+                required:
+                - "nome"
+                - "resumo"
+                properties:
+                  nome:
+                    type: "string"
+                    minLength: 1
+                  resumo:
+                    type: "string"
+                    minLength: 1
+                    description: "O que a pessoa consegue fazer na tela, em uma ou duas frases."
+              tokens:
+                type: "array"
+                items:
+                  type: "object"
+                  additionalProperties: false
+                  required:
+                  - "nome"
+                  - "uso"
+                  - "fonte"
+                  properties:
+                    nome:
+                      type: "string"
+                      pattern: "^--[a-z][a-z0-9-]*$"
+                      description: "Nome exato, como em docs/ds/tokens.md (ex.: --color-proof)."
+                    uso:
+                      type: "string"
+                      minLength: 1
+                    fonte:
+                      type: "string"
+                      minLength: 1
+                      description: "Documento de onde o token saiu (ex.: docs/ds/tokens.md)."
+              componentes:
+                type: "array"
+                items:
+                  type: "object"
+                  additionalProperties: false
+                  required:
+                  - "nome"
+                  - "export"
+                  - "uso"
+                  - "fonte"
+                  properties:
+                    nome:
+                      type: "string"
+                      pattern: "^[a-z0-9-]+$"
+                      description: "O metadado `componente` da página em docs/ds/componentes (ex.: segmented)."
+                    export:
+                      type: "string"
+                      pattern: "^[A-Z][A-Za-z0-9]*$"
+                      description: "O export usado, com a caixa do código (ex.: Segmented)."
+                    uso:
+                      type: "string"
+                      minLength: 1
+                    fonte:
+                      type: "string"
+                      minLength: 1
+                      description: "Documento recuperado (metadata.arquivo do Knowledge Retrieval)."
+              fluxo:
+                type: "array"
+                minItems: 1
+                description: "Os passos que a pessoa faz na tela, em ordem. O Proto Bot reproduz cada um no navegador."
+                items:
+                  type: "object"
+                  additionalProperties: false
+                  required:
+                  - "rota"
+                  - "acao"
+                  - "alvo"
+                  properties:
+                    rota:
+                      type: "string"
+                      pattern: "^/"
+                      description: "Rota real do atelier (arquivos de src/routes), com query se precisar (ex.: /?adicionar=fonte:Inter)."
+                    acao:
+                      enum:
+                      - "abrir"
+                      - "clicar"
+                      - "digitar"
+                      - "arrastar"
+                      - "pressionar"
+                      - "ver"
+                    alvo:
+                      type: "string"
+                      minLength: 1
+                      description: "O que recebe a ação, pelo nome que a pessoa vê (ex.: botão \"Filtros\")."
+                    valor:
+                      type: "string"
+                      description: "O que digitar ou a tecla a pressionar, quando a ação pede."
+              lacunas:
+                type: "array"
+                description: "O que o pedido precisa e o atelier não tem. A spec diz que falta em vez de inventar."
+                items:
+                  type: "object"
+                  additionalProperties: false
+                  required:
+                  - "falta"
+                  - "motivo"
+                  properties:
+                    falta:
+                      type: "string"
+                      minLength: 1
+                    motivo:
+                      type: "string"
+                      minLength: 1
+        isInLoop: true
+        isInIteration: false
+        loop_id: "1760918500010"
+      parentId: "1760918500010"
+      zIndex: 1002
+    - id: "1760918500012"
+      type: "custom"
+      position:
+        x: 480
+        y: 80
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "code"
+        desc: ""
+        selected: false
+        title: "Validar e preencher meta"
+        code_language: "javascript"
+        code: |-
+          // Gerado por npm run ds:gerar a partir de scripts/ds/validar-spec.mjs. Não edite aqui.
+          // Checks an InterfaceSpec without AI: the schema, then every token, component,
+          // source and route it cites against what the atelier really has.
+          //
+          // No imports and no I/O on purpose: the same code runs in the CI and in the
+          // Code node of the Dify app `validar-spec` (ALL-104), so the rule lives in one
+          // place. In Dify, drop the `export` keywords and add a
+          // `function main({ spec }) { return validarSpec(spec, { schema, tokens, ... }); }`.
+
+          const TOKEN = /--[a-z][a-z0-9-]*/g;
+
+          const tipoDe = (valor) => (valor === null ? "null" : Array.isArray(valor) ? "array" : typeof valor);
+
+          /** A small JSON Schema subset: what interface-spec.v0.schema.json uses. */
+          function checarSchema(valor, schema, caminho, erros) {
+            const onde = caminho || "(raiz)";
+            if ("const" in schema && valor !== schema.const) {
+              erros.push(`${onde}: deve ser ${JSON.stringify(schema.const)}.`);
+              return;
+            }
+            if (schema.enum && !schema.enum.includes(valor)) {
+              erros.push(`${onde}: deve ser um de ${schema.enum.join(", ")}.`);
+              return;
+            }
+            if (schema.type) {
+              const tipo = tipoDe(valor);
+              const ok = schema.type === "integer" ? Number.isInteger(valor) : tipo === schema.type;
+              if (!ok) {
+                erros.push(`${onde}: deve ser ${schema.type === "integer" ? "inteiro" : schema.type}.`);
+                return;
+              }
+            }
+            if (typeof valor === "string") {
+              if (schema.minLength && valor.length < schema.minLength)
+                erros.push(`${onde}: não pode ser vazio.`);
+              if (schema.pattern && !new RegExp(schema.pattern).test(valor)) {
+                erros.push(`${onde}: não segue o padrão ${schema.pattern}.`);
+              }
+            }
+            if (typeof valor === "number" && schema.minimum !== undefined && valor < schema.minimum) {
+              erros.push(`${onde}: deve ser pelo menos ${schema.minimum}.`);
+            }
+            if (Array.isArray(valor)) {
+              if (schema.minItems && valor.length < schema.minItems) {
+                erros.push(`${onde}: precisa de pelo menos ${schema.minItems} item.`);
+              }
+              if (schema.items)
+                valor.forEach((item, i) => checarSchema(item, schema.items, `${caminho}[${i}]`, erros));
+            }
+            if (tipoDe(valor) === "object") {
+              const filho = (chave) => (caminho ? `${caminho}.${chave}` : chave);
+              for (const chave of schema.required ?? []) {
+                if (!(chave in valor)) erros.push(`${onde}: falta o campo obrigatório \`${chave}\`.`);
+              }
+              if (schema.additionalProperties === false) {
+                for (const chave of Object.keys(valor)) {
+                  if (!(chave in (schema.properties ?? {})))
+                    erros.push(`${filho(chave)}: campo fora do schema.`);
+                }
+              }
+              for (const [chave, sub] of Object.entries(schema.properties ?? {})) {
+                if (chave in valor) checarSchema(valor[chave], sub, filho(chave), erros);
+              }
+            }
+          }
+
+          function distancia(a, b) {
+            let anterior = Array.from({ length: b.length + 1 }, (_, j) => j);
+            for (let i = 1; i <= a.length; i++) {
+              const atual = [i];
+              for (let j = 1; j <= b.length; j++) {
+                atual[j] = Math.min(
+                  anterior[j] + 1,
+                  atual[j - 1] + 1,
+                  anterior[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+                );
+              }
+              anterior = atual;
+            }
+            return anterior[b.length];
+          }
+
+          /** The real name a typo meant, if one is that close. */
+          function parecido(nome, validos) {
+            let melhor;
+            let menor = Infinity;
+            for (const valido of validos) {
+              const d = distancia(nome, valido);
+              if (d < menor) [melhor, menor] = [valido, d];
+            }
+            return menor <= 2 && menor < nome.length / 3 ? melhor : undefined;
+          }
+
+          function erroDeToken(onde, nome, tokens) {
+            const sugestao = parecido(nome, tokens);
+            if (sugestao) return `${onde}: \`${nome}\` não existe. Você quis dizer \`${sugestao}\`?`;
+            const grupo = nome.split("-")[2];
+            const doGrupo = tokens.filter((t) => t.split("-")[2] === grupo);
+            const lista = doGrupo.length
+              ? `Tokens desse grupo: ${doGrupo.join(", ")}.`
+              : `Tokens: ${tokens.join(", ")}.`;
+            return `${onde}: \`${nome}\` não existe. ${lista}`;
+          }
+
+          /** Every string under `no`, with its path. */
+          function* textos(no, caminho) {
+            if (typeof no === "string") yield [caminho, no];
+            else if (Array.isArray(no)) {
+              for (let i = 0; i < no.length; i++) yield* textos(no[i], `${caminho}[${i}]`);
+            } else if (no && typeof no === "object") {
+              for (const [chave, filho] of Object.entries(no)) {
+                yield* textos(filho, caminho ? `${caminho}.${chave}` : chave);
+              }
+            }
+          }
+
+          /**
+           * @param {unknown} entrada the spec, as an object or as JSON text
+           * @param {{
+           *   schema: object,
+           *   tokens?: string[],
+           *   componentes?: { nome: string, exports: string[] }[],
+           *   rotas?: string[],
+           *   fontes?: string[],
+           * }} fonte what the atelier has; a list left out is not checked
+           * @returns {{ valida: boolean, erros: string[], tokens_rejeitados: string[] }}
+           */
+          function validarSpec(entrada, { schema, tokens, componentes, rotas, fontes }) {
+            let spec = entrada;
+            if (typeof entrada === "string") {
+              try {
+                spec = JSON.parse(entrada);
+              } catch {
+                return {
+                  valida: false,
+                  erros: ["JSON inválido: a spec não pôde ser lida."],
+                  tokens_rejeitados: [],
+                };
+              }
+            }
+            const erros = [];
+            const rejeitados = [];
+            checarSchema(spec, schema, "", erros);
+            if (tipoDe(spec) !== "object") return { valida: false, erros, tokens_rejeitados: [] };
+            const lista = (campo) => (Array.isArray(spec[campo]) ? spec[campo] : []);
+
+            if (tokens) {
+              const rejeitar = (onde, nome) => {
+                if (tokens.includes(nome)) return;
+                erros.push(erroDeToken(onde, nome, tokens));
+                if (!rejeitados.includes(nome)) rejeitados.push(nome);
+              };
+              lista("tokens").forEach((t, i) => {
+                if (typeof t?.nome === "string") rejeitar(`tokens[${i}].nome`, t.nome);
+              });
+              // Tokens named in free text count too, `tokens[].uso` included (the names
+              // were checked above); `lacunas` may name what is missing.
+              const { meta: _meta, lacunas: _lacunas, ...corpo } = spec;
+              corpo.tokens = lista("tokens").map((t) => ({ ...t, nome: null }));
+              for (const [onde, texto] of textos(corpo, "")) {
+                for (const nome of texto.match(TOKEN) ?? []) {
+                  if (!rejeitados.includes(nome)) rejeitar(onde, nome);
+                }
+              }
+            }
+
+            const checarFonte = (onde, valor) => {
+              if (fontes && typeof valor === "string" && !fontes.includes(valor)) {
+                erros.push(`${onde}: \`${valor}\` não é um documento das bases.`);
+              }
+            };
+            lista("tokens").forEach((t, i) => checarFonte(`tokens[${i}].fonte`, t?.fonte));
+
+            lista("componentes").forEach((c, i) => {
+              if (componentes && typeof c?.nome === "string") {
+                const pagina = componentes.find((p) => p.nome === c.nome);
+                if (!pagina) {
+                  const sugestao = parecido(
+                    c.nome,
+                    componentes.map((p) => p.nome),
+                  );
+                  erros.push(
+                    `componentes[${i}].nome: \`${c.nome}\` não existe em docs/ds/componentes. ${
+                      sugestao
+                        ? `Você quis dizer \`${sugestao}\`?`
+                        : "Se o atelier não tem, ponha em `lacunas`."
+                    }`,
+                  );
+                } else if (typeof c.export === "string" && !pagina.exports.includes(c.export)) {
+                  erros.push(
+                    `componentes[${i}].export: \`${c.export}\` não é export de \`${c.nome}\`. Exports: ${pagina.exports.join(", ")}.`,
+                  );
+                }
+              }
+              checarFonte(`componentes[${i}].fonte`, c?.fonte);
+            });
+
+            if (rotas) {
+              lista("fluxo").forEach((passo, i) => {
+                if (typeof passo?.rota !== "string") return;
+                const caminho = passo.rota.split(/[?#]/)[0];
+                if (!rotas.includes(caminho)) {
+                  erros.push(
+                    `fluxo[${i}].rota: \`${caminho}\` não é uma rota do atelier. Rotas: ${rotas.join(", ")}.`,
+                  );
+                }
+              });
+            }
+
+            return { valida: erros.length === 0, erros, tokens_rejeitados: rejeitados };
+          }
+
+          const FONTE = {"schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"atelier/interface-spec/v0","title":"InterfaceSpec v0","description":"Contrato v0 (ALL-91), aprovado em 20/10/2026. Congelado: mudança vira v1 num arquivo novo. O que o fluxo piloto devolve para um pedido de tela do atelier. Tokens e componentes usam o nome exato de docs/ds.","type":"object","additionalProperties":false,"required":["versao","pedido","tela","tokens","componentes","fluxo","lacunas","meta"],"properties":{"versao":{"const":"0"},"pedido":{"type":"string","minLength":1,"description":"O pedido de tela, como chegou no Start."},"tela":{"type":"object","additionalProperties":false,"required":["nome","resumo"],"properties":{"nome":{"type":"string","minLength":1},"resumo":{"type":"string","minLength":1,"description":"O que a pessoa consegue fazer na tela, em uma ou duas frases."}}},"tokens":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["nome","uso","fonte"],"properties":{"nome":{"type":"string","pattern":"^--[a-z][a-z0-9-]*$","description":"Nome exato, como em docs/ds/tokens.md (ex.: --color-proof)."},"uso":{"type":"string","minLength":1},"fonte":{"type":"string","minLength":1,"description":"Documento de onde o token saiu (ex.: docs/ds/tokens.md)."}}}},"componentes":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["nome","export","uso","fonte"],"properties":{"nome":{"type":"string","pattern":"^[a-z0-9-]+$","description":"O metadado `componente` da página em docs/ds/componentes (ex.: segmented)."},"export":{"type":"string","pattern":"^[A-Z][A-Za-z0-9]*$","description":"O export usado, com a caixa do código (ex.: Segmented)."},"uso":{"type":"string","minLength":1},"fonte":{"type":"string","minLength":1,"description":"Documento recuperado (metadata.arquivo do Knowledge Retrieval)."}}}},"fluxo":{"type":"array","minItems":1,"description":"Os passos que a pessoa faz na tela, em ordem. O Proto Bot reproduz cada um no navegador.","items":{"type":"object","additionalProperties":false,"required":["rota","acao","alvo"],"properties":{"rota":{"type":"string","pattern":"^/","description":"Rota real do atelier (arquivos de src/routes), com query se precisar (ex.: /?adicionar=fonte:Inter)."},"acao":{"enum":["abrir","clicar","digitar","arrastar","pressionar","ver"]},"alvo":{"type":"string","minLength":1,"description":"O que recebe a ação, pelo nome que a pessoa vê (ex.: botão \"Filtros\")."},"valor":{"type":"string","description":"O que digitar ou a tecla a pressionar, quando a ação pede."}}}},"lacunas":{"type":"array","description":"O que o pedido precisa e o atelier não tem. A spec diz que falta em vez de inventar.","items":{"type":"object","additionalProperties":false,"required":["falta","motivo"],"properties":{"falta":{"type":"string","minLength":1},"motivo":{"type":"string","minLength":1}}}},"meta":{"type":"object","additionalProperties":false,"required":["flow_version","prompt_version","tentativas","tokens_rejeitados"],"properties":{"flow_version":{"type":"string","minLength":1,"description":"Variável de ambiente do fluxo, nunca do LLM."},"prompt_version":{"type":"string","minLength":1,"description":"Variável de ambiente do fluxo, nunca do LLM."},"tentativas":{"type":"integer","minimum":1},"tokens_rejeitados":{"type":"array","description":"Tokens que o validador rejeitou nas tentativas anteriores.","items":{"type":"string"}}}}}},"tokens":["--color-bg","--color-surface","--color-elevated","--color-fg","--color-muted","--color-subtle","--color-border","--color-accent","--color-accent-fg","--color-paper","--color-paper-fg","--color-mist","--color-ink","--color-navy","--color-sand","--color-proof","--color-proof-fg","--color-proof-ink","--color-good","--color-warn","--color-bad","--font-sans","--font-mono","--radius-sm","--radius-md","--radius-lg"],"componentes":[{"nome":"asset-card","exports":["AssetCard","AssetRow"]},{"nome":"asset-tab","exports":["AssetTab"]},{"nome":"atelier","exports":["Atelier"]},{"nome":"badges","exports":["VerdictDot","VerdictBadge","ScoreFace","ScoreBadge","StatusText"]},{"nome":"collection","exports":["Collection"]},{"nome":"command-palette","exports":["CommandPalette"]},{"nome":"confirm-dialog","exports":["ConfirmDialog"]},{"nome":"controls","exports":["GroundPicker","SizeSlider"]},{"nome":"copy-layer","exports":["CopyLayer"]},{"nome":"details","exports":["Details"]},{"nome":"dialog","exports":["Modal","DialogClose"]},{"nome":"drop-overlay","exports":["DropOverlay"]},{"nome":"dropdown-menu","exports":["DropdownMenu","DropdownMenuContent","DropdownMenuItem","DropdownMenuCheckboxItem","DropdownMenuRadioItem","DropdownMenuLabel","DropdownMenuSeparator","DropdownMenuSubTrigger","DropdownMenuSubContent","DropdownMenuTrigger","DropdownMenuSub","DropdownMenuRadioGroup"]},{"nome":"explorer","exports":["Explorer"]},{"nome":"face-icon","exports":["FaceIcon"]},{"nome":"field","exports":["Field","Property"]},{"nome":"filter-bar","exports":["FilterButton","ActiveFilters"]},{"nome":"folder-actions","exports":["FolderActions","ItemActions"]},{"nome":"font-specimen","exports":["FontProof","FontWeights","FontGlyphs"]},{"nome":"icon-button","exports":["IconButton"]},{"nome":"icon-specimen","exports":["IconSpecimen"]},{"nome":"icons","exports":["Glyph","SetGlyphs"]},{"nome":"import-dialog","exports":["ImportDialog"]},{"nome":"inspector","exports":["Inspector"]},{"nome":"pane","exports":["PaneView"]},{"nome":"popover","exports":["Popover","PopoverContent","PopoverTrigger","PopoverAnchor","PopoverClose"]},{"nome":"score-control","exports":["ScoreControl"]},{"nome":"scorecard","exports":["Scorecard"]},{"nome":"section","exports":["SpecimenSection"]},{"nome":"segmented","exports":["Segmented"]},{"nome":"sidebar","exports":["Sidebar"]},{"nome":"tab-strip","exports":["TabStrip"]},{"nome":"tabs","exports":["Tabs","TabsList","TabsTrigger","TabsContent"]},{"nome":"tooltip","exports":["Tooltip","TooltipProvider"]},{"nome":"workspace","exports":["Workspace"]}],"rotas":["/","/api/adicionar","/api/conjuntos","/api/fontes","/api/icones","/api/parecidas","/ia","/llms.txt","/mcp","/robots.txt"],"fontes":["docs/ds/tokens.md","docs/ds/componentes/asset-card.md","docs/ds/componentes/asset-tab.md","docs/ds/componentes/atelier.md","docs/ds/componentes/badges.md","docs/ds/componentes/collection.md","docs/ds/componentes/command-palette.md","docs/ds/componentes/confirm-dialog.md","docs/ds/componentes/controls.md","docs/ds/componentes/copy-layer.md","docs/ds/componentes/details.md","docs/ds/componentes/dialog.md","docs/ds/componentes/drop-overlay.md","docs/ds/componentes/dropdown-menu.md","docs/ds/componentes/explorer.md","docs/ds/componentes/face-icon.md","docs/ds/componentes/field.md","docs/ds/componentes/filter-bar.md","docs/ds/componentes/folder-actions.md","docs/ds/componentes/font-specimen.md","docs/ds/componentes/icon-button.md","docs/ds/componentes/icon-specimen.md","docs/ds/componentes/icons.md","docs/ds/componentes/import-dialog.md","docs/ds/componentes/inspector.md","docs/ds/componentes/pane.md","docs/ds/componentes/popover.md","docs/ds/componentes/score-control.md","docs/ds/componentes/scorecard.md","docs/ds/componentes/section.md","docs/ds/componentes/segmented.md","docs/ds/componentes/sidebar.md","docs/ds/componentes/tab-strip.md","docs/ds/componentes/tabs.md","docs/ds/componentes/tooltip.md","docs/ds/componentes/workspace.md",".claude/skills/atelier-iteracao/references/design.md",".claude/skills/atelier-iteracao/references/arquitetura.md",".claude/skills/atelier-iteracao/references/armadilhas.md",".claude/skills/atelier-iteracao/references/verificacao.md","README.md"]};
+
+          // Dify refuses an output array longer than 30 (CODE_MAX_STRING_ARRAY_LENGTH).
+          const LIMITE = 30;
+
+          function main({ gerado, pedido, tentativas, rejeitados, flow_version, prompt_version }) {
+            const anteriores = Array.isArray(rejeitados) ? rejeitados : [];
+            const n = (Number(tentativas) || 0) + 1;
+            const base = gerado && typeof gerado === 'object' && !Array.isArray(gerado) ? gerado : {};
+            // meta and pedido come from the flow, never from the LLM.
+            const { meta: _meta, ...corpo } = base;
+            const spec = {
+              ...corpo,
+              pedido: typeof pedido === 'string' ? pedido : corpo.pedido,
+              meta: { flow_version, prompt_version, tentativas: n, tokens_rejeitados: anteriores },
+            };
+            const r = validarSpec(spec, FONTE);
+            const erros =
+              r.erros.length > LIMITE
+                ? [...r.erros.slice(0, LIMITE - 1), `… e mais ${r.erros.length - LIMITE + 1} erros.`]
+                : r.erros;
+            const todos = [...new Set([...anteriores, ...r.tokens_rejeitados])].slice(0, LIMITE);
+            return { spec, valida: r.valida ? 1 : 0, erros, rejeitados: todos, tentativas: n };
+          }
+
+        variables:
+        - variable: "gerado"
+          value_selector:
+          - "1760918500011"
+          - "structured_output"
+        - variable: "pedido"
+          value_selector:
+          - "1760918500001"
+          - "pedido"
+        - variable: "tentativas"
+          value_selector:
+          - "1760918500010"
+          - "tentativas"
+        - variable: "rejeitados"
+          value_selector:
+          - "1760918500010"
+          - "rejeitados"
+        - variable: "flow_version"
+          value_selector:
+          - "env"
+          - "flow_version"
+        - variable: "prompt_version"
+          value_selector:
+          - "env"
+          - "prompt_version"
+        outputs:
+          spec:
+            type: "object"
+            children: null
+          valida:
+            type: "number"
+            children: null
+          erros:
+            type: "array[string]"
+            children: null
+          rejeitados:
+            type: "array[string]"
+            children: null
+          tentativas:
+            type: "number"
+            children: null
+        isInLoop: true
+        isInIteration: false
+        loop_id: "1760918500010"
+      parentId: "1760918500010"
+      zIndex: 1002
+    - id: "1760918500013"
+      type: "custom"
+      position:
+        x: 780
+        y: 80
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "assigner"
+        desc: ""
+        selected: false
+        title: "Guardar a tentativa"
+        version: "2"
+        items:
+        - variable_selector:
+          - "1760918500010"
+          - "spec"
+          input_type: "variable"
+          operation: "over-write"
+          value:
+          - "1760918500012"
+          - "spec"
+        - variable_selector:
+          - "1760918500010"
+          - "valida"
+          input_type: "variable"
+          operation: "over-write"
+          value:
+          - "1760918500012"
+          - "valida"
+        - variable_selector:
+          - "1760918500010"
+          - "erros"
+          input_type: "variable"
+          operation: "over-write"
+          value:
+          - "1760918500012"
+          - "erros"
+        - variable_selector:
+          - "1760918500010"
+          - "rejeitados"
+          input_type: "variable"
+          operation: "over-write"
+          value:
+          - "1760918500012"
+          - "rejeitados"
+        - variable_selector:
+          - "1760918500010"
+          - "tentativas"
+          input_type: "variable"
+          operation: "over-write"
+          value:
+          - "1760918500012"
+          - "tentativas"
+        isInLoop: true
+        isInIteration: false
+        loop_id: "1760918500010"
+      parentId: "1760918500010"
+      zIndex: 1002
+    - id: "1760918500020"
+      type: "custom"
+      position:
+        x: 2380
+        y: 280
+      positionAbsolute:
+        x: 2380
+        y: 280
+      width: 244
+      height: 90
+      selected: false
+      sourcePosition: "right"
+      targetPosition: "left"
+      data:
+        type: "end"
+        desc: ""
+        selected: false
+        title: "Fim"
+        outputs:
+        - variable: "spec"
+          value_selector:
+          - "1760918500010"
+          - "spec"
+          value_type: "object"
+        - variable: "valida"
+          value_selector:
+          - "1760918500010"
+          - "valida"
+          value_type: "number"
+        - variable: "erros"
+          value_selector:
+          - "1760918500010"
+          - "erros"
+          value_type: "array[string]"
+        - variable: "tentativas"
+          value_selector:
+          - "1760918500010"
+          - "tentativas"
+          value_type: "number"
+    edges:
+    - id: "1760918500001-source-1760918500002-target"
+      source: "1760918500001"
+      sourceHandle: "source"
+      target: "1760918500002"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 0
+      data:
+        sourceType: "start"
+        targetType: "knowledge-retrieval"
+        isInIteration: false
+        isInLoop: false
+    - id: "1760918500002-source-1760918500003-target"
+      source: "1760918500002"
+      sourceHandle: "source"
+      target: "1760918500003"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 0
+      data:
+        sourceType: "knowledge-retrieval"
+        targetType: "knowledge-retrieval"
+        isInIteration: false
+        isInLoop: false
+    - id: "1760918500003-source-1760918500004-target"
+      source: "1760918500003"
+      sourceHandle: "source"
+      target: "1760918500004"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 0
+      data:
+        sourceType: "knowledge-retrieval"
+        targetType: "code"
+        isInIteration: false
+        isInLoop: false
+    - id: "1760918500004-source-1760918500010-target"
+      source: "1760918500004"
+      sourceHandle: "source"
+      target: "1760918500010"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 0
+      data:
+        sourceType: "code"
+        targetType: "loop"
+        isInIteration: false
+        isInLoop: false
+    - id: "1760918500010start-source-1760918500011-target"
+      source: "1760918500010start"
+      sourceHandle: "source"
+      target: "1760918500011"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 1002
+      data:
+        sourceType: "loop-start"
+        targetType: "llm"
+        isInIteration: false
+        isInLoop: true
+        loop_id: "1760918500010"
+    - id: "1760918500011-source-1760918500012-target"
+      source: "1760918500011"
+      sourceHandle: "source"
+      target: "1760918500012"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 1002
+      data:
+        sourceType: "llm"
+        targetType: "code"
+        isInIteration: false
+        isInLoop: true
+        loop_id: "1760918500010"
+    - id: "1760918500012-source-1760918500013-target"
+      source: "1760918500012"
+      sourceHandle: "source"
+      target: "1760918500013"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 1002
+      data:
+        sourceType: "code"
+        targetType: "assigner"
+        isInIteration: false
+        isInLoop: true
+        loop_id: "1760918500010"
+    - id: "1760918500010-source-1760918500020-target"
+      source: "1760918500010"
+      sourceHandle: "source"
+      target: "1760918500020"
+      targetHandle: "target"
+      type: "custom"
+      zIndex: 0
+      data:
+        sourceType: "loop"
+        targetType: "end"
+        isInIteration: false
+        isInLoop: false
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.7

@@ -30,6 +30,26 @@ Se a camada 1 passa e a 2 falha, o problema é na implementação. Se a 0 falha,
 | Hit de recuperação             | perguntas com o chunk esperado no Top K / perguntas                                      | ≥ 90%                                    |
 | Tentativas médias              | média de `meta.tentativas`                                                               | acompanhar; subir é sinal de prompt ruim |
 
+## Como rodar a camada 1
+
+Na máquina que alcança o Dify, com o fluxo piloto (ALL-93) publicado como API:
+
+```bash
+DIFY_API_URL=http://localhost:8080/v1 DIFY_SPEC_API_KEY=app-… npm run ds:avaliar
+npm run ds:avaliar -- --casos T19,T20   # só alguns casos
+```
+
+- Cada caso de `conjunto-teste-v0.csv` vai ao fluxo como `pedido`, pela API em `streaming`. A spec que volta passa pelo mesmo validador da CI.
+- A rodada fica em `qualidade/rodadas/<data>.json` e `.md`, com as versões de fluxo e de prompt que vieram em `meta`, e é comparada com a última rodada dos mesmos casos. Commite as duas: é o histórico que o processo pede.
+- Sai com código 1 se uma métrica que bloqueia falhar.
+- A chave fica só no ambiente; o avaliador nunca a escreve.
+
+Como cada caso é medido na spec:
+
+- **Token, positivo** (T01 a T10): o token esperado tem que estar em `tokens[].nome`.
+- **Armadilha** (T11 a T13, T21): nenhum token nem componente inventado na spec final. Na armadilha de tela (T21), a spec ainda tem que dizer em `lacunas` o que falta.
+- **Negativo e ambíguo** (T14 a T18): o critério do caso não é medido, mas a spec deles conta em "spec válida". Eles pedem que a resposta diga "não é violação", e a InterfaceSpec v0 não tem campo de violação. Medir isso pede um app de revisão de tokens ou um campo novo no v1.
+
 ## Quem corrige
 
 - Falha na camada 0: Dify Conhecimento (chunk, busca, metadados).

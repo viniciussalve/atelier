@@ -9,15 +9,28 @@ import { join } from "node:path";
 export const DSL_VALIDAR = "dify/validar-spec.yml";
 /** The DSL version Dify 1.17.1 writes and expects (api/constants/dsl_version.py). */
 export const VERSAO_DSL = "0.7.0";
-const LIMITE_LISTA = 30;
+/** Dify refuses an output array longer than this (CODE_MAX_STRING_ARRAY_LENGTH). */
+export const LIMITE_LISTA = 30;
+
+const MAIN_VALIDAR = [
+  "function main({ spec }) {",
+  "  const r = validarSpec(spec, FONTE);",
+  "  const erros =",
+  "    r.erros.length > LIMITE",
+  "      ? [...r.erros.slice(0, LIMITE - 1), `… e mais ${r.erros.length - LIMITE + 1} erros.`]",
+  "      : r.erros;",
+  "  return { valida: r.valida, erros, tokens_rejeitados: r.tokens_rejeitados.slice(0, LIMITE) };",
+  "}",
+];
 
 /**
  * The Code node's JavaScript: the validator without `export`, the atelier's
  * lists as a constant, and the `main` Dify calls.
  * @param {string} validador source of validar-spec.mjs
  * @param {object} fonte what a spec may cite (fonteDoAtelier)
+ * @param {string[]} [principal] the lines of `main`; the validar-spec app's by default
  */
-export function codigoDoNo(validador, fonte) {
+export function codigoDoNo(validador, fonte, principal = MAIN_VALIDAR) {
   const corpo = validador.replace(/^export function /m, "function ");
   if (/^\s*(import|export)\b/m.test(corpo)) {
     throw new Error("validar-spec.mjs não pode ter import nem export além de validarSpec.");
@@ -31,14 +44,7 @@ export function codigoDoNo(validador, fonte) {
     "// Dify refuses an output array longer than 30 (CODE_MAX_STRING_ARRAY_LENGTH).",
     `const LIMITE = ${LIMITE_LISTA};`,
     "",
-    "function main({ spec }) {",
-    "  const r = validarSpec(spec, FONTE);",
-    "  const erros =",
-    "    r.erros.length > LIMITE",
-    "      ? [...r.erros.slice(0, LIMITE - 1), `… e mais ${r.erros.length - LIMITE + 1} erros.`]",
-    "      : r.erros;",
-    "  return { valida: r.valida, erros, tokens_rejeitados: r.tokens_rejeitados.slice(0, LIMITE) };",
-    "}",
+    ...principal,
     "",
   ].join("\n");
 }
@@ -48,7 +54,7 @@ export const lerValidador = (raiz) =>
 
 const ID = { start: "1760918400001", code: "1760918400002", end: "1760918400003" };
 
-function no(id, tipo, x, data) {
+export function no(id, tipo, x, data) {
   return {
     id,
     type: "custom",
@@ -63,7 +69,7 @@ function no(id, tipo, x, data) {
   };
 }
 
-function aresta(de, para, tipoDe, tipoPara) {
+export function aresta(de, para, tipoDe, tipoPara) {
   return {
     id: `${de}-source-${para}-target`,
     source: de,
