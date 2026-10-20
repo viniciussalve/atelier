@@ -55,7 +55,9 @@ A collection row: one line of facts, then one line of specimen that fades at the
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para mostrar um item (fonte ou conjunto de ícones) na coleção. `AssetCard` é o card da grade, com o nome, os fatos e a amostra grande desenhada no próprio item; `AssetRow` é a linha da vista em lista, mais compacta.
+
+Não use fora da coleção: para o item aberto num painel, use `AssetTab`.
 
 ## Trecho de código
 

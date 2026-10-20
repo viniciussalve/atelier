@@ -51,7 +51,9 @@ One Iconify glyph, or a dashed placeholder when the set has no icon by that name
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para desenhar ícones do Iconify. `Glyph` desenha um ícone pelo nome, ou um marcador tracejado quando o conjunto não tem esse nome; `SetGlyphs` desenha uma fileira de ícones de um conjunto.
+
+Para os ícones da própria interface do atelier (fechar, dividir, menu), use os ícones do lucide-react, não o `Glyph`.
 
 ## Trecho de código
 

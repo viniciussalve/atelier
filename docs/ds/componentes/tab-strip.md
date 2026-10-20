@@ -36,7 +36,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a faixa de abas de um painel: clicar abre, clique duplo fixa a prévia, arrastar reordena ou leva a aba para outro painel, e as setas, Home e End movem entre abas. Só faz sentido dentro do painel.
+
+Para abas de conteúdo dentro de uma aba (as partes da prova), use as `Tabs`.
 
 ## Trecho de código
 

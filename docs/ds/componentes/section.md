@@ -43,7 +43,9 @@ One part of a specimen. When a criterion is judged on this part, its score sits 
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para uma parte de uma prova (um texto, os pesos, os tamanhos). Quando um critério é avaliado nessa parte, a carinha dele fica no cabeçalho da seção, para dar nota olhando o que ela mede.
+
+Use dentro das provas de fonte e de ícones; não serve como seção genérica de página.
 
 ## Trecho de código
 

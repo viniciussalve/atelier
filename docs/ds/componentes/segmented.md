@@ -43,7 +43,9 @@ A single-choice switch that never ends up empty.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para alternar entre poucas opções exclusivas, sempre visíveis numa barra, como grade ou lista, ou Fontes e Ícones. Uma opção fica sempre escolhida; aceita rótulo em texto ou ícone (com `title`) e contagem.
+
+Para navegar entre conteúdos de um mesmo painel, use as `Tabs`. Para muitas opções, use o `DropdownMenu`.
 
 ## Trecho de código
 

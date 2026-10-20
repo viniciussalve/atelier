@@ -37,7 +37,9 @@ The overall score, a read-only line per criterion and the verdict. Criteria are 
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para o resumo da avaliação no inspetor: a nota geral, uma linha só de leitura por critério e o veredito. Os critérios recebem nota na prova, não aqui.
+
+Para dar nota a um critério, use o `ScoreControl` na seção da prova.
 
 ## Trecho de código
 

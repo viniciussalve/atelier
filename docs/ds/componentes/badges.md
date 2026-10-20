@@ -77,7 +77,9 @@ The face of the weighted score with its word ("Bom"), or a quiet "Sem nota". `co
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para mostrar a avaliação de um item em pouco espaço. `VerdictDot` é o ponto colorido do veredito (usar, revisar, evitar) e `VerdictBadge` é o selo com a palavra; `ScoreFace` é a carinha da nota e `ScoreBadge` é a nota geral com a palavra ("Bom") ou "Sem nota"; `StatusText` é o status do item em texto.
+
+Não use para dar nota: para isso há o `ScoreControl`.
 
 ## Trecho de código
 

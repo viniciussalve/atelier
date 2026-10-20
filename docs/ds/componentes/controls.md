@@ -50,7 +50,9 @@ Radix radio group: one Tab stop, the arrows move and choose.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Controles da prova e da coleção. `GroundPicker` escolhe o fundo da amostra (um grupo de rádio: uma parada de Tab, as setas mudam a escolha); `SizeSlider` é o controle deslizante com rótulo para o corpo do texto ou o tamanho dos ícones.
+
+Para escolher entre poucas opções de exibição com rótulo ou ícone, use o `Segmented`.
 
 ## Trecho de código
 

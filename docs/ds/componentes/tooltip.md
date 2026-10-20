@@ -45,7 +45,9 @@ Também aceita as props herdadas: 4 de `@radix-ui/react-tooltip`.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para mostrar uma dica curta ao passar o mouse ou focar num elemento, com um atalho de teclado opcional. `TooltipProvider` já fica uma vez na raiz do app.
+
+Para um botão só com ícone, use o `IconButton`, que já traz a dica. Não ponha na dica informação que só existe nela.
 
 ## Trecho de código
 

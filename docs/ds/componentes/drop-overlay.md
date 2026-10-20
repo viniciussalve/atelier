@@ -37,7 +37,9 @@ Covers a pane while something is dragged: the edges split the pane, the center o
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a camada que cobre um painel enquanto alguém arrasta um item ou uma aba: as bordas dividem o painel e o centro abre ali, como no VS Code. Só faz sentido dentro do painel.
+
+Não use para arrastar e soltar em outros lugares, como as pastas da barra lateral.
 
 ## Trecho de código
 

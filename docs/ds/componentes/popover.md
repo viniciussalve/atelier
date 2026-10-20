@@ -51,7 +51,9 @@ Também aceita as props herdadas: 290 de `react`, 1 de `@radix-ui/react-primitiv
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para um conteúdo pequeno que abre preso a um botão e fecha ao clicar fora: a nota escrita de um critério, a lista de filtros, editar um campo dos detalhes. `PopoverContent` é a caixa; `PopoverTrigger`, `PopoverAnchor` e `PopoverClose` são as partes do Radix.
+
+Para uma lista de ações, use o `DropdownMenu`. Para uma tarefa que interrompe a tela, use o `Modal`.
 
 ## Trecho de código
 

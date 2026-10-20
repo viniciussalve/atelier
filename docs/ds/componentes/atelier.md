@@ -35,7 +35,9 @@ Sem props.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a tela inteira do app: barra lateral, painéis e inspetor, montada uma vez na rota `/`. Só faz sentido como raiz.
+
+Não use dentro de outro componente nem para uma tela nova: monte a tela nova com as peças (`Sidebar`, `Workspace`, `Inspector`).
 
 ## Trecho de código
 

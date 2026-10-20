@@ -37,7 +37,9 @@ The panes, laid out by the split tree. On narrow screens only the active pane sh
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É o espaço de trabalho com os painéis, montado pela árvore de divisões: dividir à direita ou abaixo, arrastar as divisórias e igualar com clique duplo. Em telas estreitas mostra só o painel ativo.
+
+Não monte de novo: ele já fica na raiz do app.
 
 ## Trecho de código
 

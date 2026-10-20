@@ -36,7 +36,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para o conteúdo de uma aba de item num painel: a prova da fonte ou do conjunto, com as abas de partes da prova e os controles de fundo e corpo. É o que aparece quando alguém abre um item.
+
+Não use para listar vários itens: isso é a `Collection`.
 
 ## Trecho de código
 

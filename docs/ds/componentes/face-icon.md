@@ -43,7 +43,9 @@ Também aceita as props herdadas: 487 de `react`.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para desenhar uma carinha da escala de nota (de Muito ruim a Ótimo) como ícone. É sempre decorativa: o texto ou o controle em volta diz o nome ("Bom").
+
+Para mostrar a nota de um item, use o `ScoreBadge` ou o `ScoreFace`. Para dar nota, use o `ScoreControl`.
 
 ## Trecho de código
 

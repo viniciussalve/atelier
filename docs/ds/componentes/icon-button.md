@@ -45,7 +45,9 @@ Também aceita as props herdadas: 290 de `react`.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para um botão quadrado só com ícone, como fechar, dividir ou abrir o menu de um painel. O rótulo aparece como dica ao passar o mouse e dá o nome para leitores de tela, então ele é obrigatório.
+
+Se o botão tem texto visível, use um botão comum. Para só mostrar uma dica num elemento que não é botão, use o `Tooltip`.
 
 ## Trecho de código
 

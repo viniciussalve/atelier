@@ -45,7 +45,9 @@ The filters applied, as chips, and a way to clear them; nothing when none is.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para filtrar a coleção. `FilterButton` é o botão "Filtros" que abre todas as facetas (veredito, status, nota mínima, tags, licença, estilo, formato) com a contagem de cada opção; `ActiveFilters` mostra os filtros aplicados como chips com X e o "Limpar filtros".
+
+Uma faceta nova entra aqui, não como um controle solto na barra da coleção.
 
 ## Trecho de código
 

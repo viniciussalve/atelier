@@ -40,7 +40,9 @@ An icon set's proof, one tab at a time: samples, sizes, or the set in use.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+A prova de um conjunto de ícones, uma aba por vez: amostras (aceita nomes novos e mostra tracejado o que o conjunto não tem), tamanhos e o conjunto em componentes.
+
+Para a prova de uma fonte, use as partes de `font-specimen`.
 
 ## Trecho de código
 

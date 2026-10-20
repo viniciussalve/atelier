@@ -36,7 +36,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É um painel do espaço de trabalho, como um editor do VS Code: a faixa de abas, o menu "…" e o conteúdo da aba ativa (coleção ou item).
+
+Não monte painéis à mão: o `Workspace` monta um por folha da árvore de divisões.
 
 ## Trecho de código
 

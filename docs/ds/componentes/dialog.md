@@ -50,7 +50,9 @@ Também aceita as props herdadas: 290 de `react`, 1 de `@radix-ui/react-primitiv
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+`Modal` é o diálogo centralizado para uma tarefa que interrompe a tela, como adicionar fontes ou ver um texto para copiar: o foco fica dentro, Escape ou um clique fora fecha, e o rodapé fica visível enquanto o corpo rola. `DialogClose` é o botão que fecha.
+
+Para só confirmar uma ação perigosa, use o `ConfirmDialog`. Para algo pequeno preso a um botão, use o `Popover`.
 
 ## Trecho de código
 

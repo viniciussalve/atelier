@@ -58,7 +58,9 @@ The character set, grouped, in cells big enough to judge each glyph.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+As partes da prova de uma fonte: `FontProof` é a folha de prova com textos em vários corpos, `FontWeights` mostra os pesos e `FontGlyphs` mostra o conjunto de caracteres em células. Cada uma é uma aba da prova da fonte.
+
+Para a prova de um conjunto de ícones, use o `IconSpecimen`.
 
 ## Trecho de código
 

@@ -39,7 +39,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a paleta do ⌘K / Ctrl+K: abrir um item, uma pasta ou rodar um comando digitando o nome. Um comando novo do app entra na lista dela.
+
+Não use para um menu de ações de um item ou painel: para isso há o `DropdownMenu`.
 
 ## Trecho de código
 

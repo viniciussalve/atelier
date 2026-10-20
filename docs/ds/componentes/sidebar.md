@@ -38,7 +38,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a barra lateral do app: a escolha da biblioteca (Fontes ou Ícones), as vistas rápidas e o explorador de pastas. Abaixo de 860 px vira uma gaveta. Já fica montada uma vez na raiz.
+
+Não monte de novo: uma vista nova entra na lista de vistas dela.
 
 ## Trecho de código
 

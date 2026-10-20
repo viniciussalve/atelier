@@ -35,7 +35,9 @@ Sem props.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a coluna do inspetor: a avaliação e os detalhes do item do painel ativo. Em telas largas é uma coluna; em telas estreitas, uma gaveta. Começa fechado e abre pelo botão "Avaliar".
+
+Não use para mostrar avaliação dentro de um card ou de uma linha: para isso há os `badges`.
 
 ## Trecho de código
 

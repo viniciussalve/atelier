@@ -40,7 +40,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É a árvore de pastas e itens da barra lateral: abrir e recolher pastas, arrastar itens para uma pasta, renomear e procurar. Só faz sentido dentro da `Sidebar`.
+
+Não use para listar itens fora da barra lateral: para isso há a `Collection`.
 
 ## Trecho de código
 

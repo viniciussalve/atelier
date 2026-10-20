@@ -85,7 +85,9 @@ Também aceita as props herdadas: 280 de `react`, 2 de `@radix-ui/react-menu`, 1
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para um menu de ações que abre num botão, como o "…" de um painel, as ações de uma pasta ou a ordenação da coleção. Tem itens, itens de marcar, grupos de rádio, rótulos, separadores e submenus; `tone="danger"` marca um item destrutivo.
+
+Para escolher entre poucas opções sempre visíveis, use o `Segmented`. Para conteúdo livre (um formulário, um texto), use o `Popover`.
 
 ## Trecho de código
 

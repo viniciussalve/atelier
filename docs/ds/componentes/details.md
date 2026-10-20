@@ -37,7 +37,9 @@ Everything about an item that is not its evaluation.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para os detalhes de um item que não são a avaliação: nome, notas, tags, pastas (com "Adicionar à pasta") e as propriedades (tipo, licença, estilo, formato, pesos, tamanho, datas). Fica no inspetor, abaixo da avaliação.
+
+Não use para a nota e o veredito: isso é o `Scorecard`.
 
 ## Trecho de código
 

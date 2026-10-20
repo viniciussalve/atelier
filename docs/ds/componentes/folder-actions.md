@@ -48,7 +48,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para o menu de ações de uma pasta (`FolderActions`: nova subpasta, renomear, excluir) ou de um item (`ItemActions`) no explorador da barra lateral.
+
+Não use fora do explorador: para um menu de ações em outro lugar, use o `DropdownMenu` direto.
 
 ## Trecho de código
 

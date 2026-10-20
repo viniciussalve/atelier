@@ -41,7 +41,9 @@ A 1–5 score for one criterion, as five faces from Muito ruim to Ótimo. Clicki
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para dar nota de 1 a 5 a um critério, com cinco carinhas de Muito ruim a Ótimo. Clicar na carinha atual limpa a nota e as setas mudam a escolha. Fica no cabeçalho da seção da prova que o critério mede, com o lápis para a nota escrita.
+
+Para só mostrar a nota, use o `ScoreBadge` ou o `ScoreFace`.
 
 ## Trecho de código
 

@@ -35,7 +35,9 @@ Sem props.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É o aviso de "copiado" e o diálogo de copiar à mão quando o navegador não deixa copiar sozinho. Já fica montado uma vez na raiz do app.
+
+Não monte de novo: para copiar algo, chame a função de copiar do código compartilhado, que usa esta camada.
 
 ## Trecho de código
 

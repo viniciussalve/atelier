@@ -43,7 +43,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+`Field` é um campo de formulário com o rótulo em cima, para envolver um input ou um select. `Property` é uma linha de propriedade só de leitura, rótulo à esquerda e valor à direita, como nos detalhes do inspetor.
+
+Não use `Property` para algo editável: use `Field`.
 
 ## Trecho de código
 

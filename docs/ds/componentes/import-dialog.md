@@ -38,7 +38,9 @@ Adds fonts and icon sets from the catalogs. From a link it lists the suggested i
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+É o diálogo "Adicionar fonte ou conjunto…": busca no Google Fonts e no Iconify, ou mostra as sugestões de um link `/?adicionar=…` já marcadas. Nada entra sem confirmar.
+
+Não monte de novo: ele já fica na raiz do app e abre pelo ⌘K ou pelo link.
 
 ## Trecho de código
 

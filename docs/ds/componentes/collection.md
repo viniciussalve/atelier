@@ -35,7 +35,9 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para a grade ou lista de itens da vista atual, com busca, filtros, ordenação, "Escreva para testar" e seleção para comparar lado a lado. É a aba Coleção de um painel.
+
+Não use para um item só: para isso há a `AssetTab`.
 
 ## Trecho de código
 

@@ -42,7 +42,9 @@ Asks before something that cannot be undone.
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para pedir confirmação antes de uma ação que não dá para desfazer, como excluir uma pasta. Tem título, descrição, o rótulo do botão de confirmar e a ação.
+
+Não use para formulários ou conteúdo longo: para isso há o `Modal`. Para uma ação que dá para desfazer, não pergunte.
 
 ## Trecho de código
 
