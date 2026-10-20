@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { promisify } from "node:util";
 import { RAIZ } from "./gerar.mjs";
-import { fonteDoAtelier, rotasDe } from "./validar.mjs";
+import { SCHEMA, fonteDoAtelier, rotasDe } from "./validar.mjs";
 import { validarSpec } from "./validar-spec.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -88,4 +89,15 @@ test("the command prints one result per spec and exits 1 when one fails", async 
     assert.match(erro.stdout, /versao: deve ser \\"0\\"\./);
     return true;
   });
+});
+
+test("the approved v0 schema is frozen: a change becomes interface-spec.v1", () => {
+  const hash = createHash("sha256")
+    .update(readFileSync(join(RAIZ, SCHEMA)))
+    .digest("hex");
+  assert.equal(
+    hash,
+    "4c955d3db38fd19cd1b555c89ec77b2fec992890b23927d081abaf8f9ca09175",
+    "o v0 foi aprovado em 20/10/2026: crie docs/ds/interface-spec.v1.schema.json em vez de mudar este",
+  );
 });

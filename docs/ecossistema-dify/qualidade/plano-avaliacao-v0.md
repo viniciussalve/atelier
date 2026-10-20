@@ -45,7 +45,7 @@ Se a camada 1 passa e a 2 falha, o problema é na implementação. Se a 0 falha,
 
 ## Pendências pra fechar o v0
 
-- Schema da `InterfaceSpec` (ALL-91): proposta v0 em `docs/ds/interface-spec.v0.schema.json`, falta a aprovação da sala.
+- Schema da `InterfaceSpec` (ALL-91): v0 aprovado em 20/10/2026, em `docs/ds/interface-spec.v0.schema.json`.
 - `docs/ds/` (ALL-90): gerado; componentes e rotas de T19 a T21 preenchidos no CSV.
 - Lista de exceções final do Tech Lead DS → revisar T14 a T18 (T18 está como "a decidir").
 - Se a fonte virar DTCG JSON, o leitor de tokens (`scripts/ds/tokens.mjs`) já lê o formato.

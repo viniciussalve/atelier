@@ -27,14 +27,14 @@ Cada etapa é um commit, com o próprio critério de pronto.
 | 1   | Tokens                   | ALL-90          | Leitor de tokens (`scripts/ds/tokens.mjs`: `@theme` do CSS hoje, DTCG JSON depois) e `docs/ds/tokens.md`                       | Os 26 tokens do `@theme` aparecem com valor, grupo e comentário; teste do leitor nos dois formatos                                                                                                       |
 | 2   | Componentes              | ALL-90          | `docs/ds/componentes/<arquivo>.md`, um por arquivo `.tsx` de `src/components/ui` e `src/components/library`                    | Headings fixos; exports e props saem dos tipos do TypeScript; "onde aparece" sai de uma busca nos imports; cada arquivo tem metadados em minúsculas, termina em `<<<FIM>>>` e fica abaixo de 4000 tokens |
 | 3   | "Quando usar"            | ALL-90          | O único trecho escrito por IA, marcado como gerado                                                                             | Todo componente tem o texto; o gerador preserva o texto ao regenerar                                                                                                                                     |
-| 4   | Contrato v0              | ALL-91          | `docs/ds/interface-spec.v0.schema.json`                                                                                        | Cobre os campos combinados na sala (`meta`, `fonte` por token e componente, `fluxo` com `rota`/`acao`/`alvo`); marcado como **proposta** até a sala aprovar                                              |
+| 4   | Contrato v0              | ALL-91          | `docs/ds/interface-spec.v0.schema.json`                                                                                        | Cobre os campos combinados na sala (`meta`, `fonte` por token e componente, `fluxo` com `rota`/`acao`/`alvo`); aprovado em 20/10/2026                                                                    |
 | 5   | Validador                | ALL-104, ALL-97 | `scripts/ds/validar-spec.mjs`: JavaScript puro, sem dependência, pronto pra colar no nó Code do Dify; CLI `npm run ds:validar` | Confere schema, tokens, componentes e rotas; devolve `{valida, erros[], tokens_rejeitados[]}`; casos T19 a T21 do conjunto como testes                                                                   |
 | 6   | Guarda e entrega         | ALL-90          | `npm run ds:gerar`, teste que falha se `docs/ds/` estiver desatualizado, PR em draft                                           | `npm test`, lint e typecheck limpos; draft PR aberto                                                                                                                                                     |
 
 **Status (20/10/2026):** as etapas 0 a 6 estão feitas no branch deste plano, uma por commit. O que falta para fechar cada issue:
 
 - ALL-90: a conferência por amostragem do Dify Qualidade.
-- ALL-91: a revisão da sala e a aprovação do Vinicius. As três propostas novas (`lacunas`, `acao` fechada, `nome` separado de `export`) estão em `contrato-interface-spec-v0.md`.
+- ALL-91: aprovado pelo Vinicius em 20/10/2026, com as três propostas novas (`lacunas`, `acao` fechada, `nome` separado de `export`). O v0 está congelado; mudança vira v1.
 - ALL-104: montar o app no Dify. Ninguém rodou o validador dentro do sandbox de JavaScript do nó Code ainda; ele não usa nenhuma API além do JavaScript padrão, mas isso é a primeira coisa a conferir.
 
 ### Decisões tomadas aqui (revisáveis)
@@ -64,7 +64,7 @@ O material aqui não é tela: é texto lido por um recuperador e JSON lido por u
 | B     | Criar as bases conforme `conhecimento/configuracao-bases.md`                       | Dify Conhecimento | A + etapas 1 a 3 |
 | C     | Ingerir `docs/ds/` (plugin, ou script pela API de conhecimento se o plugin falhar) | Dify Conhecimento | A, B             |
 | D     | Rodar `conhecimento/teste-recuperacao.csv` e calibrar o threshold                  | Dify Qualidade    | C                |
-| E     | Aprovar o contrato v0                                                              | Sala + Vinicius   | Etapa 4          |
+| E     | ~~Aprovar o contrato v0~~ Feito em 20/10/2026                                      | Sala + Vinicius   | Etapa 4          |
 | F     | App `validar-spec` em DSL (cola o validador da etapa 5 no nó Code)                 | Dify Workflows    | E, etapa 5       |
 | G     | Fluxo piloto em DSL (ALL-93)                                                       | Dify Workflows    | E, F, D          |
 | H     | Plugin do Cursor carregado local (ALL-103)                                         | tinkabot          | G                |

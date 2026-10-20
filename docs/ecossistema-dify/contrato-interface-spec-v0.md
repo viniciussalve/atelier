@@ -1,6 +1,8 @@
 # Contrato v0 da InterfaceSpec (ALL-91)
 
-**Status: proposta.** Falta a revisão da sala (Dify Qualidade, tinkabot, Proto Bot, Dify Conhecimento) e a aprovação do Vinicius. Até lá, mudar o schema é livre; depois, toda mudança sobe a versão.
+**Status: aprovado** pelo Vinicius em 20/10/2026, com as três propostas novas abaixo.
+
+O v0 está congelado. Qualquer mudança no schema vira `interface-spec.v1.schema.json`, com `versao: "1"`, e o v0 fica como está até nenhum fluxo usá-lo. Um teste do `npm test` falha se o arquivo do v0 mudar.
 
 O schema único é `docs/ds/interface-spec.v0.schema.json`. Nenhum outro lugar copia o schema: o DSL do fluxo piloto (ALL-93) injeta este arquivo, e a skill do Cursor aponta pra ele.
 
@@ -31,7 +33,7 @@ O schema único é `docs/ds/interface-spec.v0.schema.json`. Nenhum outro lugar c
 | `lacunas[]`     | O que o pedido precisa e o atelier não tem (`falta`, `motivo`).             | —                                                |
 | `meta`          | `flow_version`, `prompt_version`, `tentativas`, `tokens_rejeitados`.        | Os quatro campos                                 |
 
-### O que é novo e precisa de revisão
+### O que entrou além do combinado na sala
 
 - **`lacunas`.** O caso T21 (gráfico de pizza) pede que a spec diga o que falta em vez de inventar um componente. Sem um campo pra isso, o LLM tende a preencher `componentes` com algo que não existe.
 - **`acao` como lista fechada:** `abrir`, `clicar`, `digitar`, `arrastar`, `pressionar`, `ver`. Fechada, o Proto Bot sabe reproduzir cada passo; aberta, cada spec inventaria um verbo.

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "atelier/interface-spec/v0",
   "title": "InterfaceSpec v0",
-  "description": "PROPOSTA (ALL-91), ainda não aprovada pela sala. O que o fluxo piloto devolve para um pedido de tela do atelier. Tokens e componentes usam o nome exato de docs/ds.",
+  "description": "Contrato v0 (ALL-91), aprovado em 20/10/2026. Congelado: mudança vira v1 num arquivo novo. O que o fluxo piloto devolve para um pedido de tela do atelier. Tokens e componentes usam o nome exato de docs/ds.",
   "type": "object",
   "additionalProperties": false,
   "required": ["versao", "pedido", "tela", "tokens", "componentes", "fluxo", "lacunas", "meta"],
