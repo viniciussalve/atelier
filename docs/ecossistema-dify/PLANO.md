@@ -31,6 +31,12 @@ Cada etapa é um commit, com o próprio critério de pronto.
 | 5   | Validador                | ALL-104, ALL-97 | `scripts/ds/validar-spec.mjs`: JavaScript puro, sem dependência, pronto pra colar no nó Code do Dify; CLI `npm run ds:validar` | Confere schema, tokens, componentes e rotas; devolve `{valida, erros[], tokens_rejeitados[]}`; casos T19 a T21 do conjunto como testes                                                                   |
 | 6   | Guarda e entrega         | ALL-90          | `npm run ds:gerar`, teste que falha se `docs/ds/` estiver desatualizado, PR em draft                                           | `npm test`, lint e typecheck limpos; draft PR aberto                                                                                                                                                     |
 
+**Status (20/10/2026):** as etapas 0 a 6 estão feitas no branch deste plano, uma por commit. O que falta para fechar cada issue:
+
+- ALL-90: a conferência por amostragem do Dify Qualidade.
+- ALL-91: a revisão da sala e a aprovação do Vinicius. As três propostas novas (`lacunas`, `acao` fechada, `nome` separado de `export`) estão em `contrato-interface-spec-v0.md`.
+- ALL-104: montar o app no Dify. Ninguém rodou o validador dentro do sandbox de JavaScript do nó Code ainda; ele não usa nenhuma API além do JavaScript padrão, mas isso é a primeira coisa a conferir.
+
 ### Decisões tomadas aqui (revisáveis)
 
 - **Validador em JavaScript, não Python.** O repositório é Node e o `npm test` já roda `node --test`. O nó Code do Dify aceita JavaScript, então o mesmo arquivo serve para a CI e para o app `validar-spec`, e a regra fica num lugar só (pedido da ALL-93). Ele substitui o `validar_spec.py` do kickstart.
@@ -38,6 +44,7 @@ Cada etapa é um commit, com o próprio critério de pronto.
 - **Um `.md` por arquivo, não por export.** Os exemplos do teste de recuperação já assumem isso (`segmented.md`, `dialog.md`) e um arquivo como `dropdown-menu.tsx` só faz sentido inteiro. O metadado `export` lista todos os exports do arquivo.
 - **"Telas onde aparece" = arquivos que importam o componente.** O atelier é uma tela só (`/`) com áreas (barra lateral, coleção, painéis, inspetor). A área sai do caminho do arquivo que importa.
 - **Rotas reais = arquivos de `src/routes/`**, lidos pelo validador, sem lista escrita à mão.
+- **Schema conferido por um subconjunto de JSON Schema escrito no validador**, sem `ajv`: são só as palavras-chave que o schema v0 usa. Uma palavra-chave nova no schema precisa entrar no validador, e um teste falha enquanto ela não entrar.
 
 ### As cinco lentes, aplicadas a este material
 

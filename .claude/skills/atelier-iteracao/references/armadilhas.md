@@ -53,6 +53,9 @@ Cada item já causou um bug ou custou tempo neste projeto. Para cada um vai o si
 - **O Iconify devolve mais ícones do que o pedido.**
   - Causa: a busca dele tem limite mínimo de 32.
   - O que fazer: peça ao menos 32 e corte no limite pedido (`searchIcons` já faz).
+- **`npm test` falha com "docs/ds/ is up to date with the code".**
+  - Causa: você mudou um componente de `src/components/ui` ou `src/components/library`, uma rota ou um token, e `docs/ds/` (a fonte das bases do Dify) ficou para trás.
+  - O que fazer: rode `npm run ds:gerar` e commite `docs/ds/` junto. Componente novo nasce com "Quando usar" pendente: escreva o texto na página (é o único trecho que o gerador preserva).
 - **Rota de servidor nova não existe para o `tsc`.**
   - Causa: o `src/routeTree.gen.ts` só se refaz quando o dev ou o build rodam.
   - O que fazer: suba o dev antes do typecheck e commite o arquivo gerado (ele está no `.prettierignore`).

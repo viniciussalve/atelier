@@ -173,3 +173,25 @@ test("without lists, only the schema is checked; non-JSON input is an error, not
   });
   assert.equal(validarSpec(JSON.stringify(spec()), BASE).valida, true);
 });
+
+test("the validator knows every keyword the schema uses", () => {
+  const conhecidas = new Set([
+    ...["$schema", "$id", "title", "description", "type", "const", "enum", "pattern"],
+    ...["minLength", "minimum", "minItems", "items", "required", "properties"],
+    "additionalProperties",
+  ]);
+  const usadas = new Set();
+  const visitar = (no) => {
+    for (const [chave, valor] of Object.entries(no)) {
+      usadas.add(chave);
+      if (chave === "properties") Object.values(valor).forEach(visitar);
+      else if (chave === "items") visitar(valor);
+    }
+  };
+  visitar(SCHEMA);
+  assert.deepEqual(
+    [...usadas].filter((chave) => !conhecidas.has(chave)),
+    [],
+    "palavra-chave nova no schema: ensine o validador (checarSchema) antes",
+  );
+});

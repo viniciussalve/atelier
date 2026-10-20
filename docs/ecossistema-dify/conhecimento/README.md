@@ -13,7 +13,7 @@ Alvo: **Dify 1.17.1 self-hosted**. Dono: Dify Conhecimento. Nada aqui foi aplica
 ## Ordem de execução
 
 1. Rodar `roteiro-all-96-plugin-github.md` (decide plugin vs. API).
-2. Proto Bot gera `docs/ds/` (ALL-90).
+2. ~~Proto Bot gera `docs/ds/` (ALL-90).~~ Feito: `npm run ds:gerar` (veja `../PLANO.md`).
 3. Criar as duas bases conforme `configuracao-bases.md`.
 4. Ingerir pelo caminho decidido no passo 1.
 5. Rodar `teste-recuperacao.csv` no Retrieval Testing (ou pela API de teste de recuperação) e anotar os scores.
