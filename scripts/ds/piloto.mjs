@@ -109,9 +109,10 @@ export const CODIGO_CONTEXTO = `function main({ componentes, regras }) {
       "## Regras do DS",
       bloco(regras, "") || "(nenhuma regra recuperada)",
     ].join("\\n\\n"),
-    // Zero tells the evaluator the bases gave nothing, so component cases
-    // and the screen trap measured nothing.
-    recuperados: lista(componentes).length + lista(regras).length,
+    // Counted per base: zero components tells the evaluator that component
+    // cases and the screen trap measured nothing, whatever the rules gave.
+    componentes_recuperados: lista(componentes).length,
+    regras_recuperadas: lista(regras).length,
   };
 }
 `;
@@ -204,7 +205,8 @@ export function pilotoApp({ validador, fonte, schema, tokensMd, config }) {
       ],
       outputs: {
         contexto: { type: "string", children: null },
-        recuperados: { type: "number", children: null },
+        componentes_recuperados: { type: "number", children: null },
+        regras_recuperadas: { type: "number", children: null },
       },
     }),
     {
@@ -322,11 +324,13 @@ export function pilotoApp({ validador, fonte, schema, tokensMd, config }) {
           value_selector: [ID.laco, nome],
           value_type: tipo,
         }))
-        .concat({
-          variable: "recuperados",
-          value_selector: [ID.contexto, "recuperados"],
-          value_type: "number",
-        }),
+        .concat(
+          ["componentes_recuperados", "regras_recuperadas"].map((nome) => ({
+            variable: nome,
+            value_selector: [ID.contexto, nome],
+            value_type: "number",
+          })),
+        ),
     }),
   ];
   const edges = [

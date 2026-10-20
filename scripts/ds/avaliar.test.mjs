@@ -323,26 +323,29 @@ test("--casos with no value stops instead of running every case", async () => {
   );
 });
 
-test("reads how many chunks the bases gave, and warns when they gave none", async () => {
+test("reads how many component chunks came back, and warns when none did", async () => {
   const fetch = async () =>
     sse({
       event: "workflow_finished",
-      data: { status: "succeeded", outputs: { spec: t19, recuperados: 0 } },
+      data: {
+        status: "succeeded",
+        outputs: { spec: t19, componentes_recuperados: 0, regras_recuperadas: 4 },
+      },
     });
   const r = await rodarFluxo("p", { url: "http://dify/v1", chave: "k", fetch });
-  assert.equal(r.recuperados, 0);
+  assert.equal(r.componentes_recuperados, 0, "rules found do not hide empty components");
   const antigo = await rodarFluxo("p", {
     url: "http://dify/v1",
     chave: "k",
     fetch: async () =>
       sse({ event: "workflow_finished", data: { status: "succeeded", outputs: { spec: t19 } } }),
   });
-  assert.equal(antigo.recuperados, null, "a flow without the output says nothing");
+  assert.equal(antigo.componentes_recuperados, null, "a flow without the output says nothing");
 
   const caso = { id: "T21", camada: "spec", tipo: "armadilha", esperado: "" };
   const resultados = [
-    { ...avaliarCaso(caso, t19, fonte), recuperados: 0 },
-    { ...avaliarCaso({ ...caso, id: "T19" }, t19, fonte), recuperados: 5 },
+    { ...avaliarCaso(caso, t19, fonte), componentes_recuperados: 0 },
+    { ...avaliarCaso({ ...caso, id: "T19" }, t19, fonte), componentes_recuperados: 3 },
   ];
   const md = relatorioMd({
     data: "d",
@@ -351,7 +354,7 @@ test("reads how many chunks the bases gave, and warns when they gave none", asyn
     metricas: metricas(resultados),
     comparacao: [],
   });
-  assert.match(md, /\*\*Atenção:\*\* a busca nas bases voltou vazia em 1 de 2 casos \(T21\)/);
+  assert.match(md, /\*\*Atenção:\*\* a busca de componentes voltou vazia em 1 de 2 casos \(T21\)/);
   const cheio = relatorioMd({
     data: "d",
     fluxo: "f",

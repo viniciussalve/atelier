@@ -25,9 +25,9 @@ Importado e rodado numa instância 1.17.1 pelo Vinicius em 20/10/2026: funcionou
 
 ## `interface-spec.yml` (ALL-93, fluxo piloto)
 
-Workflow: Início (`pedido`) → busca em "Componentes" (Top K 3) → busca em "Regras do DS" (Top K 4) → Montar contexto → Laço, até 3 tentativas: LLM escreve a spec → Validar e preencher meta → Guardar a tentativa → Fim (`spec`, `valida`, `erros`, `tentativas`, `recuperados`).
+Workflow: Início (`pedido`) → busca em "Componentes" (Top K 3) → busca em "Regras do DS" (Top K 4) → Montar contexto → Laço, até 3 tentativas: LLM escreve a spec → Validar e preencher meta → Guardar a tentativa → Fim (`spec`, `valida`, `erros`, `tentativas`, `componentes_recuperados`, `regras_recuperadas`).
 
-`recuperados` é quantos trechos as duas buscas trouxeram. Com zero, o avaliador avisa que a rodada não mediu componentes nem a armadilha de tela.
+`componentes_recuperados` e `regras_recuperadas` contam os trechos que cada busca trouxe. Com zero componentes, o avaliador avisa que a rodada não mediu componentes nem a armadilha de tela, mesmo que as regras tenham voltado.
 
 - **Tokens:** a lista inteira de `docs/ds/tokens.md` vai no prompt, sem busca por Top K.
 - **Saída estruturada:** o LLM devolve a spec no schema v0 sem `meta`.
