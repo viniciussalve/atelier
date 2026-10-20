@@ -300,3 +300,25 @@ test("--casos with an unknown id stops before calling the flow", async () => {
     },
   );
 });
+
+test("a spec that does not repeat the request it was sent fails, whitespace aside", () => {
+  const caso = { id: "T19", camada: "spec", tipo: "positivo", esperado: "", pedido: t19.pedido };
+  assert.equal(avaliarCaso(caso, { ...t19, pedido: `  ${t19.pedido}\n` }, fonte).valida, true);
+  const outro = avaliarCaso(caso, { ...t19, pedido: "Outra tela" }, fonte);
+  assert.equal(outro.valida, false);
+  assert.match(outro.erros.at(-1), /não repete o pedido/);
+});
+
+test("--casos with no value stops instead of running every case", async () => {
+  const script = join(RAIZ, "scripts/ds/avaliar.mjs");
+  await assert.rejects(
+    execFileAsync(process.execPath, [script, "--casos"], {
+      env: { ...process.env, DIFY_API_URL: "http://127.0.0.1:9/v1", DIFY_SPEC_API_KEY: "k" },
+    }),
+    (erro) => {
+      assert.equal(erro.code, 2);
+      assert.match(erro.stderr, /\(nenhum pedido\)/);
+      return true;
+    },
+  );
+});

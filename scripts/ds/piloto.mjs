@@ -74,14 +74,15 @@ export const versaoDoPrompt = ({ sistema, usuario }) =>
   createHash("sha256").update(`${sistema}\n---\n${usuario}`).digest("hex").slice(0, 12);
 
 const MAIN_VALIDAR = [
-  "function main({ gerado, tentativas, rejeitados, flow_version, prompt_version }) {",
+  "function main({ gerado, pedido, tentativas, rejeitados, flow_version, prompt_version }) {",
   "  const anteriores = Array.isArray(rejeitados) ? rejeitados : [];",
   "  const n = (Number(tentativas) || 0) + 1;",
   "  const base = gerado && typeof gerado === 'object' && !Array.isArray(gerado) ? gerado : {};",
-  "  // meta comes from the flow, never from the LLM.",
+  "  // meta and pedido come from the flow, never from the LLM.",
   "  const { meta: _meta, ...corpo } = base;",
   "  const spec = {",
   "    ...corpo,",
+  "    pedido: typeof pedido === 'string' ? pedido : corpo.pedido,",
   "    meta: { flow_version, prompt_version, tentativas: n, tokens_rejeitados: anteriores },",
   "  };",
   "  const r = validarSpec(spec, FONTE);",
@@ -281,6 +282,7 @@ export function pilotoApp({ validador, fonte, schema, tokensMd, config }) {
       code: codigoDoNo(validador, fonte, MAIN_VALIDAR),
       variables: [
         { variable: "gerado", value_selector: [ID.llm, "structured_output"] },
+        { variable: "pedido", value_selector: [ID.inicio, "pedido"] },
         { variable: "tentativas", value_selector: [ID.laco, "tentativas"] },
         { variable: "rejeitados", value_selector: [ID.laco, "rejeitados"] },
         { variable: "flow_version", value_selector: ["env", "flow_version"] },

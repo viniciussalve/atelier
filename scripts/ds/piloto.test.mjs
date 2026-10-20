@@ -168,3 +168,18 @@ test("contexto labels each chunk with the path the spec cites as fonte", () => {
   );
   assert.match(contexto, /## Regras do DS\n\n\(nenhuma regra recuperada\)/);
 });
+
+test("validar takes pedido from the Start input, not from the LLM", () => {
+  const main = rodar(no(montar(), "Validar e preencher meta").data.code);
+  const { meta: _meta, ...gerado } = t19;
+  const r = main({
+    gerado: { ...gerado, pedido: "reescrito pelo LLM" },
+    pedido: t19.pedido,
+    tentativas: 0,
+    rejeitados: [],
+    flow_version: "1",
+    prompt_version: "p",
+  });
+  assert.equal(r.spec.pedido, t19.pedido);
+  assert.equal(r.valida, 1);
+});

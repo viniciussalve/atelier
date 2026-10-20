@@ -90,6 +90,13 @@ export function avaliarCaso(caso, spec, fonte, erroFluxo = "sem resposta") {
     };
   }
   const v = validarSpec(spec, fonte);
+  // The contract has `pedido` repeat the request: a spec for another case
+  // (a cache, a mix-up) must not pass as this one's.
+  const normal = (t) => (typeof t === "string" ? t.replace(/\s+/g, " ").trim() : t);
+  if (caso.pedido !== undefined && normal(spec?.pedido) !== normal(caso.pedido)) {
+    v.valida = false;
+    v.erros = [...v.erros, "pedido: a spec não repete o pedido enviado ao fluxo."];
+  }
   const nomes = Array.isArray(spec?.tokens) ? spec.tokens.map((t) => t?.nome) : [];
   const r = {
     ...base,
@@ -212,7 +219,9 @@ export function versoesDe(resultados) {
 const ROTULOS = {
   spec_valida: "Spec válida",
   token_certo: "Token certo",
-  token_inventado_primeira: "Token inventado (1ª tentativa)",
+  // tokens_rejeitados holds every attempt before the last (contract v0), so
+  // this is "before the correction", the plan's formula, not attempt one alone.
+  token_inventado_primeira: "Token inventado (antes da correção)",
   token_inventado_final: "Token inventado (final)",
   falso_positivo: "Falso positivo",
   armadilha: "Armadilha",
@@ -365,7 +374,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     );
     process.exit(2);
   }
-  const filtro = process.argv.find((a, i) => process.argv[i - 1] === "--casos")?.split(",");
+  const posicao = process.argv.indexOf("--casos");
+  const filtro =
+    posicao === -1 ? undefined : (process.argv[posicao + 1] ?? "").split(",").filter(Boolean);
   const todos = casosDe(readFileSync(join(RAIZ, CONJUNTO), "utf8"));
   const desconhecidos = (filtro ?? []).filter((id) => !todos.some((c) => c.id === id));
   if (filtro && (!filtro.length || desconhecidos.length)) {

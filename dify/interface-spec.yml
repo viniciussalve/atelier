@@ -719,14 +719,15 @@ workflow:
           // Dify refuses an output array longer than 30 (CODE_MAX_STRING_ARRAY_LENGTH).
           const LIMITE = 30;
 
-          function main({ gerado, tentativas, rejeitados, flow_version, prompt_version }) {
+          function main({ gerado, pedido, tentativas, rejeitados, flow_version, prompt_version }) {
             const anteriores = Array.isArray(rejeitados) ? rejeitados : [];
             const n = (Number(tentativas) || 0) + 1;
             const base = gerado && typeof gerado === 'object' && !Array.isArray(gerado) ? gerado : {};
-            // meta comes from the flow, never from the LLM.
+            // meta and pedido come from the flow, never from the LLM.
             const { meta: _meta, ...corpo } = base;
             const spec = {
               ...corpo,
+              pedido: typeof pedido === 'string' ? pedido : corpo.pedido,
               meta: { flow_version, prompt_version, tentativas: n, tokens_rejeitados: anteriores },
             };
             const r = validarSpec(spec, FONTE);
@@ -743,6 +744,10 @@ workflow:
           value_selector:
           - "1760918500011"
           - "structured_output"
+        - variable: "pedido"
+          value_selector:
+          - "1760918500001"
+          - "pedido"
         - variable: "tentativas"
           value_selector:
           - "1760918500010"
