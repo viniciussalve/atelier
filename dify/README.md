@@ -22,3 +22,35 @@ A ferramenta MCP leva o nome do app, `validar-spec`, e recebe `spec` como texto.
 - As listas de saída ficam em no máximo 30 itens (`CODE_MAX_STRING_ARRAY_LENGTH`); o 30º erro vira "… e mais N erros.".
 
 Importado e rodado numa instância 1.17.1 pelo Vinicius em 20/10/2026: funcionou.
+
+## `interface-spec.yml` (ALL-93, fluxo piloto)
+
+Workflow: Início (`pedido`) → busca em "Componentes" (Top K 3) → busca em "Regras do DS" (Top K 4) → Montar contexto → Laço, até 3 tentativas: LLM escreve a spec → Validar e preencher meta → Guardar a tentativa → Fim (`spec`, `valida`, `erros`, `tentativas`).
+
+- **Tokens:** a lista inteira de `docs/ds/tokens.md` vai no prompt, sem busca por Top K.
+- **Saída estruturada:** o LLM devolve a spec no schema v0 sem `meta`.
+- **Validação e `meta`:** o nó Code roda o mesmo validador do `validar-spec` e preenche `meta` (`flow_version` e `prompt_version` das variáveis de ambiente, `tentativas`, `tokens_rejeitados` das tentativas anteriores).
+- **Correção:** se a spec for inválida, os erros voltam ao LLM na tentativa seguinte.
+- **Avaliação:** o avaliador (`npm run ds:avaliar`) chama este fluxo pela API.
+
+### Configurar
+`dify/interface-spec.config.json`, versionado e sem segredo:
+- `modelo`: `langgenius/deepseek/deepseek` + `deepseek-flash`. O plugin do DeepSeek não declara saída estruturada, então o Dify pede JSON pelo prompt (`json_object`); por isso o `thinking` fica desligado nos nós.
+- `bases`: os ids das bases "Componentes" e "Regras do DS". Vazios até as bases existirem; com o id vazio, a busca volta sem nada e o fluxo roda só com os tokens.
+- `flow_version`: suba a cada mudança do fluxo. O `prompt_version` é gerado do texto do prompt.
+- `tentativas`: limite do laço.
+
+Mudou a configuração: `npm run ds:gerar` e reimporte.
+
+### O que mudou em relação ao desenho da ALL-93
+- **Sem Parameter Extractor.** `configuracao-bases.md` manda testar primeiro o filtro de metadados Automático; o extrator entra só se o Automático errar no teste de recuperação.
+- **Validação no próprio fluxo, não como ferramenta.** Chamar o `validar-spec` como ferramenta exigiria o id dele na sua instância. O nó Code é gerado do mesmo `scripts/ds/validar-spec.mjs`, então a regra continua num lugar só.
+- **Sem a ferramenta do `/mcp` do atelier.** O catálogo de fontes e ícones não entra na spec v0. Fica para quando um pedido precisar dele.
+
+### O que foi conferido sem uma instância
+- Os 10 nós validados nas classes do `graphon` 0.7.0, incluindo a busca nas bases, o laço e o nó LLM com saída estruturada.
+- Toda referência `{{#…#}}` aponta para um nó que existe.
+- As variáveis do laço convertidas pelo próprio código do Dify, com os valores iniciais certos.
+- O nó de validação e o de contexto rodados com o invólucro do executor de JavaScript do Dify.
+
+Ninguém importou nem rodou este fluxo numa instância ainda.

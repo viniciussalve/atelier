@@ -14,9 +14,10 @@ import {
   quandoUsarDe,
 } from "./componentes.mjs";
 import { DSL_VALIDAR, lerValidador, validarSpecDsl } from "./dify.mjs";
+import { DSL_PILOTO, lerConfig, pilotoDsl } from "./piloto.mjs";
 import { RAIZ } from "./raiz.mjs";
 import { lerTokens, tokensMd } from "./tokens.mjs";
-import { fonteDoAtelier } from "./validar.mjs";
+import { SCHEMA, fonteDoAtelier } from "./validar.mjs";
 
 export { RAIZ };
 export const PASTA = "docs/ds";
@@ -38,7 +39,18 @@ export function gerarDocs(raiz = RAIZ) {
     arquivos.set(caminho, md);
   }
   // Built from the pages above, so one run is enough.
-  arquivos.set(DSL_VALIDAR, validarSpecDsl(lerValidador(raiz), fonteDoAtelier(raiz, arquivos)));
+  const fonte = fonteDoAtelier(raiz, arquivos);
+  arquivos.set(DSL_VALIDAR, validarSpecDsl(lerValidador(raiz), fonte));
+  arquivos.set(
+    DSL_PILOTO,
+    pilotoDsl({
+      validador: lerValidador(raiz),
+      fonte,
+      schema: JSON.parse(readFileSync(join(raiz, SCHEMA), "utf8")),
+      tokensMd: arquivos.get(`${PASTA}/tokens.md`),
+      config: lerConfig(raiz),
+    }),
+  );
   return arquivos;
 }
 

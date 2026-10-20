@@ -1,0 +1,12 @@
+{
+  "modelo": {
+    "provider": "langgenius/deepseek/deepseek",
+    "name": "deepseek-flash"
+  },
+  "bases": {
+    "componentes": "",
+    "regras": ""
+  },
+  "flow_version": "1",
+  "tentativas": 3
+}
