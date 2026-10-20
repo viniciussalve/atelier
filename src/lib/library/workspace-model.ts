@@ -83,7 +83,7 @@ export const ICON_SIZE_RANGE = { min: 16, max: 48 } as const;
 
 export const DEFAULT_PANE_SETTINGS: PaneSettings = {
   sampleText:
-    "A pessoa pergunta e o agente responde. O que fica na tela precisa ser lido sem esforço, inclusive quando a resposta passa de um parágrafo. I, l e 1, e também O e 0, têm de continuar distintos em 10, 100 e na palavra Ilustração.",
+    "Você pergunta, o agente responde. Uma boa fonte de leitura some na frente do texto: o olho corre pela linha, acha o começo da seguinte e só para quando a ideia termina.",
   fontSize: 16,
   iconSize: 24,
   ground: "paper",
@@ -607,11 +607,19 @@ function clamp(value: unknown, range: { min: number; max: number }, fallback: nu
     : fallback;
 }
 
+/** Default reading texts of earlier versions: a pane still showing one gets the current default. */
+export const LEGACY_SAMPLE_TEXTS = [
+  "A pessoa pergunta e o agente responde. O que fica na tela precisa ser lido sem esforço, inclusive quando a resposta passa de um parágrafo. I, l e 1, e também O e 0, têm de continuar distintos em 10, 100 e na palavra Ilustração.",
+];
+
 function sanitizeSettings(raw: unknown): PaneSettings {
   const value = isObject(raw) ? raw : {};
   const defaults = DEFAULT_PANE_SETTINGS;
   return {
-    sampleText: typeof value.sampleText === "string" ? value.sampleText : defaults.sampleText,
+    sampleText:
+      typeof value.sampleText === "string" && !LEGACY_SAMPLE_TEXTS.includes(value.sampleText)
+        ? value.sampleText
+        : defaults.sampleText,
     fontSize: clamp(value.fontSize, FONT_SIZE_RANGE, defaults.fontSize),
     iconSize: clamp(value.iconSize, ICON_SIZE_RANGE, defaults.iconSize),
     ground: GROUND_IDS.includes(value.ground as PreviewGround)

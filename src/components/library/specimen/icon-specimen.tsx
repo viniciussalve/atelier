@@ -128,18 +128,17 @@ function Sizes({ asset, color }: { asset: Asset; color: string }) {
           </div>
         </div>
       ))}
-      <div className="space-y-2 border-t border-current/10 pt-4 text-[14px]">
-        {names.slice(0, 3).map((name) => (
-          <p key={name} className="flex items-center gap-2">
-            <Glyph prefix={asset.iconKey} name={name} size={16} color={color} />
-            Texto de 14 px ao lado de um ícone de 16 px
-          </p>
-        ))}
-      </div>
     </div>
   );
 }
 
+/** An icon name as a label: "arrow-right" reads "Arrow right". */
+function labelOf(name: string): string {
+  const words = name.replace(/-/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** One small screen where every icon sits next to its own name: tabs, a list and two buttons. */
 function InUse({
   asset,
   color,
@@ -152,56 +151,64 @@ function InUse({
   inverse: string;
 }) {
   const names = asset.samples;
+  const tabs = names.slice(0, 3);
+  const items = names.slice(3, 6);
+  const [secondary, primary] = names.slice(6, 8);
+  const glyph = (name: string, tint = color) => (
+    <Glyph prefix={asset.iconKey} name={name} size={16} color={tint} />
+  );
+  // A set with few samples shows fewer parts: nothing is drawn empty.
   return (
-    <div className="max-w-md space-y-4">
-      <div className="flex gap-5">
-        {names.slice(0, 4).map((name) => (
-          <span key={name} className="grid justify-items-center gap-1 text-[11px] opacity-80">
-            <Glyph prefix={asset.iconKey} name={name} size={20} color={color} />
-            {name.split("-")[0]}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <span
-          className={cn(
-            "inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm",
-            dark ? "bg-paper text-paper-fg" : "bg-ink text-fg",
-          )}
-        >
-          {names[0] ? (
-            <Glyph prefix={asset.iconKey} name={names[0]} size={16} color={inverse} />
-          ) : null}
-          Ação
-        </span>
-        <span className="inline-flex h-9 items-center gap-2 rounded-md border border-current/20 px-3 text-sm">
-          {names[1] ? (
-            <Glyph prefix={asset.iconKey} name={names[1]} size={16} color={color} />
-          ) : null}
-          Secundária
-        </span>
-      </div>
-      <div className="flex items-center gap-3 rounded-lg border border-current/15 px-3 py-2">
-        {names[2] ? <Glyph prefix={asset.iconKey} name={names[2]} size={16} color={color} /> : null}
-        <span>
-          <span className="block text-sm">{asset.name}</span>
-          <span className="block text-xs opacity-70">Item de lista a 16 px</span>
-        </span>
-      </div>
-      <div className="flex gap-1 border-b border-current/15">
-        {names.slice(0, 3).map((name, index) => (
+    <div className="max-w-sm overflow-hidden rounded-lg border border-current/15 text-sm">
+      <div className="flex gap-1 border-b border-current/15 px-2">
+        {tabs.map((name, index) => (
           <span
             key={name}
             className={cn(
-              "inline-flex h-9 items-center gap-1.5 px-3 text-sm",
+              "-mb-px inline-flex h-9 min-w-0 items-center gap-1.5 px-2",
               index === 0 ? "border-b-2 border-current" : "opacity-60",
             )}
           >
-            <Glyph prefix={asset.iconKey} name={name} size={16} color={color} />
-            {name.split("-")[0]}
+            {glyph(name)}
+            <span className="truncate">{labelOf(name)}</span>
           </span>
         ))}
       </div>
+      {items.length ? (
+        <ul className="p-1">
+          {items.map((name, index) => (
+            <li
+              key={name}
+              className={cn(
+                "flex h-8 items-center gap-2 rounded-md px-2",
+                index === 0 && "bg-current/[0.06]",
+              )}
+            >
+              {glyph(name)}
+              <span className="truncate">{labelOf(name)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {secondary ? (
+        <div className="flex flex-wrap justify-end gap-2 border-t border-current/15 p-2">
+          <span className="inline-flex h-8 items-center gap-2 rounded-md border border-current/20 px-3">
+            {glyph(secondary)}
+            {labelOf(secondary)}
+          </span>
+          {primary ? (
+            <span
+              className={cn(
+                "inline-flex h-8 items-center gap-2 rounded-md px-3 font-medium",
+                dark ? "bg-paper text-paper-fg" : "bg-ink text-fg",
+              )}
+            >
+              {glyph(primary, inverse)}
+              {labelOf(primary)}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

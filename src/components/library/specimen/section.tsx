@@ -3,12 +3,11 @@ import { ScoreControl } from "@/components/library/evaluation/score-control";
 import { score } from "@/lib/library/commands";
 import { criteriaForSection } from "@/lib/library/criteria";
 import { useLibrary } from "@/lib/library/store";
-import { cn } from "@/lib/utils";
 import type { Asset, SpecimenSection as SectionId } from "@/lib/library/types";
 
 /**
  * One part of a specimen. When a criterion is judged on this part, its score
- * sits in the section header, so it can be rated while looking at it.
+ * opens the section, so it can be rated while looking at it; otherwise the title does.
  */
 export function SpecimenSection({
   title,
@@ -27,31 +26,28 @@ export function SpecimenSection({
 }) {
   const setCriterionNote = useLibrary((state) => state.setCriterionNote);
   const criteria = section ? criteriaForSection(asset.kind, section) : [];
-  // A criterion named like the section already labels it; the section keeps its name for assistive tech.
-  const repeated = criteria.some((criterion) => criterion.label === title);
 
   return (
     <section aria-label={title} className="scroll-mt-4">
-      <div className="flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">
-        {repeated ? null : <h3 className="text-xs font-medium opacity-60">{title}</h3>}
+      {/* A judged part opens with its scores: the criterion names what to look at, so no title repeats it. */}
+      <div
+        className="flex min-h-8 flex-wrap items-center gap-2"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
         {criteria.length ? (
-          <div
-            // Without a title the marks take its place on the left, so the header does not open with a gap.
-            className={cn("flex flex-wrap gap-2", repeated ? "" : "ml-auto justify-end")}
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
-            {criteria.map((criterion) => (
-              <ScoreControl
-                key={criterion.id}
-                onPaper={onPaper}
-                criterion={criterion}
-                entry={asset.criteria[criterion.id]}
-                onScore={(value) => score(paneId, asset.id, criterion.id, value)}
-                onNote={(note) => setCriterionNote(asset.id, criterion.id, note)}
-              />
-            ))}
-          </div>
-        ) : null}
+          criteria.map((criterion) => (
+            <ScoreControl
+              key={criterion.id}
+              onPaper={onPaper}
+              criterion={criterion}
+              entry={asset.criteria[criterion.id]}
+              onScore={(value) => score(paneId, asset.id, criterion.id, value)}
+              onNote={(note) => setCriterionNote(asset.id, criterion.id, note)}
+            />
+          ))
+        ) : (
+          <h3 className="text-xs font-medium opacity-60">{title}</h3>
+        )}
       </div>
       <div className="mt-3">{children}</div>
     </section>

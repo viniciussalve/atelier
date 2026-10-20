@@ -23,7 +23,7 @@ library: peça do atelier, ligada aos stores e às regras da biblioteca.
 
 ### `SpecimenSection`
 
-One part of a specimen. When a criterion is judged on this part, its score sits in the section header, so it can be rated while looking at it.
+One part of a specimen. When a criterion is judged on this part, its score opens the section, so it can be rated while looking at it; otherwise the title does.
 
 | Prop | Tipo | Obrigatória | Descrição |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ De `src/components/library/specimen/font-specimen.tsx`:
     className="max-w-[20ch] text-[2.5em] leading-[1.1] font-medium tracking-tight"
     style={face}
   >
-    Clareza na conversa com o agente
+    {HEADLINE}
   </h2>
 </SpecimenSection>
 ```

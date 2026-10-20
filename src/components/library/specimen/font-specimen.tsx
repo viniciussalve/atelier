@@ -7,6 +7,11 @@ import { SpecimenSection } from "./section";
 
 const SIZES = [12, 14, 16, 20, 28, 40];
 
+/** One line for every place the face is shown big: title and weights. */
+const HEADLINE = "Respostas claras, decisões rápidas";
+/** Its first half, short enough for the size ladder to fit a narrow pane up to 40 px. */
+const HEADLINE_SHORT = "Respostas claras";
+
 /** The proof sheet for a font. Sizes are in em of the pane's "Corpo", except the fixed-size rows. */
 export function FontProof({
   asset,
@@ -31,7 +36,7 @@ export function FontProof({
           className="max-w-[20ch] text-[2.5em] leading-[1.1] font-medium tracking-tight"
           style={face}
         >
-          Clareza na conversa com o agente
+          {HEADLINE}
         </h2>
       </SpecimenSection>
 
@@ -42,7 +47,7 @@ export function FontProof({
           onChange={(event) => onSettings({ sampleText: event.target.value })}
           aria-label="Texto de prova, editável"
           placeholder="Escreva o texto da prova"
-          rows={4}
+          rows={3}
           spellCheck={false}
           className="-mx-2 block w-[calc(100%+1rem)] max-w-[calc(62ch+1rem)] resize-none rounded-md bg-transparent px-2 py-1 text-[1.0625em] leading-relaxed [field-sizing:content] placeholder:opacity-40 hover:bg-current/[0.04] focus:bg-current/[0.06]"
           style={face}
@@ -50,12 +55,20 @@ export function FontProof({
       </SpecimenSection>
 
       <SpecimenSection title="Interface" section="interface" {...section}>
+        {/* A message as the product shows it: 12 px meta, 14 px text and buttons, 13 px figures. */}
         <div className="max-w-md space-y-3" style={face}>
-          <p className="text-[11px] opacity-70">Agente, agora</p>
-          <div className="rounded-lg border border-current/15 px-3 py-2 text-sm leading-snug">
-            Posso resumir a conversa em três pontos, sem perder o que você marcou como decisão.
+          <div className="rounded-lg border border-current/15 px-3 py-2.5">
+            <p className="text-xs opacity-70">Agente, agora</p>
+            <p className="mt-1 text-sm leading-snug">
+              Resumi a conversa em três pontos. A decisão que você marcou ficou no topo.
+            </p>
+            <p className="mt-2 flex flex-wrap gap-x-5 text-[13px] tabular-nums opacity-80">
+              <span>R$ 1.250,00</span>
+              <span>10/08/2026</span>
+              <span>98,6%</span>
+            </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-2">
             <span
               className={cn(
                 "inline-flex h-8 items-center rounded-md px-3 text-sm font-medium",
@@ -67,21 +80,15 @@ export function FontProof({
             <span className="inline-flex h-8 items-center rounded-md border border-current/20 px-3 text-sm">
               Revisar
             </span>
-            <span className="text-xs opacity-70">Rótulo de campo, 12 px</span>
           </div>
-          <p className="flex flex-wrap gap-x-5 text-[13px] tabular-nums opacity-80">
-            <span>R$ 1.250,00</span>
-            <span>10/08/2026</span>
-            <span>98,6%</span>
-          </p>
         </div>
       </SpecimenSection>
 
-      <SpecimenSection title="Caracteres críticos" section="criticos" {...section}>
+      <SpecimenSection title="Caracteres" section="criticos" {...section}>
+        {/* Look-alike pairs first, then the accents of Portuguese inside real words. */}
         <div className="space-y-1 text-[1.5em] leading-relaxed" style={face}>
-          <p>Il1 O0 rn m cl d</p>
-          <p>áéíóú âêô ãõ ç Ç</p>
-          <p>0O 1lI 5S 8B 6b 9g</p>
+          <p>Il1 O0 rn m cl d 5S 8B</p>
+          <p>Ilustração, você, pão, à, Ç</p>
         </div>
       </SpecimenSection>
 
@@ -99,7 +106,7 @@ export function FontProof({
               >
                 {size}
               </span>
-              <span className="truncate">Clareza na conversa com o agente</span>
+              <span className="truncate">{HEADLINE_SHORT}</span>
             </p>
           ))}
         </div>
@@ -108,29 +115,23 @@ export function FontProof({
   );
 }
 
-/** Every declared weight, one line each, at 1.5em of the pane's "Corpo". */
+/** Every declared weight: its name, the headline and two lines of the reading text. */
 export function FontWeights({ asset, settings }: { asset: Asset; settings: PaneSettings }) {
   const weights = parseWeights(asset.weights);
   return (
     <div className="space-y-6" style={{ fontSize: settings.fontSize }}>
       {weights.map((weight) => (
-        <div key={weight}>
-          <p className="text-xs opacity-60 tabular-nums">
+        <section key={weight} aria-label={`${weight} ${weightName(weight)}`}>
+          <h3 className="text-xs opacity-60 tabular-nums">
             {weight} {weightName(weight)}
-          </p>
-          <p
-            className="mt-1 truncate text-[1.5em] leading-snug"
-            style={{ fontFamily: asset.family, fontWeight: weight }}
-          >
-            Clareza na conversa com o agente
-          </p>
-          <p
-            className="max-w-[62ch] leading-relaxed opacity-80"
-            style={{ fontFamily: asset.family, fontWeight: weight }}
-          >
-            {settings.sampleText}
-          </p>
-        </div>
+          </h3>
+          <div style={{ fontFamily: asset.family, fontWeight: weight }}>
+            <p className="mt-1 truncate text-[1.5em] leading-snug">{HEADLINE}</p>
+            <p className="line-clamp-2 max-w-[62ch] leading-relaxed opacity-80">
+              {settings.sampleText}
+            </p>
+          </div>
+        </section>
       ))}
     </div>
   );

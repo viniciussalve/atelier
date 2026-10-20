@@ -34,7 +34,7 @@ The proof sheet for a font. Sizes are in em of the pane's "Corpo", except the fi
 
 ### `FontWeights`
 
-Every declared weight, one line each, at 1.5em of the pane's "Corpo".
+Every declared weight: its name, the headline and two lines of the reading text.
 
 | Prop | Tipo | Obrigatória | Descrição |
 | --- | --- | --- | --- |
