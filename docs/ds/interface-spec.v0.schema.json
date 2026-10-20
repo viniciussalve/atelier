@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atelier/interface-spec/v0",
+  "title": "InterfaceSpec v0",
+  "description": "PROPOSTA (ALL-91), ainda não aprovada pela sala. O que o fluxo piloto devolve para um pedido de tela do atelier. Tokens e componentes usam o nome exato de docs/ds.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["versao", "pedido", "tela", "tokens", "componentes", "fluxo", "lacunas", "meta"],
+  "properties": {
+    "versao": { "const": "0" },
+    "pedido": {
+      "type": "string",
+      "minLength": 1,
+      "description": "O pedido de tela, como chegou no Start."
+    },
+    "tela": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nome", "resumo"],
+      "properties": {
+        "nome": { "type": "string", "minLength": 1 },
+        "resumo": {
+          "type": "string",
+          "minLength": 1,
+          "description": "O que a pessoa consegue fazer na tela, em uma ou duas frases."
+        }
+      }
+    },
+    "tokens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nome", "uso", "fonte"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "pattern": "^--[a-z][a-z0-9-]*$",
+            "description": "Nome exato, como em docs/ds/tokens.md (ex.: --color-proof)."
+          },
+          "uso": { "type": "string", "minLength": 1 },
+          "fonte": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Documento de onde o token saiu (ex.: docs/ds/tokens.md)."
+          }
+        }
+      }
+    },
+    "componentes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nome", "export", "uso", "fonte"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "O metadado `componente` da página em docs/ds/componentes (ex.: segmented)."
+          },
+          "export": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "description": "O export usado, com a caixa do código (ex.: Segmented)."
+          },
+          "uso": { "type": "string", "minLength": 1 },
+          "fonte": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Documento recuperado (metadata.arquivo do Knowledge Retrieval)."
+          }
+        }
+      }
+    },
+    "fluxo": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Os passos que a pessoa faz na tela, em ordem. O Proto Bot reproduz cada um no navegador.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rota", "acao", "alvo"],
+        "properties": {
+          "rota": {
+            "type": "string",
+            "pattern": "^/",
+            "description": "Rota real do atelier (arquivos de src/routes), com query se precisar (ex.: /?adicionar=fonte:Inter)."
+          },
+          "acao": { "enum": ["abrir", "clicar", "digitar", "arrastar", "pressionar", "ver"] },
+          "alvo": {
+            "type": "string",
+            "minLength": 1,
+            "description": "O que recebe a ação, pelo nome que a pessoa vê (ex.: botão \"Filtros\")."
+          },
+          "valor": {
+            "type": "string",
+            "description": "O que digitar ou a tecla a pressionar, quando a ação pede."
+          }
+        }
+      }
+    },
+    "lacunas": {
+      "type": "array",
+      "description": "O que o pedido precisa e o atelier não tem. A spec diz que falta em vez de inventar.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["falta", "motivo"],
+        "properties": {
+          "falta": { "type": "string", "minLength": 1 },
+          "motivo": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flow_version", "prompt_version", "tentativas", "tokens_rejeitados"],
+      "properties": {
+        "flow_version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Variável de ambiente do fluxo, nunca do LLM."
+        },
+        "prompt_version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Variável de ambiente do fluxo, nunca do LLM."
+        },
+        "tentativas": { "type": "integer", "minimum": 1 },
+        "tokens_rejeitados": {
+          "type": "array",
+          "description": "Tokens que o validador rejeitou nas tentativas anteriores.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
