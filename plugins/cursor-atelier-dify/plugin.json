@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "atelier-dify",
+  "version": "0.1.0",
+  "description": "Liga o Cursor ao ecossistema de interfaces no Dify (MCP embutido de cada app) e ao /mcp do atelier.",
+  "author": { "name": "Vinicius Alves" },
+  "repository": "https://github.com/viniciussalve/atelier",
+  "keywords": ["dify", "design-system", "atelier", "mcp"]
+}

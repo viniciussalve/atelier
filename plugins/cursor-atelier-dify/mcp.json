@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "dify-interface-spec": {
+      "type": "streamable-http",
+      "url": "${DIFY_SPEC_MCP_URL}"
+    },
+    "atelier": {
+      "type": "streamable-http",
+      "url": "${ATELIER_MCP_URL}"
+    }
+  }
+}
