@@ -32,8 +32,9 @@ Cada etapa é um commit, com o próprio critério de pronto.
 | 6   | Guarda e entrega          | ALL-90          | `npm run ds:gerar`, teste que falha se `docs/ds/` estiver desatualizado, PR em draft                                           | `npm test`, lint e typecheck limpos; draft PR aberto                                                                                                                                                     |
 | 7   | Aprovação do contrato     | ALL-91          | v0 congelado, com teste                                                                                                        | Contrato e schema dizem "aprovado"; mudar o v0 quebra o `npm test`                                                                                                                                       |
 | 8   | App `validar-spec` em DSL | ALL-104         | `dify/validar-spec.yml`, gerado com o validador e as listas embutidas                                                          | Os nós validam nas classes do `graphon` 0.7.0; o nó Code roda como no Dify; o DSL fica em dia pelo `npm test`                                                                                            |
+| 9   | Avaliador da camada 1     | ALL-97          | `npm run ds:avaliar`: conjunto de teste contra o fluxo piloto pela API, métricas do plano e rodadas comparadas                 | Testado com um Dify falso; passa a valer quando o fluxo piloto existir                                                                                                                                   |
 
-**Status (20/10/2026):** as etapas 0 a 8 estão feitas no branch deste plano, uma por commit. O que falta para fechar cada issue:
+**Status (20/10/2026):** as etapas 0 a 9 estão feitas no branch deste plano, uma por commit. O que falta para fechar cada issue:
 
 - ALL-90: a conferência por amostragem do Dify Qualidade.
 - ALL-91: aprovado pelo Vinicius em 20/10/2026, com as três propostas novas (`lacunas`, `acao` fechada, `nome` separado de `export`). O v0 está congelado; mudança vira v1.
