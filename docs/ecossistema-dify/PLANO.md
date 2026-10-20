@@ -37,7 +37,7 @@ Cada etapa é um commit, com o próprio critério de pronto.
 
 - ALL-90: a conferência por amostragem do Dify Qualidade.
 - ALL-91: aprovado pelo Vinicius em 20/10/2026, com as três propostas novas (`lacunas`, `acao` fechada, `nome` separado de `export`). O v0 está congelado; mudança vira v1.
-- ALL-104: importar `dify/validar-spec.yml` numa instância 1.17.1, publicar como API e MCP e rodar as linhas de validação da ALL-97. O passo a passo está em `dify/README.md`. A lista de tokens veio embutida no DSL (uma das três opções da issue); a Dify Workflows e o tinkabot podem trocar.
+- ALL-104: importado e rodado na instância 1.17.1 em 20/10/2026, funcionou. Falta publicar como API e MCP (se ainda não estiver) e rodar as linhas de validação da ALL-97. O passo a passo está em `dify/README.md`. A lista de tokens veio embutida no DSL (uma das três opções da issue); a Dify Workflows e o tinkabot podem trocar.
 
 ### Decisões tomadas aqui (revisáveis)
 
@@ -67,7 +67,7 @@ O material aqui não é tela: é texto lido por um recuperador e JSON lido por u
 | C     | Ingerir `docs/ds/` (plugin, ou script pela API de conhecimento se o plugin falhar) | Dify Conhecimento | A, B             |
 | D     | Rodar `conhecimento/teste-recuperacao.csv` e calibrar o threshold                  | Dify Qualidade    | C                |
 | E     | ~~Aprovar o contrato v0~~ Feito em 20/10/2026                                      | Sala + Vinicius   | Etapa 4          |
-| F     | Importar e publicar o `validar-spec` (DSL pronto na etapa 8)                       | Dify Workflows    | E, etapa 5       |
+| F     | ~~Importar o `validar-spec`~~ Feito em 20/10/2026; falta publicar API e MCP        | Dify Workflows    | E, etapa 5       |
 | G     | Fluxo piloto em DSL (ALL-93)                                                       | Dify Workflows    | E, F, D          |
 | H     | Plugin do Cursor carregado local (ALL-103)                                         | tinkabot          | G                |
 | I     | Segunda camada: spec vira draft PR (ALL-92, ALL-101)                               | Proto Bot         | G                |

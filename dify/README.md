@@ -21,4 +21,4 @@ A ferramenta MCP leva o nome do app, `validar-spec`, e recebe `spec` como texto.
 - O nó Code rodado no Node com o mesmo invólucro do executor de JavaScript do Dify: devolve só as três saídas declaradas.
 - As listas de saída ficam em no máximo 30 itens (`CODE_MAX_STRING_ARRAY_LENGTH`); o 30º erro vira "… e mais N erros.".
 
-Ninguém importou o arquivo numa instância 1.17.1 ainda. É o primeiro passo.
+Importado e rodado numa instância 1.17.1 pelo Vinicius em 20/10/2026: funcionou.
