@@ -7,6 +7,7 @@ Sem servidor próprio: aponta pro MCP embutido de cada app do Dify 1.17.1 e pro 
 Defina as variáveis de ambiente antes de abrir o Cursor. As URLs carregam credencial: nunca commitar.
 
 - `DIFY_SPEC_MCP_URL`: URL gerada em app > pontos de acesso > MCP Server ([doc](https://docs.dify.ai/en/self-host/use-dify/publish/publish-mcp)). O app não pode ter nó de gatilho (ALL-95).
+- `DIFY_VALIDAR_MCP_URL`: a mesma URL, do app `validar-spec` (importado de `dify/validar-spec.yml`).
 - `ATELIER_MCP_URL`: endereço da rota `/mcp` do atelier rodando local.
 
 ## Instalar local

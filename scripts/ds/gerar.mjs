@@ -13,9 +13,12 @@ import {
   extrairComponentes,
   quandoUsarDe,
 } from "./componentes.mjs";
+import { DSL_VALIDAR, lerValidador, validarSpecDsl } from "./dify.mjs";
+import { RAIZ } from "./raiz.mjs";
 import { lerTokens, tokensMd } from "./tokens.mjs";
+import { fonteDoAtelier } from "./validar.mjs";
 
-export const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "../..");
+export { RAIZ };
 export const PASTA = "docs/ds";
 export const FONTE_TOKENS = "src/styles.css";
 
@@ -34,6 +37,8 @@ export function gerarDocs(raiz = RAIZ) {
     }
     arquivos.set(caminho, md);
   }
+  // Built from the pages above, so one run is enough.
+  arquivos.set(DSL_VALIDAR, validarSpecDsl(lerValidador(raiz), fonteDoAtelier(raiz, arquivos)));
   return arquivos;
 }
 

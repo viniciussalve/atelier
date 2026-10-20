@@ -49,4 +49,4 @@ Em `docs/ds/exemplos/`, validados pelo `npm test`:
 
 ## Validação
 
-`npm run ds:validar -- <spec.json>` confere o schema, os tokens, os componentes, as fontes e as rotas. A mesma função vai no nó Code do app `validar-spec` (ALL-104); veja `scripts/ds/validar-spec.mjs`.
+`npm run ds:validar -- <spec.json>` confere o schema, os tokens, os componentes, as fontes e as rotas. A mesma função roda no nó Code do app `validar-spec` (ALL-104), em `dify/validar-spec.yml`, gerado a partir de `scripts/ds/validar-spec.mjs`.

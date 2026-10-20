@@ -12,7 +12,16 @@ test("docs/ds/ is up to date with the code (run npm run ds:gerar)", () => {
 test("flags a changed page and a page left over from a removed component", () => {
   const raiz = mkdtempSync(join(tmpdir(), "ds-"));
   cpSync(join(RAIZ, "docs/ds"), join(raiz, "docs/ds"), { recursive: true });
-  cpSync(join(RAIZ, "src"), join(raiz, "src"), { recursive: true });
+  // Everything the generator reads, the documents of the bases included.
+  for (const pasta of [
+    "src",
+    "scripts/ds",
+    "dify",
+    ".claude/skills/atelier-iteracao",
+    "README.md",
+  ]) {
+    cpSync(join(RAIZ, pasta), join(raiz, pasta), { recursive: true });
+  }
   symlinkSync(join(RAIZ, "node_modules"), join(raiz, "node_modules"));
   const arquivos = gerarDocs(raiz);
   assert.deepEqual(diferencas(raiz, arquivos), []);
