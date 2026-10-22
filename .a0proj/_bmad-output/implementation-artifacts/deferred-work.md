@@ -67,3 +67,15 @@ Human decision at B1 step-01: ship only the two views Atelier has data for
 **Resume when:** Atelier gains a plan/diagram model (e.g. an agent proposes a change
 set). Both are already named in `docs/steering/vistas-de-trabalho.md`, which now marks
 them as lacking data.
+
+## 2026-10-22 — Test-runner timeout and cancellation policy
+
+Deferred at step-04 of `spec-atelier-test-wiring.md`: a test holding an active
+interval can keep a worker alive indefinitely and prevent the later group from
+starting. This limitation also exists in the native baseline; the approved spec
+sets no deadline. The new runner handles finite failing, crashing and cancelled
+paths, but does not bound indefinitely live workers. No arbitrary timeout added.
+
+**Follow-up:** agree on per-file/group deadlines, cancellation and worker cleanup,
+then test bounded termination, retained diagnostics and subsequent-group execution
+with live-handle fixtures before implementing that policy.

@@ -34,8 +34,8 @@ binding. This file adds what they do not cover and never restates them._
 ### Language-Specific Rules
 
 - Import through the `@/*` → `./src/*` alias. No `../../..` chains across areas.
-- Relative imports **inside `src/lib/library/**` and `src/lib/ai/**` carry the explicit `.ts`/`.tsx` extension** (e.g. `from "./filters.ts"`). Those modules run under `node --experimental-strip-types`; extensionless specifiers fail there while typecheck passes.
-- In those same two trees, `@typescript-eslint/consistent-type-imports` is an **error** with `fixStyle: inline-type-imports` — use `import { type Foo } from ...`. A value import of a type-only export survives strip-types and throws at runtime.
+- Relative imports **inside `src/lib/library/**` and `src/lib/ai/**` carry the explicit `.ts`/`.tsx` extension** (e.g. `from "./filters.ts"`). Tests use Node ESM resolution with the local TypeScript loader; it does not guess extensions or resolve `@/*` aliases, even when typecheck accepts them.
+- In those same two trees, `@typescript-eslint/consistent-type-imports` is an **error** with `fixStyle: inline-type-imports` — use `import { type Foo } from ...`. The test loader preserves value imports (`verbatimModuleSyntax`), so importing a type-only export as a value throws at runtime.
 - Domain shapes are literal unions, not enums: `CriterionId = FontCriterionId | IconCriterionId`, `Score = 1 | 2 | 3 | 4 | 5`, `Verdict = "" | "usar" | "revisar" | "evitar"`. Optional is modelled as `Partial<Record<Id, T>>` where a key exists only while it holds data — don't paper over it with defaults.
 - `allowJs` + `checkJs` are on: `src/lib/db.ts` imports `scripts/migration-plan.mjs`, so JS scripts are typechecked. Change a script and its consumer together.
 - `tsconfig.json` `exclude` lists platform glue that is not in this repo (multiplayer, auth middleware/use-current-user/verify, app-data index/readiness). Do not re-include them to make `typecheck` "cleaner" — they are stubs.
@@ -54,10 +54,10 @@ binding. This file adds what they do not cover and never restates them._
 
 ### Testing Rules
 
-- There is no Jest/Vitest. `npm test` is two groups: plain-JS tests in `scripts/**/*.test.mjs`, then TS tests run with `node --experimental-strip-types` — currently `src/lib/library/*.test.ts`, `src/lib/ai/*.test.ts`, `auth/sign-in-gate.test.ts`, `app-data/readiness-schedule.test.ts`, `preview-path-prefix.test.ts`. **A new TS test file outside those patterns is silently not run** until the `test` script glob is extended.
+- There is no Jest/Vitest. `npm test` invokes `scripts/test.mjs`: sorted recursive discovery of `scripts/**/*.test.mjs` and `src/**/*.test.ts`/`*.test.tsx`, including scope-root files, independent of cwd. Both process-isolated Node test groups run despite failures; directory symlinks are not followed and matching file symlinks are errors. TS workers preload `scripts/test-register.mjs` and transpile in memory with installed TypeScript (ES2022/ESNext/react-jsx, source maps), without native stripping. `npm run typecheck` remains separate; TSX support supplies no DOM/Vite emulation. Structured per-file summaries must prove an ordinary completed test and reconcile with the aggregate: empty, skip/TODO-only or missing/malformed evidence fails by path. This is execution evidence, not proof of assertion quality. Verified on this Debian Node 22.22.0 build without amaro, not a universal Node/CI guarantee.
 - Tests are colocated as `*.test.ts` next to the module; shared builders live in `test-fixtures.ts` per tree.
 - `npm test` also fails on a stale `docs/ds/` and on colour/measure violations — it is the design-system gate, not only unit tests.
-- Known baseline: **85 tests, 82 pass, 3 fail**, all in `scripts/with-app-env.test.mjs` and pre-existing. Treat those as noise and never as your regression; add no new failures.
+- Local setup matters: missing `.grok/app-env.json` causes three real failures in `scripts/with-app-env.test.mjs`; never ignore them. The runner prints `.claude/skills/atelier-iteracao/scripts/setup.sh` guidance but does not run setup, create/reset config or override environment values. Review that script before use (it may install dependencies; obtain approval). Configured verification passed 119 MJS tests (85 existing + 34 runner/loader regressions) and 333 TS tests; counts are observations, not fixed runner thresholds.
 
 ### Code Quality & Style Rules
 
@@ -71,7 +71,7 @@ binding. This file adds what they do not cover and never restates them._
 
 - `npm install --legacy-peer-deps` is mandatory (npm 9/10 crash on `edgesOut`). **No lockfile is tracked** — do not add one without asking.
 - Dev server contract: `0.0.0.0:8080`, `strictPort`; preview `127.0.0.1:8081`. `startup.sh` reuses a live server on 8080. Do not change host/port.
-- Platform glue stubs are installed by `.claude/skills/atelier-iteracao/scripts/setup.sh` (with `scripts/browser-guard.mjs` guarding browser use).
+- Platform glue stubs and a missing local app-env config can be prepared by `.claude/skills/atelier-iteracao/scripts/setup.sh` (with `scripts/browser-guard.mjs` guarding browser use). Setup is explicit and separate from tests; preserve existing config and obtain approval before dependency installation.
 - `npm run build` = vite build **then** `npm run db:migrate`. Migrations are SQL under `migrations/<domain>/NNNN_name.sql`, globbed non-recursively per domain directory (`src/lib/db.ts`), so nesting a new subdirectory hides it.
 - Nitro config must keep `serverDir: "./server"` — dropping it silently unwires the PWA middleware on deploy.
 - Absolute links in AI-facing text derive from `PUBLIC_BASE_URL`, else the request. `X-Forwarded-*` are trusted only when well-formed; responses carry `Vary` so caches cannot cross origins.

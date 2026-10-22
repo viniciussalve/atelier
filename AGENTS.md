@@ -33,7 +33,20 @@ When a rule needs to change, edit these files. That is the point of them.
 
 ## Verify
 
-- `npm test` — the suite. Fails on stale `docs/ds/` and on invented colours.
+- `npm test` — `scripts/test.mjs` recursively discovers MJS tests under `scripts/`
+  and TS/TSX tests under `src/`, including root-level matches. It attempts both
+  groups, checks per-file execution summaries, and fails on incomplete evidence,
+  stale `docs/ds/`, or invented colours. TS is transpiled in memory using the
+  installed TypeScript compiler, not native Node stripping; typecheck is separate.
+  Directory symlinks are not followed; matching file symlinks are diagnosed.
+  Empty or skip/TODO-only files do not satisfy the execution-evidence guard.
+  This guard does not prove assertion quality; TSX support does not supply a DOM.
+- Missing `.grok/app-env.json` is a real setup failure, not ignorable baseline
+  noise. Review `.claude/skills/atelier-iteracao/scripts/setup.sh` for explicit
+  setup (it may install dependencies; obtain approval). Tests never run setup,
+  create/reset config, or override caller environment values. Preserve existing
+  local config. Runtime verification and limitations live in
+  `.a0proj/_bmad-output/project-context.md`; do not infer CI compatibility.
 - `npm run typecheck` and `npm run lint` — clean before you finish.
 - `npm run ds:gerar` — regenerate `docs/ds/` after touching tokens or components.
 - `npm run ds:gerar -- --check` — what CI runs; writes nothing.
