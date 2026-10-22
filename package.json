@@ -22,6 +22,7 @@
     "ds:gerar": "node scripts/ds/gerar.mjs",
     "ds:check": "node scripts/ds/gerar.mjs --check",
     "ds:validar": "node scripts/ds/validar.mjs",
+    "ds:reuso": "node scripts/ds/reuso.mjs",
     "ds:avaliar": "node scripts/ds/avaliar.mjs"
   },
   "dependencies": {
