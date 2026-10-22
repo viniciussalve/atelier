@@ -108,7 +108,7 @@ export function Sidebar({
     >
       <div className="flex flex-col gap-3 px-3 pt-4 pb-3">
         <div className="flex items-center gap-2 px-1">
-          <p className="min-w-0 flex-1 text-[15px] font-semibold tracking-tight">Atelier</p>
+          <p className="min-w-0 flex-1 text-sm font-semibold tracking-tight">Atelier</p>
           <button
             type="button"
             onClick={onQuickOpen}

@@ -38,6 +38,7 @@ A single-choice switch that never ends up empty.
 - Coleção: `src/components/library/browser/collection.tsx`
 - Diálogo Adicionar: `src/components/library/import-dialog.tsx`
 - Barra lateral: `src/components/library/sidebar/sidebar.tsx`
+- Rota /design-system: `src/routes/design-system.tsx`
 
 ## Quando usar
 

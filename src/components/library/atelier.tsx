@@ -158,7 +158,7 @@ export function Atelier() {
           // Clicking outside, Escape, or choosing a view or item closes it.
           <div
             aria-hidden
-            className="fixed inset-0 z-20 bg-ink/70 min-[860px]:hidden"
+            className="fixed inset-0 z-20 bg-ink/80 backdrop-blur-sm min-[860px]:hidden"
             onClick={closeNav}
           />
         ) : null}
@@ -186,7 +186,12 @@ function ShellFrame() {
     <div className="flex h-dvh bg-bg" aria-busy="true">
       <div className="hidden w-64 shrink-0 border-r border-border bg-surface min-[860px]:block" />
       <div className="flex-1">
-        <div className="h-9 border-b border-border bg-surface" />
+        {/* Mirrors the real band: an eyebrow over a title, then the toolbar row. */}
+        <div className="border-b border-border bg-surface px-4 pt-4 pb-2">
+          <div className="h-2 w-16 rounded-sm bg-border" />
+          <div className="mt-2 h-4 w-32 rounded-sm bg-border" />
+        </div>
+        <div className="h-11 border-b border-border" />
       </div>
     </div>
   );

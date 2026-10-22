@@ -16,18 +16,22 @@ import {
 import { DSL_VALIDAR, lerValidador, validarSpecDsl } from "./dify.mjs";
 import { DSL_PILOTO, lerConfig, pilotoDsl } from "./piloto.mjs";
 import { RAIZ } from "./raiz.mjs";
-import { lerTokens, tokensMd } from "./tokens.mjs";
+import { lerTokens, tokensMd, tokensTs } from "./tokens.mjs";
 import { SCHEMA, fonteDoAtelier } from "./validar.mjs";
 
 export { RAIZ };
 export const PASTA = "docs/ds";
 export const FONTE_TOKENS = "src/styles.css";
+/** The same tokens as TypeScript, for the live page at `/design-system`. */
+export const TOKENS_TS = "src/lib/ds/tokens.gen.ts";
 
 /** Every generated file, as `path from the repository root -> content`. */
 export function gerarDocs(raiz = RAIZ) {
   const arquivos = new Map();
   const tokens = lerTokens(FONTE_TOKENS, readFileSync(join(raiz, FONTE_TOKENS), "utf8"));
   arquivos.set(`${PASTA}/tokens.md`, tokensMd(tokens, FONTE_TOKENS));
+  // The live page reads the same tokens, so `--check` guards it too.
+  arquivos.set(TOKENS_TS, tokensTs(tokens, FONTE_TOKENS));
   for (const componente of extrairComponentes(raiz)) {
     const caminho = `${PASTA}/componentes/${componente.nome}.md`;
     const md = componenteMd(componente, quandoUsarDe(ler(join(raiz, caminho))));

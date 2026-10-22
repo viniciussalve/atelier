@@ -1,5 +1,6 @@
 # Generated
 src/routeTree.gen.ts
+src/lib/ds/tokens.gen.ts
 src/lib/ai/data/
 # Platform config, kept in the platform's own layout
 eslint.config.mjs

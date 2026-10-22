@@ -96,7 +96,7 @@ De `src/components/library/workspace/pane.tsx`:
 ```tsx
 <DropdownMenu>
   <DropdownMenuTrigger className="h-7 rounded-md px-2 text-xs text-muted tabular-nums hover:bg-elevated hover:text-fg">
-    Painel {index + 1} de {panes.length}
+    Vista {index + 1} de {panes.length}
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     <DropdownMenuRadioGroup value={activePaneId} onValueChange={focus}>

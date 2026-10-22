@@ -20,7 +20,7 @@ export function Glyph({
         role="img"
         aria-label={`${name}: não encontrado`}
         title="Não encontrado neste conjunto"
-        className="inline-grid place-items-center rounded-[3px] border border-dashed border-current/40 text-[9px] opacity-60"
+        className="inline-grid place-items-center rounded border border-dashed border-current/40 text-xs opacity-60"
         style={{ width: size, height: size }}
       >
         ?

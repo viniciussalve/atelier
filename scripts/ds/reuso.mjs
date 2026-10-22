@@ -31,16 +31,8 @@ export const PERMITIDOS = {
     "renderiza quando o tema pode não ter carregado; utilidade de paleta é a escolha certa ali.",
   "src/routes/__root.tsx":
     "#0c0d10 no meta theme-color: o navegador lê antes do CSS, então um var() não chega lá.",
-  "src/components/library/browser/asset-card.tsx":
-    "LIGHT_INK espelha --color-fg, mesmo motivo de grounds.ts. Dívida de Goal B.",
   "src/components/library/evaluation/score-control.tsx":
     "3 medidas finas do controle de nota; entram na escala quando Goal B redesenhar a avaliação.",
-  "src/components/library/icons.tsx":
-    "traço do glifo em px, não espaçamento de layout: o token de raio não descreve isso.",
-  "src/components/library/import-dialog.tsx":
-    "text-[15px] num diálogo; Goal B troca pela escala de tipo.",
-  "src/components/library/sidebar/sidebar.tsx":
-    "text-[15px] do título da barra; Goal B redesenha a barra.",
   "src/components/library/specimen/controls.tsx":
     "text-[11px] do espécime, fora do escopo de Goal B por decisão humana.",
   "src/components/library/specimen/font-specimen.tsx":

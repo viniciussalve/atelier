@@ -4,6 +4,7 @@ import { Collection } from "@/components/library/browser/collection";
 import { AssetTab } from "@/components/library/specimen/asset-tab";
 import { buildAiLink } from "@/components/library/shared/ai-link";
 import { copyText } from "@/components/library/shared/copy";
+import { viewKindLabel } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import { useTabLabel } from "@/components/library/shared/use-tab-label";
 import {
@@ -167,7 +168,7 @@ function PaneSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="h-7 rounded-md px-2 text-xs text-muted tabular-nums hover:bg-elevated hover:text-fg">
-        Painel {index + 1} de {panes.length}
+        Vista {index + 1} de {panes.length}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuRadioGroup value={activePaneId} onValueChange={focus}>
@@ -193,6 +194,7 @@ function PaneOption({
   return (
     <DropdownMenuRadioItem value={id}>
       <span className="text-muted tabular-nums">{position + 1}</span>
+      <span className="text-subtle">{viewKindLabel(tab)}</span>
       {label}
     </DropdownMenuRadioItem>
   );

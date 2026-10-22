@@ -24,3 +24,14 @@ sabem abrir uma linha.
 
 Pergunte a alguém que não escreveu o código: "o que o agente está fazendo agora?".
 Se a resposta exigir interpretar um spinner ou abrir uma aba, a linha está faltando.
+
+## Onde isso se aplica hoje
+
+O Atelier **ainda não renderiza trabalho de agente**. As rotas `/ia` e
+`/api/parecidas` respondem markdown e JSON no servidor; nenhum componente mostra
+sugestão, plano ou progresso. Então esta regra não governa nenhuma tela hoje —
+ela existe para quando existir.
+
+Quando houver superfície, o alvo é o mesmo do artigo: o processo aparece
+enquanto trabalha e recolhe num resumo de uma linha depois, com link para o
+resto. Nunca um spinner no lugar do processo.

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Segmented } from "@/components/ui/segmented";
 import { Tooltip } from "@/components/ui/tooltip";
-import { itemCount, viewTitle } from "@/components/library/shared/labels";
+import { KIND_LABEL, itemCount, viewTitle } from "@/components/library/shared/labels";
 import { SizeSlider } from "@/components/library/specimen/controls";
 import { beginDrag, compareItems, endDrag, openItem } from "@/lib/library/commands";
 import { activeFilterCount } from "@/lib/library/filters";
@@ -94,21 +94,29 @@ export function Collection({ paneId }: { paneId: string }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 pt-3 pb-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-medium">{viewTitle(nav.view, folders, kind)}</h1>
-          <p className="text-xs text-muted tabular-nums">
+      <div className="border-b border-border">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 pt-4 pb-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium tracking-wide text-subtle uppercase">
+              Vista de {KIND_LABEL[kind]}
+            </p>
+            <h1 className="mt-0.5 truncate text-lg font-semibold tracking-tight">
+              {viewTitle(nav.view, folders, kind)}
+            </h1>
+          </div>
+          <p className="shrink-0 text-xs text-muted tabular-nums">
             {list.length === total
               ? itemCount(total, kind)
               : `${list.length} de ${itemCount(total, kind)}`}
           </p>
         </div>
-        <PreviewControls
-          kind={kind}
-          preview={nav.preview}
-          onChange={(patch) => setPreview(kind, patch)}
-        />
-        <label className="flex h-8 w-full items-center gap-2 rounded-md border border-border bg-surface px-2 focus-within:border-proof/60 @lg:w-56">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 pb-3">
+          <PreviewControls
+            kind={kind}
+            preview={nav.preview}
+            onChange={(patch) => setPreview(kind, patch)}
+          />
+          <label className="flex h-8 w-full items-center gap-2 rounded-md border border-border bg-surface px-2 focus-within:border-proof/60 @lg:w-56">
           <Search className="size-3.5 shrink-0 text-subtle" />
           <input
             value={nav.query}
@@ -139,16 +147,17 @@ export function Collection({ paneId }: { paneId: string }) {
           locked={sortLocked}
           onSort={(key) => setSort(kind, key)}
         />
-        <Segmented<Display>
-          label="Exibição"
-          value={nav.display}
-          onChange={(display) => setDisplay(kind, display)}
-          className="w-20"
-          options={[
-            { value: "grid", label: <Grid2x2 className="size-4" />, title: "Grade" },
-            { value: "list", label: <List className="size-4" />, title: "Lista" },
-          ]}
-        />
+          <Segmented<Display>
+            label="Exibição"
+            value={nav.display}
+            onChange={(display) => setDisplay(kind, display)}
+            className="w-20"
+            options={[
+              { value: "grid", label: <Grid2x2 className="size-4" />, title: "Grade" },
+              { value: "list", label: <List className="size-4" />, title: "Lista" },
+            ]}
+          />
+        </div>
       </div>
       <ActiveFilters kind={kind} />
 
@@ -169,7 +178,7 @@ export function Collection({ paneId }: { paneId: string }) {
                     clearFilters(kind);
                     setQuery(kind, "");
                   }}
-                  className="mt-3 h-8 rounded-md border border-border px-3 text-sm hover:border-muted"
+                  className="mt-4 h-8 rounded-md border border-border bg-elevated px-3 text-sm font-medium hover:border-proof hover:text-proof"
                 >
                   Limpar filtros e busca
                 </button>
@@ -334,10 +343,10 @@ function SortMenu({
 
 function EmptyState({ title, hint, action }: { title: string; hint: string; action?: ReactNode }) {
   return (
-    <div className="grid h-full min-h-48 place-items-center px-6 text-center">
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="mt-1 max-w-sm text-sm text-muted">{hint}</p>
+    <div className="grid h-full min-h-48 place-items-center px-6 py-10 text-center">
+      <div className="max-w-sm rounded-lg border border-dashed border-border bg-surface/60 px-6 py-8">
+        <p className="text-sm font-semibold tracking-tight">{title}</p>
+        <p className="mt-1.5 text-sm text-muted">{hint}</p>
         {action}
       </div>
     </div>

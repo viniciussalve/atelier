@@ -2,6 +2,7 @@ import { useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { LayoutGrid, X } from "lucide-react";
 import { VerdictDot } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
+import { viewKindLabel } from "@/components/library/shared/labels";
 import { useTabLabel } from "@/components/library/shared/use-tab-label";
 import {
   activate,
@@ -122,6 +123,7 @@ function Tab({
   const assetId = assetIdOf(tabKey);
   const asset = useAsset(assetId);
   const label = useTabLabel(tabKey);
+  const kind = viewKindLabel(tabKey);
 
   return (
     <div
@@ -142,8 +144,8 @@ function Tab({
         role="tab"
         aria-selected={active}
         tabIndex={active ? 0 : -1}
-        aria-label={asset ? withVerdict(label, asset.verdict) : label}
-        title={preview ? `${label} (prévia: clique duas vezes para fixar)` : label}
+        aria-label={asset ? withVerdict(label, asset.verdict) : `${kind}: ${label}`}
+        title={preview ? `${kind} · ${label} (prévia: clique duas vezes para fixar)` : `${kind} · ${label}`}
         draggable
         onDragStart={(event) => {
           if (assetId) event.dataTransfer.setData("text/asset-id", assetId);

@@ -39,9 +39,9 @@ import type { Asset, Kind } from "@/lib/library/types";
 import { useWorkspace } from "@/lib/library/workspace";
 
 const item =
-  "flex h-9 cursor-default items-center gap-2.5 rounded-md px-2 text-sm text-muted outline-none select-none data-[selected=true]:bg-elevated data-[selected=true]:text-fg [&_svg]:size-4 [&_svg]:shrink-0";
+  "flex h-10 cursor-default items-center gap-2.5 rounded-md px-2 text-sm text-muted outline-none select-none data-[selected=true]:bg-elevated data-[selected=true]:text-fg [&_svg]:size-4 [&_svg]:shrink-0";
 const heading =
-  "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-subtle";
+  "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:tracking-wide [&_[cmdk-group-heading]]:text-subtle [&_[cmdk-group-heading]]:uppercase";
 
 // cmdk's own fuzzy ranking, but "titulos" finds "Títulos", as in the sidebar. Scores
 // under 0.01 are letters scattered across a name and its tags ("adicionar" in

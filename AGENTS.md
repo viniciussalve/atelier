@@ -13,6 +13,9 @@ does. This file is the steering layer: what to do before writing UI code.
   a second component.
 - `docs/ds/tokens.md` and `docs/ds/componentes/*.md` are generated from the code.
   Read them; never edit them. Change the code, then run `npm run ds:gerar`.
+- `/design-system` is the same system rendered live: every token with its swatch,
+  value and class, plus real components. Read it when you need to see a token,
+  not just its name. It is generated from `src/styles.css`; it cannot go stale.
 - Finer visual rules (layout, copy, accessibility) live in
   `.claude/skills/atelier-iteracao/references/design.md`.
 

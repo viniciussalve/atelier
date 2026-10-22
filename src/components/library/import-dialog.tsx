@@ -309,7 +309,7 @@ function ImportRow({
       </span>
       <span className="min-w-0 flex-1">
         <span
-          className="block truncate text-[15px]"
+          className="block truncate text-sm"
           style={item.kind === "font" ? { fontFamily: item.family } : undefined}
         >
           {item.name}

@@ -2,13 +2,13 @@ import type { DragEvent, MouseEvent, ReactNode } from "react";
 import { Check } from "lucide-react";
 import { ScoreBadge, VerdictBadge } from "@/components/library/evaluation/badges";
 import { withVerdict } from "@/components/library/evaluation/tones";
+import { CHROME_INK } from "@/components/library/shared/grounds";
 import { Glyph } from "@/components/library/icons";
 import { overallScore } from "@/lib/library/criteria";
 import { previewText } from "@/lib/library/preview";
 import type { Asset, CollectionPreview } from "@/lib/library/types";
 import { cn } from "@/lib/utils";
 
-const LIGHT_INK = "#eceef2"; // --color-fg
 
 /** Fades a one-line specimen out at the right edge instead of cutting it with an ellipsis. */
 const FADE_RIGHT = "[mask-image:linear-gradient(to_right,black_85%,transparent)]";
@@ -178,7 +178,7 @@ function Specimen({
     >
       {asset.samples.map((name) => (
         <span key={name} className="shrink-0">
-          <Glyph prefix={asset.iconKey} name={name} size={preview.size} color={LIGHT_INK} />
+          <Glyph prefix={asset.iconKey} name={name} size={preview.size} color={CHROME_INK} />
         </span>
       ))}
     </span>

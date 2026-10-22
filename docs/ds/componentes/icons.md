@@ -60,7 +60,7 @@ Para os ícones da própria interface do atelier (fechar, dividir, menu), use os
 De `src/components/library/browser/asset-card.tsx`:
 
 ```tsx
-<Glyph prefix={asset.iconKey} name={name} size={preview.size} color={LIGHT_INK} />
+<Glyph prefix={asset.iconKey} name={name} size={preview.size} color={CHROME_INK} />
 ```
 
 <<<FIM>>>

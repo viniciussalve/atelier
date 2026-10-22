@@ -40,6 +40,7 @@ Também aceita as props herdadas: 290 de `react`.
 - Barra lateral: `src/components/library/sidebar/sidebar.tsx`
 - Provas: `src/components/library/specimen/asset-tab.tsx`
 - Painéis: `src/components/library/workspace/pane.tsx`
+- Rota /design-system: `src/routes/design-system.tsx`
 
 ## Quando usar
 
