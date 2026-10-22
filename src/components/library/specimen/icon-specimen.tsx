@@ -195,7 +195,7 @@ function InUse({
       </SpecimenScreen>
 
       <SpecimenScreen title="Barra de ferramentas">
-        <div className="flex items-center gap-1 p-2">
+        <div className="flex flex-wrap items-center gap-1 p-2">
           {[0, 1, 2, 3].map((index) => (
             <span
               key={index}

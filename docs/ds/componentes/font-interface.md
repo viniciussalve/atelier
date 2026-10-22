@@ -39,7 +39,9 @@ The font at work: six small screens, sized in em of the pane's "Corpo" (0.875em 
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-_Pendente: texto a ser escrito por IA._
+Para ver uma fonte em uso numa interface: a aba Interface da prova mostra seis telas pequenas (conversa, formulário, tabela, métricas, menu com aviso e configurações), com texto, rótulos e títulos no peso que a fonte tem para cada papel, e a nota do critério Interface no topo.
+
+Para o texto corrido e os tamanhos, use o `FontProof`; para o conjunto de caracteres, o `FontGlyphs`. Para ícones em uso, é a aba Componentes do `IconSpecimen`.
 
 ## Trecho de código
 

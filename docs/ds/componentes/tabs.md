@@ -47,7 +47,7 @@ Também aceita as props herdadas: 280 de `react`, 2 de `@radix-ui/react-tabs`, 1
 
 <!-- Texto gerado por IA. Revise antes de confiar. -->
 
-Para navegar entre seções do mesmo painel, como as partes da prova (Prova, Pesos, Glifos). São abas de texto sublinhadas: `TabsList` agrupa, `TabsTrigger` é cada aba e `TabsContent` é o conteúdo.
+Para navegar entre seções do mesmo painel, como as partes da prova (Prova, Interface, Glifos). São abas de texto sublinhadas: `TabsList` agrupa, `TabsTrigger` é cada aba e `TabsContent` é o conteúdo.
 
 Para as abas de itens abertos num painel, isso é a `TabStrip`. Para uma escolha de exibição, use o `Segmented`.
 
