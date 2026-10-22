@@ -1,7 +1,7 @@
 import type { CollectionPreview, Kind } from "./types.ts";
 
 /** What the collection draws in each font when the preview field is blank. */
-export const PREVIEW_SAMPLE = "Clareza na conversa com o agente, em 10 ou 100 respostas por dia.";
+export const PREVIEW_SAMPLE = "Respostas claras, decisões rápidas, em 10 ou 100 conversas por dia.";
 
 /** Size of the specimen on every card and row: font body in px, icon side in px. */
 export const PREVIEW_RANGE: Record<Kind, { min: number; max: number; step: number }> = {

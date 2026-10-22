@@ -32,6 +32,36 @@ export function weightName(weight: number): string {
   return WEIGHT_NAMES[weight] ?? String(weight);
 }
 
+/** The weight a font gives each part of an interface: running text, labels and buttons, titles. */
+export type WeightRoles = { texto: number; rotulo: number; titulo: number };
+
+/** The declared weight closest to `target`; a tie goes to the lighter one unless `heavier`. */
+function closest(weights: number[], target: number, heavier = false): number {
+  return weights.reduce((best, weight) => {
+    const gap = Math.abs(weight - target) - Math.abs(best - target);
+    return gap < 0 || (gap === 0 && heavier === weight > best) ? weight : best;
+  });
+}
+
+/**
+ * Text near 400, labels near 500 and titles near 600, each never lighter than
+ * the role below it. A font with one weight uses it everywhere.
+ */
+export function weightRoles(weights: number[]): WeightRoles {
+  const sorted = weights.length ? [...weights].sort((a, b) => a - b) : [400];
+  const texto = closest(sorted, 400);
+  const rotulo = closest(
+    sorted.filter((weight) => weight >= texto),
+    500,
+  );
+  const titulo = closest(
+    sorted.filter((weight) => weight >= rotulo),
+    600,
+    true,
+  );
+  return { texto, rotulo, titulo };
+}
+
 /** The first family of a CSS font stack, without quotes. */
 export function primaryFamily(stack: string): string {
   return (stack.split(",")[0] ?? "").trim().replace(/^["']|["']$/g, "");

@@ -40,13 +40,13 @@ const { open, goto, shot, check, realErrors } = require(process.env.ATELIER_E2E 
 
   // Localize por papel e nome acessível, como uma pessoa com leitor de tela faria.
   await page.getByRole("button", { name: "Inter, usar" }).first().click();
-  await page.getByRole("tab", { name: "Pesos" }).first().click();
+  await page.getByRole("tab", { name: "Interface" }).first().click();
 
   await check(
-    "a aba Pesos mostra o peso 600",
+    "a aba Interface diz o peso dos títulos",
     async () => (await page.getByText("600 Seminegrito").count()) > 0,
   );
-  await shot(page, "pesos-inter");
+  await shot(page, "interface-inter");
 
   await browser.close();
   if (realErrors(errors).length) throw new Error(realErrors(errors).join("\n"));
@@ -66,7 +66,7 @@ const { open, goto, shot, check, realErrors } = require(process.env.ATELIER_E2E 
   - Painéis do layout: `[data-panel]`. Um split aninhado também conta como painel.
   - Nota: role `radio` com nome "Leitura: Ok" (a palavra da carinha).
   - Nota geral: `[aria-label='Nota geral'] p`. Ela fica no inspetor, que começa fechado: clique em "Avaliar" antes de ler.
-- **Abas do painel e abas da prova são `tab` as duas.** Dentro de um painel, `getByRole("tab")` acha também Prova, Pesos e Glifos. Para as abas do painel, use `getByRole("tablist", { name: "Abas do painel" }).getByRole("tab")`.
+- **Abas do painel e abas da prova são `tab` as duas.** Dentro de um painel, `getByRole("tab")` acha também Prova, Interface e Glifos. Para as abas do painel, use `getByRole("tablist", { name: "Abas do painel" }).getByRole("tab")`.
 - **Setas num `RadioGroup` ou `ToggleGroup` do Radix** (seletor de fundo, nota): o Radix move o foco num `setTimeout` e só marca a opção se a tecla ainda estiver descida.
   - Segure a tecla como uma pessoa: `page.keyboard.press("ArrowRight", { delay: 50 })`.
   - Sem isso, o teste falha de vez em quando: o foco vai para a opção certa, mas a anterior continua marcada.

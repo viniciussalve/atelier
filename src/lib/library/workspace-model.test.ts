@@ -28,6 +28,7 @@ import {
   replaceTab,
   roomForItems,
   sanitizeWorkspace,
+  LEGACY_SAMPLE_TEXTS,
   splitPane,
   type Workspace,
 } from "./workspace-model.ts";
@@ -398,6 +399,54 @@ describe("sanitizeWorkspace", () => {
     assert.ok(ws);
     valid(ws);
     assert.equal(shape(ws.root), "H[P,P]");
+  });
+
+  it("swaps the old default reading text for the new one and keeps a text the person wrote", () => {
+    const pane = (id: string, sampleText: string) => ({
+      id,
+      tabs: ["collection"],
+      active: "collection",
+      preview: null,
+      settings: { ...DEFAULT_PANE_SETTINGS, sampleText },
+    });
+    const ws = sanitizeWorkspace({
+      root: {
+        type: "split",
+        id: "split-1",
+        orientation: "horizontal",
+        children: [
+          { type: "pane", id: "pane-1" },
+          { type: "pane", id: "pane-2" },
+        ],
+        sizes: {},
+      },
+      panes: {
+        "pane-1": pane("pane-1", LEGACY_SAMPLE_TEXTS[0]),
+        "pane-2": pane("pane-2", "Meu texto"),
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.equal(ws.panes["pane-1"].settings.sampleText, DEFAULT_PANE_SETTINGS.sampleText);
+    assert.equal(ws.panes["pane-2"].settings.sampleText, "Meu texto");
+  });
+
+  it("opens a pane saved on the removed Pesos tab on Interface", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["collection"],
+          active: "collection",
+          preview: null,
+          settings: { ...DEFAULT_PANE_SETTINGS, fontTab: "pesos" },
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.equal(ws.panes["pane-1"].settings.fontTab, "interface");
   });
 
   it("sends a pane saved on the removed Info tab back to the first specimen tab", () => {
