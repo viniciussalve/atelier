@@ -21,7 +21,7 @@ Quadro para avaliar artefatos de design (fontes tipográficas e conjuntos de íc
 
 **Provas.**
 
-- Fontes: Prova, Pesos e Glifos.
+- Fontes: Prova, Interface (telas de exemplo com os pesos de cada papel) e Glifos.
 - Ícones: Amostras (aceita nomes novos; os que o conjunto não tem aparecem tracejados), Tamanhos e Componentes.
 
 **Adicionar.** No ⌘K, "Adicionar fonte ou conjunto…" busca no Google Fonts e no Iconify. Um link `/?adicionar=fonte:Inter Tight,icones:lucide&motivo=…`, o formato que uma IA escreve, abre o mesmo diálogo com as sugestões já marcadas. Nada entra sem confirmar. Sugestões de IA levam a tag `ia` e o motivo nas notas, e aparecem em Para avaliar.

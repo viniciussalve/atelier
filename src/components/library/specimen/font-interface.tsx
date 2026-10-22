@@ -26,7 +26,8 @@ export function FontInterface({
   settings: PaneSettings;
 }) {
   const ground = groundOf(settings.ground);
-  const roles = weightRoles(parseWeights(asset.weights));
+  const weights = parseWeights(asset.weights);
+  const roles = weightRoles(weights);
   const w = (role: keyof WeightRoles): CSSProperties => ({ fontWeight: roles[role] });
   const ui = {
     w,
@@ -34,7 +35,7 @@ export function FontInterface({
     // The switch knob is cut from the ground, so it reads on light and dark alike.
     knob: ground.surface,
   };
-  const single = roles.texto === roles.titulo;
+  const single = weights.length === 1;
 
   return (
     <div style={{ fontSize: settings.fontSize }}>
@@ -170,7 +171,7 @@ function Form({ w, primary }: Ui) {
         </span>
         Aceito os termos de uso
       </p>
-      <div className="flex justify-end gap-2 text-[1.143em]">
+      <div className="flex flex-wrap justify-end gap-2 text-[1.143em]">
         <Button style={w("rotulo")}>Cancelar</Button>
         <Button primary={primary} style={w("rotulo")}>
           Criar conta
