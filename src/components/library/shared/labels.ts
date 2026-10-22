@@ -1,5 +1,5 @@
 import type { Folder, Kind, View } from "@/lib/library/types";
-import { assetIdOf, type TabKey } from "@/lib/library/workspace-model";
+import { assetIdOf, viewKindOf, type TabKey, type ViewKind } from "@/lib/library/workspace-model";
 
 export const KIND_LABEL: Record<Kind, string> = { font: "Fontes", icon: "Ícones" };
 
@@ -27,9 +27,19 @@ export function itemCount(count: number, kind: Kind): string {
 
 /**
  * What kind of view a tab is (article 2165): the collection is a view of the
- * library, an item tab is a view of one asset. The shell says "view" out loud
- * instead of leaving the two kinds unnamed.
+ * library, an item tab is a view of one asset, and a view tab is a way of
+ * looking at what the pane already holds. The shell says "view" out loud
+ * instead of leaving the kinds unnamed.
  */
 export function viewKindLabel(key: TabKey): string {
-  return assetIdOf(key) ? "Item" : "Coleção";
+  if (assetIdOf(key)) return "Item";
+  const kind = viewKindOf(key);
+  if (kind) return VIEW_KIND_LABEL[kind];
+  return "Coleção";
 }
+
+/** The two views that exist, named the way the steering doc names them. */
+export const VIEW_KIND_LABEL: Record<ViewKind, string> = {
+  "antes-depois": "Antes e depois",
+  sistema: "Sistema de design",
+};

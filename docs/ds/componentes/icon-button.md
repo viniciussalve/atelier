@@ -39,8 +39,8 @@ Também aceita as props herdadas: 290 de `react`.
 - Inspetor: `src/components/library/inspector/inspector.tsx`
 - Barra lateral: `src/components/library/sidebar/sidebar.tsx`
 - Provas: `src/components/library/specimen/asset-tab.tsx`
+- Outro: `src/components/library/views/design-system-view.tsx`
 - Painéis: `src/components/library/workspace/pane.tsx`
-- Rota /design-system: `src/routes/design-system.tsx`
 
 ## Quando usar
 

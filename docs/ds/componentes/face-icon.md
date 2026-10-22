@@ -38,7 +38,7 @@ Também aceita as props herdadas: 487 de `react`.
 - Coleção: `src/components/library/browser/filter-bar.tsx`
 - Avaliação: `src/components/library/evaluation/badges.tsx`
 - Avaliação: `src/components/library/evaluation/score-control.tsx`
-- Rota /design-system: `src/routes/design-system.tsx`
+- Outro: `src/components/library/views/design-system-view.tsx`
 
 ## Quando usar
 

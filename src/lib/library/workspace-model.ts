@@ -46,7 +46,17 @@ function fits(ws: Workspace, paneId: string, edge: Edge, area?: Box): boolean {
   return !area || canHalve(ws.root, paneId, edge, area, PANE_MIN);
 }
 
-export type TabKey = "collection" | `asset:${string}`;
+/**
+ * The views that are real pane content (article 2165). A view is data Atelier
+ * already owns, shown a different way: never a placeholder for data it lacks.
+ * Diagram and stepped walkthrough are absent on purpose — nothing to draw yet.
+ */
+export type ViewKind = "antes-depois" | "sistema";
+
+/** The views that exist, in menu order. One list, so no surface offers a kind that cannot open. */
+export const VIEW_KINDS: ViewKind[] = ["antes-depois", "sistema"];
+
+export type TabKey = "collection" | `asset:${string}` | `vista:${ViewKind}`;
 export type FontSpecimenTab = "prova" | "interface" | "glifos";
 export type IconSpecimenTab = "amostras" | "tamanhos" | "componentes";
 
@@ -110,12 +120,22 @@ export const SYNC_FIELDS: Record<SyncKey, (keyof PaneSettings)[]> = {
 
 export const assetKey = (id: string): TabKey => `asset:${id}`;
 
+export const viewKey = (kind: ViewKind): TabKey => `vista:${kind}`;
+
+export function viewKindOf(key: TabKey): ViewKind | null {
+  return key.startsWith("vista:") ? (key.slice(6) as ViewKind) : null;
+}
+
 export function assetIdOf(key: TabKey): string | null {
   return key.startsWith("asset:") ? key.slice(6) : null;
 }
 
 export function isTabKey(value: unknown): value is TabKey {
-  return value === "collection" || (typeof value === "string" && /^asset:.+/.test(value));
+  if (typeof value !== "string") return false;
+  if (value === "collection" || /^asset:.+/.test(value)) return true;
+  // Anchored on purpose: an unknown view kind is not a tab, so a stored
+  // workspace from a future build sheds it instead of rendering nothing.
+  return /^vista:(antes-depois|sistema)$/.test(value);
 }
 
 export function paneCount(ws: Workspace): number {

@@ -6,6 +6,7 @@ import {
   Equal,
   Folder,
   LayoutGrid,
+  Monitor,
   PanelRight,
   Plus,
   Rows2,
@@ -19,7 +20,7 @@ import { ScoreBadge, VerdictDot } from "@/components/library/evaluation/badges";
 import { activeTab } from "@/components/library/shared/active-tab";
 import { buildAiContext, buildAiLink } from "@/components/library/shared/ai-link";
 import { copyText } from "@/components/library/shared/copy";
-import { KIND_LABEL } from "@/components/library/shared/labels";
+import { KIND_LABEL, VIEW_KIND_LABEL } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import { returnFocus } from "@/components/ui/return-focus";
 import {
@@ -27,6 +28,7 @@ import {
   close,
   equalizeAll,
   openItem,
+  openView,
   showLibrary,
   showView,
   split,
@@ -36,6 +38,7 @@ import { useRoomToSplit } from "@/lib/library/hooks";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useLibrary } from "@/lib/library/store";
 import type { Asset, Kind } from "@/lib/library/types";
+import { VIEW_KINDS } from "@/lib/library/workspace-model";
 import { useWorkspace } from "@/lib/library/workspace";
 
 const item =
@@ -211,6 +214,14 @@ export function CommandPalette({
             label="Mostrar o que falta avaliar"
             onSelect={() => run(() => showView(useLibrary.getState().kind, { type: "pending" }))}
           />
+          {VIEW_KINDS.map((kind) => (
+            <Action
+              key={kind}
+              icon={<Monitor />}
+              label={`Abrir vista: ${VIEW_KIND_LABEL[kind]}`}
+              onSelect={() => run(() => openView(kind))}
+            />
+          ))}
           {canSplit && roomRight ? (
             <Action
               icon={<Columns2 />}

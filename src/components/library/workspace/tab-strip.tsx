@@ -144,8 +144,20 @@ function Tab({
         role="tab"
         aria-selected={active}
         tabIndex={active ? 0 : -1}
-        aria-label={asset ? withVerdict(label, asset.verdict) : `${kind}: ${label}`}
-        title={preview ? `${kind} · ${label} (prévia: clique duas vezes para fixar)` : `${kind} · ${label}`}
+        // A view tab is named after its kind, so printing both reads "Antes e
+        // depois: Antes e depois". Say it once.
+        aria-label={
+          asset ? withVerdict(label, asset.verdict) : kind === label ? label : `${kind}: ${label}`
+        }
+        title={
+          kind === label
+            ? preview
+              ? `${label} (prévia: clique duas vezes para fixar)`
+              : label
+            : preview
+              ? `${kind} · ${label} (prévia: clique duas vezes para fixar)`
+              : `${kind} · ${label}`
+        }
         draggable
         onDragStart={(event) => {
           if (assetId) event.dataTransfer.setData("text/asset-id", assetId);
@@ -166,6 +178,14 @@ function Tab({
         ) : (
           <LayoutGrid className="size-3.5 shrink-0 text-subtle" />
         )}
+        {/* Above 860px there is room to say what kind of view this is; below it
+            the strip budget belongs to the view's own name. A view tab is named
+            after its kind, so printing both would read "Antes e depois" twice. */}
+        {kind !== label ? (
+          <span className={cn("hidden shrink-0 text-xs text-subtle min-[860px]:inline")}>
+            {kind}
+          </span>
+        ) : null}
         <span className={cn("truncate", preview && "italic")}>{label}</span>
       </button>
       {closable ? (

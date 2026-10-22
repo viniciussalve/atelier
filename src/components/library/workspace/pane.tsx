@@ -2,9 +2,11 @@ import { Columns2, Equal, MoreHorizontal, PanelLeft, Rows2, Sparkles, X } from "
 import { useShallow } from "zustand/react/shallow";
 import { Collection } from "@/components/library/browser/collection";
 import { AssetTab } from "@/components/library/specimen/asset-tab";
+import { BeforeAfterView } from "@/components/library/views/before-after-view";
+import { DesignSystemView } from "@/components/library/views/design-system-view";
 import { buildAiLink } from "@/components/library/shared/ai-link";
 import { copyText } from "@/components/library/shared/copy";
-import { viewKindLabel } from "@/components/library/shared/labels";
+import { VIEW_KIND_LABEL, viewKindLabel } from "@/components/library/shared/labels";
 import { isMacPlatform } from "@/components/library/shared/use-media-query";
 import { useTabLabel } from "@/components/library/shared/use-tab-label";
 import {
@@ -22,11 +24,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { IconButton } from "@/components/ui/icon-button";
-import { closeWholePane, equalizeAll, focus, split } from "@/lib/library/commands";
+import { closeWholePane, equalizeAll, focus, openView, split } from "@/lib/library/commands";
 import { usePane, useRoomToSplit } from "@/lib/library/hooks";
 import { shortcutLabel } from "@/lib/library/shortcuts";
 import { useWorkspace } from "@/lib/library/workspace";
-import { MAX_PANES, assetIdOf, orderedPanes, type SyncKey } from "@/lib/library/workspace-model";
+import {
+  MAX_PANES,
+  VIEW_KINDS,
+  assetIdOf,
+  orderedPanes,
+  viewKindOf,
+  type SyncKey,
+} from "@/lib/library/workspace-model";
 import { DropOverlay } from "./drop-overlay";
 import { TabStrip } from "./tab-strip";
 
@@ -47,6 +56,7 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
   const roomDown = useRoomToSplit(paneId, "bottom");
   if (!pane) return null;
   const assetId = assetIdOf(pane.active);
+  const viewKind = viewKindOf(pane.active);
   const mac = isMacPlatform();
   const full = paneCount >= MAX_PANES;
 
@@ -94,7 +104,15 @@ export function PaneView({ paneId, onOpenNav }: { paneId: string; onOpenNav: () 
         </div>
       </header>
       <div className="relative min-h-0 flex-1">
-        {assetId ? <AssetTab paneId={paneId} assetId={assetId} /> : <Collection paneId={paneId} />}
+        {viewKind === "antes-depois" ? (
+          <BeforeAfterView paneId={paneId} />
+        ) : viewKind === "sistema" ? (
+          <DesignSystemView />
+        ) : assetId ? (
+          <AssetTab paneId={paneId} assetId={assetId} />
+        ) : (
+          <Collection paneId={paneId} />
+        )}
         <DropOverlay paneId={paneId} />
       </div>
     </section>
@@ -141,6 +159,17 @@ function PaneMenu({ paneId, paneCount }: { paneId: string; paneCount: number }) 
               >
                 {option.label}
               </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Abrir vista</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuLabel>No lugar do item</DropdownMenuLabel>
+            {VIEW_KINDS.map((kind) => (
+              <DropdownMenuItem key={kind} onSelect={() => openView(kind, paneId)}>
+                {VIEW_KIND_LABEL[kind]}
+              </DropdownMenuItem>
             ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>

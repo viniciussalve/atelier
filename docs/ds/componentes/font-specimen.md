@@ -44,6 +44,7 @@ The character set, grouped, in cells big enough to judge each glyph.
 ## Telas onde aparece
 
 - Provas: `src/components/library/specimen/asset-tab.tsx`
+- Outro: `src/components/library/views/before-after-view.tsx`
 
 ## Quando usar
 

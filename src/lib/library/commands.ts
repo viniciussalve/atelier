@@ -28,7 +28,9 @@ import {
   replaceTab,
   roomForItems,
   splitPane,
+  viewKey,
   type TabKey,
+  type ViewKind,
 } from "./workspace-model.ts";
 
 export type OpenMode = "preview" | "pin" | "side";
@@ -54,6 +56,20 @@ export function openItem(assetId: string, mode: OpenMode, paneId?: string) {
     const target = paneId && state.panes[paneId] ? paneId : state.activePaneId;
     if (mode === "side" && ws().canSplit) return openToSide(state, target, key, roomFor(true));
     return openTab(state, target, key, { preview: mode === "preview" });
+  });
+}
+
+/**
+ * Opens a view as pane content (article 2165): activates it when the pane
+ * already has that tab, otherwise adds it. Views are tabs, not pages, so the
+ * shell keeps its panes and the back button is not involved.
+ */
+export function openView(kind: ViewKind, paneId?: string) {
+  const key = viewKey(kind);
+  ws().update((state) => {
+    const target = paneId && state.panes[paneId] ? paneId : state.activePaneId;
+    if (state.panes[target]?.tabs.includes(key)) return activateTab(state, target, key);
+    return openTab(state, target, key, { preview: false });
   });
 }
 

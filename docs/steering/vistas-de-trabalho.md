@@ -13,12 +13,16 @@ do `react-resizable-panels` e a coluna do inspetor continuam como estão.
 
 As quatro vistas que valem implementar:
 
-| Vista | Responde |
-| --- | --- |
-| Diagrama | O que o agente pretende fazer, antes de gastar token |
-| Passo a passo | Em que estágio do diagrama estamos, com o trecho em destaque |
-| Antes e depois | A mudança de UI se explica sem ler código |
-| Sistema de design ao vivo | "Qual padding?" a um olhar de distância |
+| Vista | Responde | Estado no Atelier |
+| --- | --- | --- |
+| Diagrama | O que o agente pretende fazer, antes de gastar token | ainda sem dados |
+| Passo a passo | Em que estágio do diagrama estamos, com o trecho em destaque | ainda sem dados |
+| Antes e depois | A mudança de UI se explica sem ler código | **no painel**: item atual contra o padrão |
+| Sistema de design ao vivo | "Qual padding?" a um olhar de distância | **no painel**: os mesmos tokens da rota |
+
+Diagrama e passo a passo não existem porque não há o que desenhar: o Atelier ainda
+não produz plano nem saída de agente. Uma vista vazia seria a mentira que esta regra
+existe para impedir — elas entram quando houver dados, não antes.
 
 Uma vista pode fixar uma captura para mostrar progresso de relance. Caixas do
 diagrama que apontam para arquivo abrem o arquivo ao clicar.

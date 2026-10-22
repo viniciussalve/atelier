@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { overallScore } from "./criteria.ts";
 import { migrateLibrary } from "./migrate.ts";
+import { DEFAULT_PANE_SETTINGS, sanitizeWorkspace } from "./workspace-model.ts";
 import { DEFAULT_PREVIEW } from "./preview.ts";
 import { defaultLibrary, seedAssets, seedFolders } from "./seed.ts";
 
@@ -153,5 +154,30 @@ describe("seeds", () => {
     assert.deepEqual([...verdicts].sort(), ["", "evitar", "revisar", "usar"]);
     assert.ok(seedAssets.some((item) => !item.verdict && Object.keys(item.criteria).length > 0));
     assert.ok(seedAssets.some((item) => Object.keys(item.criteria).length === 0));
+  });
+});
+
+
+describe("workspace persistence across tabs kinds", () => {
+  const stored = (tabs: string[], active: string) => ({
+    root: { type: "pane", id: "pane-1" },
+    panes: {
+      "pane-1": { id: "pane-1", tabs, active, preview: null, settings: DEFAULT_PANE_SETTINGS },
+    },
+    activePaneId: "pane-1",
+  });
+
+  it("opens a stored workspace that already has a view tab", () => {
+    const ws = sanitizeWorkspace(stored(["collection", "vista:sistema"], "vista:sistema"));
+    assert.ok(ws);
+    assert.deepEqual(ws.panes["pane-1"].tabs, ["collection", "vista:sistema"]);
+    assert.equal(ws.panes["pane-1"].active, "vista:sistema");
+  });
+
+  it("tolerates a kind this build does not know instead of losing the pane", () => {
+    const ws = sanitizeWorkspace(stored(["collection", "vista:passo-a-passo"], "vista:passo-a-passo"));
+    assert.ok(ws);
+    assert.deepEqual(ws.panes["pane-1"].tabs, ["collection"]);
+    assert.equal(ws.panes["pane-1"].active, "collection");
   });
 });

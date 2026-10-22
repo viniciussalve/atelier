@@ -53,3 +53,17 @@ endpoint and no component renders suggestions; the only trace is
 **Scope when picked up:** only if Atelier starts rendering agent work. The rule in
 `docs/steering/revelar-o-processo.md` stays as written, with a note added by B3 saying
 it has no applicable surface today.
+
+## 2026-10-22 — Diagram and stepped walkthrough deferred out of B1
+
+Human decision at B1 step-01: ship only the two views Atelier has data for
+(`antes e depois`, `sistema de design`). These two are deferred because
+**sem dados no Atelier ainda**:
+
+- **Diagrama** — there is no plan model, no agent output, nothing to draw. A pane
+  would render invented boxes.
+- **Passo a passo** — there are no stages to step through; it depends on the diagram.
+
+**Resume when:** Atelier gains a plan/diagram model (e.g. an agent proposes a change
+set). Both are already named in `docs/steering/vistas-de-trabalho.md`, which now marks
+them as lacking data.

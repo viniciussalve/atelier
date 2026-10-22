@@ -28,6 +28,9 @@ import {
   replaceTab,
   roomForItems,
   sanitizeWorkspace,
+  isTabKey,
+  viewKey,
+  viewKindOf,
   LEGACY_SAMPLE_TEXTS,
   splitPane,
   type Workspace,
@@ -583,5 +586,79 @@ describe("keepPanes", () => {
     const ws = splitPane(createWorkspace(), "pane-1", "right");
     const state = { "pane-1": 1, "pane-2": 2 };
     assert.equal(keepPanes(state, ws.panes), state);
+  });
+});
+
+
+describe("view kinds", () => {
+  it("accepts only the view kinds that exist", () => {
+    assert.equal(isTabKey("vista:antes-depois"), true);
+    assert.equal(isTabKey("vista:sistema"), true);
+    assert.equal(isTabKey("vista:diagrama"), false);
+    assert.equal(isTabKey("vista:"), false);
+    assert.equal(isTabKey("vista:antes-depois-x"), false);
+  });
+
+  it("round-trips the kind", () => {
+    assert.equal(viewKindOf(viewKey("sistema")), "sistema");
+    assert.equal(viewKindOf(viewKey("antes-depois")), "antes-depois");
+    assert.equal(viewKindOf("collection"), null);
+    assert.equal(viewKindOf(a), null);
+  });
+
+  it("keeps a stored view tab on load", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["collection", viewKey("antes-depois")],
+          active: viewKey("antes-depois"),
+          preview: null,
+          settings: DEFAULT_PANE_SETTINGS,
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.deepEqual(ws.panes["pane-1"].tabs, ["collection", "vista:antes-depois"]);
+    assert.equal(ws.panes["pane-1"].active, "vista:antes-depois");
+  });
+
+  it("drops an unknown view kind and keeps the rest of the pane", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["collection", "vista:diagrama"],
+          active: "vista:diagrama",
+          preview: null,
+          settings: DEFAULT_PANE_SETTINGS,
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.deepEqual(ws.panes["pane-1"].tabs, ["collection"]);
+    assert.equal(ws.panes["pane-1"].active, "collection");
+  });
+
+  it("falls back to the collection when every stored tab is unknown", () => {
+    const ws = sanitizeWorkspace({
+      root: { type: "pane", id: "pane-1" },
+      panes: {
+        "pane-1": {
+          id: "pane-1",
+          tabs: ["vista:diagrama", "vista:passo-a-passo"],
+          active: "vista:diagrama",
+          preview: null,
+          settings: DEFAULT_PANE_SETTINGS,
+        },
+      },
+      activePaneId: "pane-1",
+    });
+    assert.ok(ws);
+    assert.deepEqual(ws.panes["pane-1"].tabs, ["collection"]);
   });
 });

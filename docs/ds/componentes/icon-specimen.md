@@ -35,6 +35,7 @@ An icon set's proof, one tab at a time: samples, sizes, or the set in use.
 ## Telas onde aparece
 
 - Provas: `src/components/library/specimen/asset-tab.tsx`
+- Outro: `src/components/library/views/before-after-view.tsx`
 
 ## Quando usar
 
