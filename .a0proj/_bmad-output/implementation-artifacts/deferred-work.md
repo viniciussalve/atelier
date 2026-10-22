@@ -15,3 +15,41 @@ Deferred from `spec-atelier-steering-layer.md` at step-01 multi-goal split. Huma
 **Coupling note:** plan B only after Goal A merges, so the B spec cites `AGENTS.md` and `docs/steering/*` instead of re-deriving the rules. Article 2146's lesson applies directly — the guardrails shipped in A get exactly one tightening pass driven by B's real usage, then they stop being hypotheses.
 
 **Known context for B:** the shell today is `docs/steering/`-less and `AGENTS.md`-less; Goal A creates both. `npm test` already fails when `docs/ds/` falls behind the code, so any B work touching tokens must run `npm run ds:gerar`.
+
+## Update 2026-10-21 — design-system page is now DRAFTED, not deferred
+
+The live `/design-system` half of article 2164 left Goal A by token-budget split.
+It is no longer loose deferred work: it lives as
+`.a0proj/_bmad-output/implementation-artifacts/spec-atelier-design-system-page.md`
+with `status: draft`, awaiting CHECKPOINT 1 approval.
+
+Pick it up **before Goal B** (it gives B a live reference to build against) or
+after, human's choice. This entry stays only to record that ordering choice is open.
+
+## 2026-10-21 — B1 and B2 split out of Goal B (human decision, step-01)
+
+Goal B was split at step-01. **B3 (visible interface reformulation)** proceeds now as
+`spec-atelier-interface-reformulation.md`. The two below are follow-ups.
+
+### B1 — View types as pane content (article 2165, binding (b))
+
+**Why deferred:** the locked scope said "keep the shell, add view types", but
+`src/lib/library/workspace-model.ts:49` defines
+`TabKey = "collection" | \`asset:${id}\`` and `:118` validates with
+`value === "collection" || /^asset:.+/`. A fourth kind cannot exist without editing
+that file. "Keep the shell, add views" is structurally "keep the shell, edit the model".
+
+**Scope when picked up:** minimal `TabKey` extension (new kind + validator + migration
+tolerance in `migrateWorkspace`), no layout or `MAX_PANES` change. Then the four view
+types from `docs/steering/vistas-de-trabalho.md` as pane content: diagram, stepped
+walkthrough, before/after review, live design system.
+
+### B2 — Process disclosure (article 2142, binding (c))
+
+**Why deferred:** Atelier has no agent-run surface. `/api/parecidas` is a server/MCP
+endpoint and no component renders suggestions; the only trace is
+`import-dialog.tsx:148` ("Adicionar sugestões"). There is nothing to disclose.
+
+**Scope when picked up:** only if Atelier starts rendering agent work. The rule in
+`docs/steering/revelar-o-processo.md` stays as written, with a note added by B3 saying
+it has no applicable surface today.
